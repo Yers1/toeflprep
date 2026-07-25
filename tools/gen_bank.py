@@ -73,7 +73,7 @@ def call_llm(key, provider, prompt, max_tokens=3000):
         req = urllib.request.Request(
             "https://api.openai.com/v1/chat/completions",
             data=json.dumps({
-                "model": "gpt-4o-mini",
+                "model": os.environ.get("TP_MODEL", "gpt-4o-mini"),  # дешевле: gpt-4.1-nano
                 "messages": [{"role": "user", "content": prompt}],
                 "response_format": {"type": "json_object"},
             }).encode(),
