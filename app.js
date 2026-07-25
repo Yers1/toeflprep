@@ -46,17 +46,20 @@ function getSettings() {
 async function callLLM(prompt) {
   const s = getSettings();
   if (!s.key) throw new Error('нет API-ключа — введите в настройках выше');
-  if (s.provider === 'openai') {
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+  if (s.provider === 'openai' || s.provider === 'deepseek') {
+    const url = s.provider === 'deepseek'
+      ? 'https://api.deepseek.com/v1/chat/completions'
+      : 'https://api.openai.com/v1/chat/completions';
+    const r = await fetch(url, {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: 'Bearer ' + s.key },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: s.provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini',
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
       }),
     });
-    if (!r.ok) throw new Error('OpenAI ' + r.status);
+    if (!r.ok) throw new Error(s.provider + ' ' + r.status);
     const j = await r.json();
     return j.choices[0].message.content;
   }

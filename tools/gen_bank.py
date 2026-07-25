@@ -69,11 +69,13 @@ def extract_json(raw):
 
 
 def call_llm(key, provider, prompt, max_tokens=3000):
-    if provider == "openai":
+    if provider in ("openai", "deepseek"):
+        url = "https://api.deepseek.com/v1/chat/completions" if provider == "deepseek" else "https://api.openai.com/v1/chat/completions"
+        default_model = "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini"  # дешевле: gpt-4.1-nano
         req = urllib.request.Request(
-            "https://api.openai.com/v1/chat/completions",
+            url,
             data=json.dumps({
-                "model": os.environ.get("TP_MODEL", "gpt-4o-mini"),  # дешевле: gpt-4.1-nano
+                "model": os.environ.get("TP_MODEL", default_model),
                 "messages": [{"role": "user", "content": prompt}],
                 "response_format": {"type": "json_object"},
             }).encode(),
@@ -95,7 +97,7 @@ def call_llm(key, provider, prompt, max_tokens=3000):
         )
     with urllib.request.urlopen(req, timeout=90) as r:
         j = json.load(r)
-    if provider == "openai":
+    if provider != "anthropic":
         return j["choices"][0]["message"]["content"]
     return "".join(b.get("text", "") for b in j["content"])
 
@@ -126,7 +128,7 @@ def main():
     ap.add_argument("--task", choices=sorted(TASKS))
     ap.add_argument("--count", type=int, default=5)
     ap.add_argument("--provider", default=os.environ.get("TP_PROVIDER", "anthropic"))
-    ap.add_argument("--key", default=os.environ.get("TP_KEY") or os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY"))
+    ap.add_argument("--key", default=os.environ.get("TP_KEY") or os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY") or os.environ.get("DEEPSEEK_API_KEY"))
     ap.add_argument("--out", default=None)
     ap.add_argument("--min-score", type=int, default=8)
     ap.add_argument("--demo", action="store_true")
