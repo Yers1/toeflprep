@@ -46,15 +46,19 @@ function getSettings() {
 async function callLLM(prompt) {
   const s = getSettings();
   if (!s.key) throw new Error('нет API-ключа — введите в настройках выше');
-  if (s.provider === 'openai' || s.provider === 'deepseek') {
-    const url = s.provider === 'deepseek'
-      ? 'https://api.deepseek.com/v1/chat/completions'
-      : 'https://api.openai.com/v1/chat/completions';
-    const r = await fetch(url, {
+  const OPENAI_COMPAT = {
+    openai:   { url: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini' },
+    deepseek: { url: 'https://api.deepseek.com/v1/chat/completions', model: 'deepseek-chat' },
+    gemini:   { url: 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions', model: 'gemini-2.5-flash' },
+    github:   { url: 'https://models.github.ai/inference/chat/completions', model: 'openai/gpt-4o-mini' },
+  };
+  const p = OPENAI_COMPAT[s.provider];
+  if (p) {
+    const r = await fetch(p.url, {
       method: 'POST',
       headers: { 'content-type': 'application/json', authorization: 'Bearer ' + s.key },
       body: JSON.stringify({
-        model: s.provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini',
+        model: p.model,
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
       }),

@@ -68,10 +68,18 @@ def extract_json(raw):
     return json.loads(m.group(0))
 
 
+# OpenAI-совместимые провайдеры: (url, модель по умолчанию)
+OPENAI_COMPAT = {
+    "openai": ("https://api.openai.com/v1/chat/completions", "gpt-4o-mini"),  # дешевле: gpt-4.1-nano
+    "deepseek": ("https://api.deepseek.com/v1/chat/completions", "deepseek-chat"),
+    "gemini": ("https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "gemini-2.5-flash"),  # free tier
+    "github": ("https://models.github.ai/inference/chat/completions", "openai/gpt-4o-mini"),  # бесплатно по GitHub-токену
+}
+
+
 def call_llm(key, provider, prompt, max_tokens=3000):
-    if provider in ("openai", "deepseek"):
-        url = "https://api.deepseek.com/v1/chat/completions" if provider == "deepseek" else "https://api.openai.com/v1/chat/completions"
-        default_model = "deepseek-chat" if provider == "deepseek" else "gpt-4o-mini"  # дешевле: gpt-4.1-nano
+    if provider in OPENAI_COMPAT:
+        url, default_model = OPENAI_COMPAT[provider]
         req = urllib.request.Request(
             url,
             data=json.dumps({
@@ -128,7 +136,7 @@ def main():
     ap.add_argument("--task", choices=sorted(TASKS))
     ap.add_argument("--count", type=int, default=5)
     ap.add_argument("--provider", default=os.environ.get("TP_PROVIDER", "anthropic"))
-    ap.add_argument("--key", default=os.environ.get("TP_KEY") or os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY") or os.environ.get("DEEPSEEK_API_KEY"))
+    ap.add_argument("--key", default=os.environ.get("TP_KEY") or os.environ.get("ANTHROPIC_API_KEY") or os.environ.get("OPENAI_API_KEY") or os.environ.get("DEEPSEEK_API_KEY") or os.environ.get("GEMINI_API_KEY") or os.environ.get("GITHUB_TOKEN"))
     ap.add_argument("--out", default=None)
     ap.add_argument("--min-score", type=int, default=8)
     ap.add_argument("--demo", action="store_true")
