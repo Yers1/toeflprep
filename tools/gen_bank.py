@@ -48,6 +48,15 @@ TASKS = {
             '{"items":[{"sentence":"..."}]}'
         ),
     },
+    "reading_words": {
+        "prompt": (
+            "Create {n} original items for the NEW TOEFL iBT (2026 format) Reading task "
+            "'Complete the Words' (student reads a sentence and types one missing word). "
+            "Each item: one sentence with one word replaced by blanks (e.g. 'b___f' for 'brief'), "
+            "the full correct word, and a short synonym clue. Return STRICT JSON: "
+            '{"items":[{"sentence":"The professor asked for a b___f summary.","word":"brief","clue":"short"}]}'
+        ),
+    },
 }
 
 

@@ -46,6 +46,13 @@ const FALLBACK = {
     { sentence: 'The new cafeteria offers cheaper meals than the one near the dormitory.' },
     { sentence: 'If it rains tomorrow, the football match will be moved indoors.' },
   ],
+  reading_words: [
+    { sentence: 'The professor asked for a b___f summary of the main arguments.', word: 'brief', clue: 'short' },
+    { sentence: 'Students must _b_id_ by the university code of conduct.', word: 'abide', clue: 'follow' },
+    { sentence: 'The lecture was so _b_or_ that half the class fell asleep.', word: 'boring', clue: 'not interesting' },
+    { sentence: 'She needed to _r_vis_ her essay before the deadline.', word: 'revise', clue: 'edit' },
+    { sentence: 'The library has a strict _si_en_e policy during exam week.', word: 'silence', clue: 'no noise' },
+  ],
 };
 
 const BANK = {};
@@ -237,6 +244,7 @@ function initInterview() {
     $('live').textContent = '';
     $('feedback').innerHTML = '';
     $('gradeBtn').disabled = true;
+    startTimer('interview');
   };
   $('recBtn').onclick = () => {
     if (recording) { stopRec(); return; }
@@ -295,9 +303,11 @@ function initRepeat() {
   $('repRec').onclick = () => {
     if (!repItem) return;
     if (recording) { stopRec(); return; }
+    startTimer('repeat');
     const ok = startRec(
       (text) => { $('repLive').textContent = text; },
       (text) => {
+        stopTimer();
         $('repRec').textContent = '● Повторить';
         $('repTimer').textContent = '';
         scoreRepeat(repItem.sentence, text);
@@ -339,6 +349,8 @@ function initEmail() {
       '<b>Ситуация:</b> ' + emItem.scenario + '<br><b>Кому:</b> ' + emItem.recipient +
       '<br><b>Нужно покрыть:</b> ' + emItem.points.join(' · ');
     $('emFb').innerHTML = '';
+    $('emText').value = '';
+    startTimer('email');
   };
   $('emGrade').onclick = async () => {
     if (!emItem) return;
@@ -377,6 +389,7 @@ function initSentence() {
   $('bsNew').onclick = () => {
     bsItem = pick(BANK.writing_sentence);
     bsPicked = [];
+    startTimer('sentence');
     const words = bsItem.sentence.replace(/[.!?]+$/, '').split(/\s+/);
     let shuffled = words.slice();
     do {
@@ -413,6 +426,53 @@ function initSentence() {
   };
 }
 
+// ================= Таймеры =================
+// ponytail: лимиты ETS 2026 приблизительные (сверить с официальной спецификацией).
+const MODE_LIMITS = {
+  interview: 45,
+  repeat: 15,
+  email: 600,
+  sentence: 120,
+  words: 60,
+};
+
+let timerId = null, timerLeft = 0, timerMode = null;
+
+function startTimer(mode) {
+  stopTimer();
+  timerMode = mode;
+  timerLeft = MODE_LIMITS[mode] || 0;
+  const bar = $('timer-bar');
+  bar.style.display = 'flex';
+  bar.className = '';
+  $('timer-task').textContent = mode === 'interview' ? 'Ответ (45 сек)' :
+    mode === 'repeat' ? 'Повтор (15 сек)' :
+    mode === 'email' ? 'Письмо (10 мин)' :
+    mode === 'sentence' ? 'Предложение (2 мин)' :
+    mode === 'words' ? 'Слово (1 мин)' : 'Таймер';
+  updateTimerDisplay();
+  if (timerLeft > 0) {
+    timerId = setInterval(() => {
+      timerLeft--;
+      updateTimerDisplay();
+      if (timerLeft <= 0) stopTimer();
+    }, 1000);
+  }
+}
+
+function stopTimer() {
+  if (timerId) { clearInterval(timerId); timerId = null; }
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerLeft / 60);
+  const s = timerLeft % 60;
+  $('timer-count').textContent = timerLeft ? (m ? m + ':' + String(s).padStart(2, '0') : s + ' сек') : 'время вышло';
+  const bar = $('timer-bar');
+  bar.classList.toggle('warn', timerLeft > 0 && timerLeft <= 10 && MODE_LIMITS[timerMode] <= 60);
+  bar.classList.toggle('danger', timerLeft === 0);
+}
+
 function renderBsAnswer() {
   const box = $('bsAnswer');
   box.innerHTML = '';
@@ -427,6 +487,32 @@ function renderBsAnswer() {
     };
     box.appendChild(b);
   });
+}
+
+// ================= Режим 5: Complete the Words =================
+let cwItem = null;
+
+function initWords() {
+  $('cwNew').onclick = () => {
+    cwItem = pick(BANK.reading_words);
+    $('cwSentence').textContent = cwItem.sentence + ' (' + cwItem.clue + ')';
+    $('cwInput').value = '';
+    $('cwResult').innerHTML = '';
+    $('cwInput').focus();
+    startTimer('words');
+  };
+  $('cwCheck').onclick = () => {
+    if (!cwItem) return;
+    const val = $('cwInput').value.trim().toLowerCase();
+    const ok = val === cwItem.word.toLowerCase();
+    $('cwResult').innerHTML = ok
+      ? '<p class="ok">Верно! ' + cwItem.word + '</p>'
+      : '<p class="bad">Неверно.</p><p><b>Правильно:</b> ' + cwItem.word + '</p>';
+    stopTimer();
+    saveHistory({ mode: 'words', score: ok ? '✓' : '✗', detail: cwItem.word });
+    renderHistory();
+  };
+  $('cwInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('cwCheck').click(); });
 }
 
 // ================= Запуск =================
@@ -445,6 +531,8 @@ function init() {
       b.classList.add('active');
       document.querySelectorAll('main > section').forEach((s) => { s.style.display = 'none'; });
       $('mode-' + b.dataset.mode).style.display = 'block';
+      stopTimer();
+      $('timer-bar').style.display = 'none';
     };
   });
 
@@ -452,6 +540,7 @@ function init() {
   initRepeat();
   initEmail();
   initSentence();
+  initWords();
   renderHistory();
 }
 

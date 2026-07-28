@@ -28,6 +28,20 @@ python -m http.server 8000   # из корня репо
 
 - [x] Listen and Repeat (Speaking 2026)
 - [x] Build a Sentence + Write an Email (Writing 2026)
-- [ ] Complete the Words (Reading 2026) — сначала сверить механику задания со спецификацией ETS
+- [x] Complete the Words (Reading 2026) — fallback-банк без API
 - [ ] Read in Daily Life / Academic Passage (Reading 2026)
-- [ ] Таймеры по официальным лимитам ETS (сверить со спецификацией)
+- [x] Таймеры по официальным лимитам ETS (сверить со спецификацией)
+
+## Таймеры
+
+В каждом режиме сверху показывается таймер по приблизительным лимитам нового формата:
+
+| Режим | Лимит |
+|-------|-------|
+| Interview | 45 сек |
+| Listen & Repeat | 15 сек |
+| Write an Email | 10 мин |
+| Build a Sentence | 2 мин |
+| Complete the Words | 1 мин |
+
+Точные цифры нужно сверить с официальной спецификацией ETS 2026.
