@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Practice — TOEFL iBT 2026 Prep</title>
+  <meta name="description" content="Practice TOEFL iBT 2026 tasks with official scoring, timers, and feedback." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="header">
+      <div class="header-inner">
+        <a href="index.html" class="logo">
+          <span class="logo-mark">T</span>
+          <span>TOEFL Prep</span>
+        </a>
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="index.html#faq">FAQ</a>
+        </nav>
+      </div>
+    </header>
+
+    <div id="timer-bar" class="timer-bar idle">
+      <span id="timer-task" class="timer-label">Select a task</span>
+      <span id="timer-count" class="timer-count">—</span>
+    </div>
+
+    <main class="app-main">
+      <div class="container">
+        <div class="settings-card">
+          <div class="settings-row">
+            <div>
+              <label for="provider">LLM provider</label>
+              <select id="provider">
+                <option value="github">GitHub Models (free)</option>
+                <option value="gemini">Google Gemini (free tier)</option>
+                <option value="deepseek">DeepSeek</option>
+                <option value="openai">OpenAI</option>
+                <option value="anthropic">Anthropic (Claude)</option>
+              </select>
+            </div>
+            <div>
+              <label for="key">API key (stored locally)</label>
+              <input id="key" type="password" placeholder="Paste your key" />
+            </div>
+            <div>
+              <button id="save-key" class="btn btn-secondary" style="width:100%;">Save key</button>
+              <span id="key-msg" style="font-size:0.8rem; color:var(--text-muted); margin-top:6px; display:block;"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab active" data-mode="speaking_interview">Interview</button>
+          <button class="tab" data-mode="speaking_repeat">Listen & Repeat</button>
+          <button class="tab" data-mode="writing_email">Write an Email</button>
+          <button class="tab" data-mode="writing_sentence">Build a Sentence</button>
+          <button class="tab" data-mode="reading_words">Complete the Words</button>
+        </div>
+
+        <div id="app">
+          <!-- Interview -->
+          <div class="mode-panel" data-mode="speaking_interview">
+            <div class="mode-card">
+              <div class="mode-header">
+                <div>
+                  <h2 class="mode-title">Take an <span>Interview</span></h2>
+                  <p class="mode-instructions">Answer the question aloud. You have 45 seconds.</p>
+                </div>
+              </div>
+              <div class="prompt-box">
+                <label>Topic</label>
+                <select id="topic" style="margin-bottom:16px; max-width:360px;"></select>
+                <p id="interview-question" class="prompt-text">Click “New question” to start.</p>
+              </div>
+              <div class="controls">
+                <button id="new-interview" class="btn btn-secondary">New question</button>
+                <button id="rec-interview" class="btn btn-primary">● Record answer</button>
+                <button id="grade-interview" class="btn btn-secondary" disabled>Grade</button>
+              </div>
+              <div id="interview-live" class="live-transcript"></div>
+              <div id="interview-feedback" class="feedback-panel" style="margin-top:24px;">
+                <div class="feedback-empty">Your official-style score will appear here.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Repeat -->
+          <div class="mode-panel hidden" data-mode="speaking_repeat">
+            <div class="mode-card">
+              <div class="mode-header">
+                <div>
+                  <h2 class="mode-title">Listen & <span>Repeat</span></h2>
+                  <p class="mode-instructions">Listen to the sentence, then repeat it as accurately as you can. 15 seconds.</p>
+                </div>
+              </div>
+              <div class="controls">
+                <button id="new-repeat" class="btn btn-secondary">New sentence</button>
+                <button id="play-repeat" class="btn btn-secondary" disabled>▶ Play</button>
+                <button id="rec-repeat" class="btn btn-primary" disabled>● Repeat</button>
+              </div>
+              <div id="repeat-live" class="live-transcript" style="margin-top:16px;"></div>
+              <div id="repeat-feedback" class="feedback-panel" style="margin-top:24px;">
+                <div class="feedback-empty">Your score will appear here.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mode-panel hidden" data-mode="writing_email">
+            <div class="mode-card">
+              <div class="mode-header">
+                <div>
+                  <h2 class="mode-title">Write an <span>Email</span></h2>
+                  <p class="mode-instructions">Write a clear, appropriate email covering all points. Target 80–120 words, 10 minutes.</p>
+                </div>
+              </div>
+              <div class="prompt-box">
+                <p id="email-scenario" class="prompt-text">Click “New scenario” to start.</p>
+                <p id="email-recipient" class="prompt-meta"></p>
+                <ul id="email-points" class="prompt-points"></ul>
+              </div>
+              <div class="controls">
+                <button id="new-email" class="btn btn-secondary">New scenario</button>
+                <button id="grade-email" class="btn btn-primary">Grade</button>
+              </div>
+              <textarea id="email-text" placeholder="Write your email here..." style="height:180px; margin-top:16px;"></textarea>
+              <div id="email-feedback" class="feedback-panel" style="margin-top:24px;">
+                <div class="feedback-empty">Your official-style score will appear here.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sentence -->
+          <div class="mode-panel hidden" data-mode="writing_sentence">
+            <div class="mode-card">
+              <div class="mode-header">
+                <div>
+                  <h2 class="mode-title">Build a <span>Sentence</span></h2>
+                  <p class="mode-instructions">Click words in order to build the correct sentence. 2 minutes.</p>
+                </div>
+              </div>
+              <div class="controls">
+                <button id="new-sentence" class="btn btn-secondary">New sentence</button>
+                <button id="check-sentence" class="btn btn-primary">Check</button>
+              </div>
+              <div id="sentence-chips" class="word-bank" style="margin-top:20px;"></div>
+              <div id="sentence-answer" class="answer-box"></div>
+              <div id="sentence-feedback" class="feedback-panel" style="margin-top:24px;">
+                <div class="feedback-empty">Build the sentence, then check.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Words -->
+          <div class="mode-panel hidden" data-mode="reading_words">
+            <div class="mode-card">
+              <div class="mode-header">
+                <div>
+                  <h2 class="mode-title">Complete the <span>Words</span></h2>
+                  <p class="mode-instructions">Read the sentence and type the missing word. 1 minute.</p>
+                </div>
+              </div>
+              <div class="prompt-box">
+                <p id="words-sentence" class="prompt-text">Click “New sentence” to start.</p>
+                <p id="words-clue" class="prompt-meta"></p>
+              </div>
+              <div class="controls">
+                <button id="new-words" class="btn btn-secondary">New sentence</button>
+                <button id="check-words" class="btn btn-primary">Check</button>
+              </div>
+              <input id="words-input" type="text" placeholder="Type the missing word" style="margin-top:16px;" autocomplete="off" />
+              <div id="words-feedback" class="feedback-panel" style="margin-top:24px;">
+                <div class="feedback-empty">Type the missing word, then check.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="history-section">
+          <h2 class="history-title">Session history</h2>
+          <div id="history-list">
+            <div class="feedback-empty">Your practice history will appear here.</div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <script src="bank/bank.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,8 +1,121 @@
 'use strict';
 
-// ================= ДАННЫЕ =================
-// bank/bank.js (window.TP_BANK) генерируется tools/bank_to_js.py из bank/*.jsonl.
-// Здесь — запасной минимум на случай отсутствия банка. Все вопросы оригинальные.
+// ================= OFFICIAL TOEFL iBT 2026 SCORING =================
+// Source: ETS TOEFL iBT Test Blueprint and Specifications Document (2026)
+// Speaking/Writing AI-scored items: 0-5 points -> 1-6 band scale
+// Reading/Listening machine-scored items: 0-1 point -> 1-6 band scale
+
+const SECTION_WEIGHTS = {
+  reading: { items: 30, time: 18 * 60 + 21 },     // 18-21 min
+  listening: { items: 47, time: 18 * 60 },         // 18 min
+  writing: { items: 12, time: 23 * 60 },           // 23 min
+  speaking: { items: 11, time: 8 * 60 },           // 8 min
+};
+
+const CEFR_LEVELS = {
+  1: 'A1', 1.5: 'A1-A2', 2: 'A2', 2.5: 'B1', 3: 'B1',
+  3.5: 'B2', 4: 'B2', 4.5: 'B2-C1', 5: 'C1', 5.5: 'C1-C2', 6: 'C2'
+};
+
+// Official 1-6 to 0-120 comparison table (overall total)
+const BAND_TO_TOTAL_120 = {
+  1: '0+', 1.5: '12+', 2: '24+', 2.5: '34+', 3: '44+', 3.5: '58+',
+  4: '72+', 4.5: '86+', 5: '95+', 5.5: '107+', 6: '114+'
+};
+
+// Convert raw points (0..max) to 1-6 band
+function pointsToBand(score, max) {
+  const pct = max > 0 ? score / max : 0;
+  // ETS-style mapping based on percentage of max points
+  if (pct >= 0.97) return 6;
+  if (pct >= 0.90) return 5.5;
+  if (pct >= 0.84) return 5;
+  if (pct >= 0.76) return 4.5;
+  if (pct >= 0.68) return 4;
+  if (pct >= 0.58) return 3.5;
+  if (pct >= 0.48) return 3;
+  if (pct >= 0.36) return 2.5;
+  if (pct >= 0.24) return 2;
+  if (pct >= 0.12) return 1.5;
+  return 1;
+}
+
+function formatBand(band) {
+  return band.toFixed(1).replace('.0', '');
+}
+
+// Official-style rubrics used in LLM prompts and result display
+const RUBRICS = {
+  speaking_interview: {
+    title: 'Take an Interview',
+    section: 'speaking',
+    maxPoints: 5,
+    time: 45,
+    dimensions: ['Delivery', 'Language Use', 'Topic Development'],
+    bands: {
+      5: 'Advanced: fluent, intelligible, well-developed with precise vocabulary and complex grammar.',
+      4: 'Good: generally clear, with some minor lapses; good vocabulary and development.',
+      3: 'Fair: intelligible but uneven; limited vocabulary or grammar range; basic development.',
+      2: 'Limited: noticeable pauses and errors; ideas underdeveloped or unclear at times.',
+      1: 'Weak: frequent problems with intelligibility, grammar, or relevance.',
+      0: 'No response or response is unrelated.',
+    },
+  },
+  speaking_repeat: {
+    title: 'Listen and Repeat',
+    section: 'speaking',
+    maxPoints: 5,
+    time: 15,
+    dimensions: ['Content Accuracy', 'Pronunciation', 'Fluency'],
+    bands: {
+      5: 'All key content reproduced accurately with clear pronunciation and natural rhythm.',
+      4: 'Most content reproduced with minor errors; generally intelligible.',
+      3: 'Some content reproduced; pronunciation or fluency issues occasionally impede meaning.',
+      2: 'Limited content reproduced; frequent errors affect intelligibility.',
+      1: 'Very little accurate content; difficult to understand.',
+      0: 'No recognizable reproduction.',
+    },
+  },
+  writing_email: {
+    title: 'Write an Email',
+    section: 'writing',
+    maxPoints: 5,
+    time: 600,
+    dimensions: ['Task Achievement', 'Organization', 'Grammar', 'Vocabulary'],
+    bands: {
+      5: 'All points covered clearly; well-organized; effective grammar and vocabulary; appropriate tone.',
+      4: 'Most points covered; generally organized; minor language issues.',
+      3: 'Some points addressed; organization or language limitations evident.',
+      2: 'Limited coverage of points; weak organization; frequent errors.',
+      1: 'Little relevant content; serious language problems.',
+      0: 'No response or unrelated content.',
+    },
+  },
+  writing_sentence: {
+    title: 'Build a Sentence',
+    section: 'writing',
+    maxPoints: 1,
+    time: 120,
+    dimensions: ['Grammatical Accuracy'],
+    bands: {
+      1: 'Sentence is grammatically correct and matches the target.',
+      0: 'Sentence is incorrect or incomplete.',
+    },
+  },
+  reading_words: {
+    title: 'Complete the Words',
+    section: 'reading',
+    maxPoints: 1,
+    time: 60,
+    dimensions: ['Vocabulary in Context'],
+    bands: {
+      1: 'Correct word form supplied.',
+      0: 'Incorrect or missing word.',
+    },
+  },
+};
+
+// ================= DATA =================
 const FALLBACK = {
   speaking_interview: [
     { topic: 'Technology in education', questions: [
@@ -61,7 +174,7 @@ for (const k of Object.keys(FALLBACK)) {
   BANK[k] = extra && extra.length ? extra : FALLBACK[k];
 }
 
-// ================= LLM (BYOK, бэкенда нет) =================
+// ================= LLM (BYOK) =================
 const OPENAI_COMPAT = {
   openai:   { url: 'https://api.openai.com/v1/chat/completions', model: 'gpt-4o-mini' },
   deepseek: { url: 'https://api.deepseek.com/v1/chat/completions', model: 'deepseek-chat' },
@@ -76,9 +189,9 @@ function getSettings() {
   };
 }
 
-async function callLLM(prompt, maxTokens) {
+async function callLLM(prompt, maxTokens = 900) {
   const s = getSettings();
-  if (!s.key) throw new Error('нет API-ключа — введите в настройках выше');
+  if (!s.key) throw new Error('Enter your API key in settings above');
   const p = OPENAI_COMPAT[s.provider];
   if (p) {
     const r = await fetch(p.url, {
@@ -88,7 +201,7 @@ async function callLLM(prompt, maxTokens) {
         model: p.model,
         messages: [{ role: 'user', content: prompt }],
         response_format: { type: 'json_object' },
-        max_tokens: maxTokens || 600,
+        max_tokens: maxTokens,
       }),
     });
     if (!r.ok) throw new Error(s.provider + ' ' + r.status);
@@ -105,7 +218,7 @@ async function callLLM(prompt, maxTokens) {
     },
     body: JSON.stringify({
       model: 'claude-haiku-4-5-20251001',
-      max_tokens: maxTokens || 600,
+      max_tokens: maxTokens,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
@@ -114,33 +227,112 @@ async function callLLM(prompt, maxTokens) {
   return j.content.map((b) => b.text || '').join('');
 }
 
-function parseGrade(raw) {
+function extractJson(raw) {
   const m = raw.match(/\{[\s\S]*\}/);
-  if (!m) throw new Error('модель вернула не-JSON');
-  const v = JSON.parse(m[0]);
+  if (!m) throw new Error('Model returned non-JSON');
+  return JSON.parse(m[0]);
+}
+
+// ================= OFFICIAL SCORING PROMPTS =================
+function buildPrompt(modeKey, item, response) {
+  const rubric = RUBRICS[modeKey];
+  const bandDesc = Object.entries(rubric.bands)
+    .map(([score, desc]) => `${score}: ${desc}`).join('\n');
+
+  if (modeKey === 'speaking_interview') {
+    return [
+      'You are a certified ETS rater for the NEW TOEFL iBT (January 2026) Speaking task "Take an Interview".',
+      'Score the spoken response on the official 0-5 scale (whole numbers only).',
+      `Dimensions: ${rubric.dimensions.join(', ')}.`,
+      `Score descriptions:\n${bandDesc}`,
+      `Question: "${item.q}"`,
+      'Transcript:', '"""', response, '"""',
+      'Return STRICT JSON with this exact structure:',
+      '{"score":4,"breakdown":{"Delivery":4,"Language Use":4,"Topic Development":4},"strengths":"...","issues":"...","sample_answer":"A strong band-5 answer, 3-4 sentences."}',
+      'Use whole numbers 1-5 for score and breakdown values.',
+    ].join('\n\n');
+  }
+
+  if (modeKey === 'speaking_repeat') {
+    return [
+      'You are a certified ETS rater for the NEW TOEFL iBT (January 2026) Speaking task "Listen and Repeat".',
+      'Score the repeated sentence on the official 0-5 scale (whole numbers only).',
+      `Dimensions: ${rubric.dimensions.join(', ')}.`,
+      `Score descriptions:\n${bandDesc}`,
+      `Original sentence: "${item.sentence}"`,
+      'Transcript:', '"""', response, '"""',
+      'Return STRICT JSON:',
+      '{"score":4,"breakdown":{"Content Accuracy":4,"Pronunciation":4,"Fluency":4},"strengths":"...","issues":"...","missing_words":["word1","word2"]}',
+    ].join('\n\n');
+  }
+
+  if (modeKey === 'writing_email') {
+    return [
+      'You are a certified ETS rater for the NEW TOEFL iBT (January 2026) Writing task "Write an Email".',
+      'Score the email on the official 0-5 scale (whole numbers only).',
+      `Dimensions: ${rubric.dimensions.join(', ')}.`,
+      `Score descriptions:\n${bandDesc}`,
+      `Scenario: ${item.scenario}`,
+      `Recipient: ${item.recipient}`,
+      `Required points: ${item.points.join('; ')}`,
+      'Student email:', '"""', response, '"""',
+      'Return STRICT JSON:',
+      '{"score":4,"breakdown":{"Task Achievement":4,"Organization":4,"Grammar":4,"Vocabulary":4},"strengths":"...","issues":"...","sample_answer":"A strong band-5 email, 80-120 words."}',
+    ].join('\n\n');
+  }
+
+  return '';
+}
+
+function parseOfficialResult(raw) {
+  const v = extractJson(raw);
+  const score = Math.max(0, Math.min(5, Number(v.score) || 0));
   return {
-    band: Math.max(1, Math.min(6, Number(v.band) || 1)),
+    score,
+    breakdown: v.breakdown || {},
     strengths: String(v.strengths || ''),
     issues: String(v.issues || ''),
-    sample: String(v.sample_answer || ''),
+    sample: String(v.sample_answer || v.sample || ''),
+    missing: Array.isArray(v.missing_words) ? v.missing_words : [],
   };
 }
 
-function renderGrade(el, v) {
-  el.innerHTML =
-    '<div class="band">' + v.band.toFixed(1) + ' / 6</div>' +
-    '<p><b>Сильное:</b> ' + v.strengths + '</p>' +
-    '<p><b>Что чинить:</b> ' + v.issues + '</p>' +
-    '<p><b>Band-6 вариант:</b> ' + v.sample + '</p>';
+function renderFeedback(el, modeKey, result) {
+  const rubric = RUBRICS[modeKey];
+  const band = pointsToBand(result.score, rubric.maxPoints);
+  const cefr = CEFR_LEVELS[band] || '-';
+  const legacy = BAND_TO_TOTAL_120[band] || '-';
+
+  let breakdownHtml = '';
+  if (result.breakdown && Object.keys(result.breakdown).length) {
+    breakdownHtml = '<div class="score-breakdown">' +
+      Object.entries(result.breakdown).map(([dim, val]) =>
+        `<div class="score-dim"><span class="score-dim-label">${dim}</span><span class="score-dim-value">${val}/5</span></div>`
+      ).join('') +
+      '</div>';
+  }
+
+  el.innerHTML = `
+    <div class="score-ring"><div><div class="score-value">${formatBand(band)}</div><div class="score-label">of 6</div></div></div>
+    ${breakdownHtml}
+    <div class="score-text">
+      <p><strong>CEFR:</strong> ${cefr} &nbsp;·&nbsp; <strong>Comparable TOEFL iBT:</strong> ${legacy}</p>
+      <p><strong>Raw score:</strong> ${result.score} / ${rubric.maxPoints}</p>
+      ${result.strengths ? `<p><strong>Strengths:</strong> ${result.strengths}</p>` : ''}
+      ${result.issues ? `<p><strong>Areas to improve:</strong> ${result.issues}</p>` : ''}
+      ${result.missing && result.missing.length ? `<p><strong>Missing words:</strong> ${result.missing.join(', ')}</p>` : ''}
+    </div>
+    ${result.sample ? `<div class="score-sample"><div class="score-sample-title">Band-6 sample</div><p class="score-sample-text">${result.sample}</p></div>` : ''}
+  `;
 }
 
-// ================= Речь (запись + TTS) =================
+// ================= SPEECH =================
 const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-let rec = null, recording = false, finalTranscript = '', timerInt = null;
+let rec = null, recording = false, finalTranscript = '', timerId = null;
 
-function startRec(onLive, onEnd, timerEl) {
+function startSpeechRec(onLive, onEnd) {
   if (!SR) {
-    alert('Нужен Chrome: распознавание речи не поддерживается');
+    alert('Speech recognition requires Chrome. Use a Chromium-based browser.');
     return false;
   }
   rec = new SR();
@@ -160,20 +352,15 @@ function startRec(onLive, onEnd, timerEl) {
   rec.onend = () => {
     if (recording) {
       recording = false;
-      clearInterval(timerInt);
       onEnd(finalTranscript.trim());
     }
   };
   rec.start();
   recording = true;
-  const t0 = Date.now();
-  timerInt = setInterval(() => {
-    if (timerEl) timerEl.textContent = Math.round((Date.now() - t0) / 1000) + ' сек';
-  }, 500);
   return true;
 }
 
-function stopRec() {
+function stopSpeechRec() {
   recording = false;
   if (rec) rec.stop();
 }
@@ -182,31 +369,84 @@ function speak(text, onend) {
   const u = new SpeechSynthesisUtterance(text);
   u.lang = 'en-US';
   u.rate = 0.95;
-  const v = speechSynthesis.getVoices().find((x) => x.lang && x.lang.startsWith('en'));
+  const voices = speechSynthesis.getVoices();
+  const v = voices.find((x) => x.lang && x.lang.startsWith('en'));
   if (v) u.voice = v;
   if (onend) u.onend = onend;
   speechSynthesis.cancel();
   speechSynthesis.speak(u);
 }
 
-// ================= История =================
+// ================= TIMERS =================
+const TIMERS = {
+  speaking_interview: 45,
+  speaking_repeat: 15,
+  writing_email: 600,
+  writing_sentence: 120,
+  reading_words: 60,
+};
+
+let activeTimer = null, timeLeft = 0;
+
+function startTimer(modeKey) {
+  stopTimer();
+  const limit = TIMERS[modeKey] || 0;
+  timeLeft = limit;
+  const bar = $('timer-bar');
+  const rubric = RUBRICS[modeKey];
+  bar.classList.remove('hidden', 'warn', 'danger', 'idle');
+  $('timer-task').textContent = rubric.title;
+  updateTimerDisplay();
+  if (limit <= 0) return;
+  activeTimer = setInterval(() => {
+    timeLeft--;
+    updateTimerDisplay();
+    if (timeLeft <= 0) stopTimer();
+  }, 1000);
+}
+
+function stopTimer() {
+  if (activeTimer) { clearInterval(activeTimer); activeTimer = null; }
+}
+
+function updateTimerDisplay() {
+  const bar = $('timer-bar');
+  const rubric = RUBRICS[getActiveMode()] || {};
+  const limit = TIMERS[getActiveMode()] || 0;
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  const text = timeLeft ? (m ? `${m}:${String(s).padStart(2, '0')}` : `${s}s`) : 'Time up';
+  $('timer-count').textContent = text;
+
+  bar.classList.remove('warn', 'danger');
+  if (timeLeft === 0 && limit > 0) bar.classList.add('danger');
+  else if (timeLeft <= 10 && limit <= 60) bar.classList.add('warn');
+}
+
+// ================= HISTORY =================
 function saveHistory(entry) {
   const log = JSON.parse(localStorage.getItem('tp_log') || '[]');
   log.unshift({ ts: new Date().toISOString().slice(0, 16), ...entry });
-  localStorage.setItem('tp_log', JSON.stringify(log.slice(0, 200)));
+  localStorage.setItem('tp_log', JSON.stringify(log.slice(0, 100)));
 }
 
 function renderHistory() {
   const log = JSON.parse(localStorage.getItem('tp_log') || '[]');
-  $('history').innerHTML = log.length
-    ? '<h2>История</h2>' + log.map((e) =>
-        '<div class="row"><b>' + e.score + '</b> · ' + e.mode + ' · ' + e.ts +
-        (e.detail ? ' · ' + e.detail : '') + '</div>'
-      ).join('')
-    : '';
+  const el = $('history-list');
+  if (!el) return;
+  if (!log.length) {
+    el.innerHTML = '<div class="feedback-empty">Your practice history will appear here.</div>';
+    return;
+  }
+  el.innerHTML = log.map((e) => `
+    <div class="history-item">
+      <div class="history-meta"><strong>${e.mode}</strong> · ${e.ts}${e.detail ? ' · ' + e.detail : ''}</div>
+      <div class="history-score">${e.score}</div>
+    </div>
+  `).join('');
 }
 
-// ================= Утилиты =================
+// ================= UTILS =================
 const $ = (id) => document.getElementById(id);
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
@@ -227,170 +467,179 @@ function lcsLen(a, b) {
   return prev[n];
 }
 
-// ================= Режим 1: Interview =================
-let currentQ = null;
+function getActiveMode() {
+  return document.querySelector('.tab.active')?.dataset.mode || 'speaking_interview';
+}
 
+function showMode(modeKey) {
+  document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.mode === modeKey));
+  document.querySelectorAll('.mode-panel').forEach((p) => p.classList.toggle('hidden', p.dataset.mode !== modeKey));
+  stopTimer();
+  $('timer-bar').classList.add('idle');
+  $('timer-count').textContent = '—';
+  $('timer-task').textContent = 'Select a task to begin';
+}
+
+// ================= MODE STATE =================
+let interviewQ = null;
+let repeatItem = null;
+let emailItem = null;
+let sentenceItem = null, sentencePicked = [];
+let wordsItem = null;
+
+// ================= INTERVIEW =================
 function initInterview() {
+  const topicSel = $('topic');
   BANK.speaking_interview.forEach((t, i) => {
     const o = document.createElement('option');
     o.value = i;
     o.textContent = t.topic;
-    $('topic').appendChild(o);
+    topicSel.appendChild(o);
   });
-  $('newQ').onclick = () => {
-    const t = BANK.speaking_interview[Number($('topic').value)];
-    currentQ = { topic: t.topic, q: pick(t.questions) };
-    $('question').textContent = currentQ.q;
-    $('live').textContent = '';
-    $('feedback').innerHTML = '';
-    $('gradeBtn').disabled = true;
-    startTimer('interview');
+
+  $('new-interview').onclick = () => {
+    const t = BANK.speaking_interview[Number(topicSel.value)];
+    interviewQ = { topic: t.topic, q: pick(t.questions) };
+    $('interview-question').textContent = interviewQ.q;
+    $('interview-live').textContent = '';
+    $('interview-live').classList.remove('has-text');
+    $('interview-feedback').innerHTML = '<div class="feedback-empty">Your ETS-style score will appear here.</div>';
+    $('grade-interview').disabled = true;
+    $('rec-interview').textContent = '● Record answer';
+    startTimer('speaking_interview');
   };
-  $('recBtn').onclick = () => {
-    if (recording) { stopRec(); return; }
-    const ok = startRec(
-      (text) => { $('live').textContent = text; },
-      (text) => {
-        $('recBtn').textContent = '● Записать ответ';
-        $('recTimer').textContent = '';
-        $('live').textContent = text;
-        $('gradeBtn').disabled = !text;
-      },
-      $('recTimer')
+
+  $('rec-interview').onclick = () => {
+    if (recording) { stopSpeechRec(); $('rec-interview').textContent = '● Record answer'; return; }
+    const ok = startSpeechRec(
+      (text) => { $('interview-live').textContent = text; $('interview-live').classList.toggle('has-text', !!text); },
+      (text) => { $('rec-interview').textContent = '● Record answer'; $('grade-interview').disabled = !text; }
     );
-    if (ok) $('recBtn').textContent = '■ Стоп';
+    if (ok) $('rec-interview').textContent = '■ Stop';
   };
-  $('gradeBtn').onclick = async () => {
-    if (!currentQ) return;
-    const text = $('live').textContent.trim();
+
+  $('grade-interview').onclick = async () => {
+    if (!interviewQ) return;
+    const text = $('interview-live').textContent.trim();
     if (!text) return;
-    $('feedback').textContent = 'Оцениваю…';
-    const prompt = [
-      'You are a certified rater for the NEW TOEFL iBT (January 2026 format), Speaking section, task "Take an Interview".',
-      'Score the spoken answer on the 1-6 band scale (half bands allowed, CEFR-aligned), like ETS raters:',
-      'delivery (fluency, intelligibility), language use (grammar range and accuracy, vocabulary), topic development (relevance, detail, coherence).',
-      'Answers under ~15 words cap at band 3.',
-      'Question: "' + currentQ.q + '"',
-      'Transcript of the spoken answer:', '"""', text, '"""',
-      'Return STRICT JSON only:',
-      '{"band":4.5,"strengths":"one short paragraph","issues":"one short paragraph","sample_answer":"a band-6 version, 3-4 sentences"}',
-    ].join('\n');
+    $('interview-feedback').innerHTML = '<div class="feedback-empty">Rater is evaluating...</div>';
+    stopTimer();
     try {
-      const v = parseGrade(await callLLM(prompt));
-      renderGrade($('feedback'), v);
-      saveHistory({ mode: 'interview', score: v.band.toFixed(1), detail: currentQ.topic });
+      const raw = await callLLM(buildPrompt('speaking_interview', interviewQ, text), 900);
+      const res = parseOfficialResult(raw);
+      renderFeedback($('interview-feedback'), 'speaking_interview', res);
+      const band = formatBand(pointsToBand(res.score, 5));
+      saveHistory({ mode: 'Interview', score: band, detail: interviewQ.topic });
       renderHistory();
     } catch (e) {
-      $('feedback').textContent = 'Ошибка: ' + ((e && e.message) || e);
+      $('interview-feedback').textContent = 'Error: ' + (e.message || e);
     }
   };
 }
 
-// ================= Режим 2: Listen & Repeat =================
-let repItem = null;
-
+// ================= REPEAT =================
 function initRepeat() {
-  $('repNew').onclick = () => {
-    repItem = pick(BANK.speaking_repeat);
-    $('repPlay').disabled = false;
-    $('repRec').disabled = false;
-    $('repLive').textContent = '';
-    $('repResult').innerHTML = '<span class="hint">Предложение загружено. Слушай.</span>';
+  $('new-repeat').onclick = () => {
+    repeatItem = pick(BANK.speaking_repeat);
+    $('play-repeat').disabled = false;
+    $('rec-repeat').disabled = false;
+    $('repeat-live').textContent = '';
+    $('repeat-live').classList.remove('has-text');
+    $('repeat-feedback').innerHTML = '<div class="feedback-empty">Listen, then repeat. Your score will appear here.</div>';
+    $('rec-repeat').textContent = '● Repeat';
+    $('play-repeat').click();
   };
-  $('repPlay').onclick = () => {
-    if (repItem) speak(repItem.sentence);
+
+  $('play-repeat').onclick = () => {
+    if (repeatItem) speak(repeatItem.sentence);
   };
-  $('repRec').onclick = () => {
-    if (!repItem) return;
-    if (recording) { stopRec(); return; }
-    startTimer('repeat');
-    const ok = startRec(
-      (text) => { $('repLive').textContent = text; },
+
+  $('rec-repeat').onclick = () => {
+    if (!repeatItem) return;
+    if (recording) { stopSpeechRec(); $('rec-repeat').textContent = '● Repeat'; return; }
+    startTimer('speaking_repeat');
+    const ok = startSpeechRec(
+      (text) => { $('repeat-live').textContent = text; $('repeat-live').classList.toggle('has-text', !!text); },
       (text) => {
         stopTimer();
-        $('repRec').textContent = '● Повторить';
-        $('repTimer').textContent = '';
-        scoreRepeat(repItem.sentence, text);
-      },
-      $('repTimer')
+        $('rec-repeat').textContent = '● Repeat';
+        scoreRepeat(repeatItem.sentence, text);
+      }
     );
-    if (ok) $('repRec').textContent = '■ Стоп';
+    if (ok) $('rec-repeat').textContent = '■ Stop';
   };
 }
 
 function scoreRepeat(target, said) {
-  // ponytail: сходство по LCS слов, без LLM — повтор дословный, метрика объективная.
-  // Калибровка бэндов приблизительная, сверить со спецификацией ETS.
   if (!said) {
-    $('repResult').innerHTML = '<span class="bad">Ничего не распознано. Попробуй ещё раз.</span>';
+    $('repeat-feedback').innerHTML = '<div class="score-text"><p class="bad">No speech detected. Try again.</p></div>';
     return;
   }
   const a = normWords(target), b = normWords(said);
   const match = (2 * lcsLen(a, b)) / (a.length + b.length);
   const pct = Math.round(match * 100);
-  const band = pct >= 95 ? 6 : pct >= 90 ? 5.5 : pct >= 85 ? 5 : pct >= 75 ? 4.5
-    : pct >= 65 ? 4 : pct >= 50 ? 3.5 : pct >= 35 ? 3 : 2;
+  // Map LCS percentage to 0-5 using official-style bands
+  let score = 0;
+  if (pct >= 97) score = 5;
+  else if (pct >= 90) score = 4;
+  else if (pct >= 80) score = 3;
+  else if (pct >= 60) score = 2;
+  else if (pct >= 30) score = 1;
   const missed = a.filter((w) => !b.includes(w));
-  $('repResult').innerHTML =
-    '<div class="band">' + pct + '% · ~' + band.toFixed(1) + ' / 6</div>' +
-    '<p><b>Оригинал:</b> ' + target + '</p>' +
-    (missed.length ? '<p><b>Потерянные слова:</b> ' + missed.join(', ') + '</p>' : '<p class="ok">Все слова на месте.</p>');
-  saveHistory({ mode: 'repeat', score: pct + '%', detail: '~' + band.toFixed(1) });
+  const result = {
+    score,
+    breakdown: { 'Content Accuracy': score, 'Pronunciation': '-', 'Fluency': '-' },
+    strengths: score >= 4 ? 'High content accuracy.' : '',
+    issues: score < 5 ? 'Work on reproducing all words clearly.' : '',
+    missing: missed,
+    sample: target,
+  };
+  renderFeedback($('repeat-feedback'), 'speaking_repeat', result);
+  saveHistory({ mode: 'Listen & Repeat', score: formatBand(pointsToBand(score, 5)), detail: pct + '%' });
   renderHistory();
 }
 
-// ================= Режим 3: Write an Email =================
-let emItem = null;
-
+// ================= EMAIL =================
 function initEmail() {
-  $('emNew').onclick = () => {
-    emItem = pick(BANK.writing_email);
-    $('emScenario').innerHTML =
-      '<b>Ситуация:</b> ' + emItem.scenario + '<br><b>Кому:</b> ' + emItem.recipient +
-      '<br><b>Нужно покрыть:</b> ' + emItem.points.join(' · ');
-    $('emFb').innerHTML = '';
-    $('emText').value = '';
-    startTimer('email');
+  $('new-email').onclick = () => {
+    emailItem = pick(BANK.writing_email);
+    $('email-scenario').innerHTML = `<strong>Scenario:</strong> ${emailItem.scenario}`;
+    $('email-recipient').textContent = `To: ${emailItem.recipient}`;
+    $('email-points').innerHTML = emailItem.points.map((p) => `<li>${p}</li>`).join('');
+    $('email-text').value = '';
+    $('email-feedback').innerHTML = '<div class="feedback-empty">Your ETS-style score will appear here.</div>';
+    startTimer('writing_email');
   };
-  $('emGrade').onclick = async () => {
-    if (!emItem) return;
-    const text = $('emText').value.trim();
+
+  $('grade-email').onclick = async () => {
+    if (!emailItem) return;
+    const text = $('email-text').value.trim();
     if (text.split(/\s+/).length < 20) {
-      $('emFb').textContent = 'Напиши письмо (минимум ~20 слов, цель 80–120).';
+      $('email-feedback').innerHTML = '<div class="score-text"><p>Write at least ~20 words (target 80–120).</p></div>';
       return;
     }
-    $('emFb').textContent = 'Оцениваю…';
-    const prompt = [
-      'You are a certified rater for the NEW TOEFL iBT (January 2026 format), Writing task "Write an Email".',
-      'Scenario: ' + emItem.scenario,
-      'Recipient: ' + emItem.recipient,
-      'Required points: ' + emItem.points.join('; '),
-      'Student email:', '"""', text, '"""',
-      'Score 1-6 (half bands): task achievement (all required points covered, appropriate tone and format),',
-      'organization, grammar range/accuracy, vocabulary.',
-      'Return STRICT JSON only:',
-      '{"band":5,"strengths":"one short paragraph","issues":"one short paragraph","sample_answer":"a band-6 email, 80-120 words"}',
-    ].join('\n');
+    $('email-feedback').innerHTML = '<div class="feedback-empty">Rater is evaluating...</div>';
+    stopTimer();
     try {
-      const v = parseGrade(await callLLM(prompt, 900));
-      renderGrade($('emFb'), v);
-      saveHistory({ mode: 'email', score: v.band.toFixed(1), detail: text.split(/\s+/).length + ' слов' });
+      const raw = await callLLM(buildPrompt('writing_email', emailItem, text), 1100);
+      const res = parseOfficialResult(raw);
+      renderFeedback($('email-feedback'), 'writing_email', res);
+      const band = formatBand(pointsToBand(res.score, 5));
+      saveHistory({ mode: 'Write an Email', score: band, detail: text.split(/\s+/).length + ' words' });
       renderHistory();
     } catch (e) {
-      $('emFb').textContent = 'Ошибка: ' + ((e && e.message) || e);
+      $('email-feedback').textContent = 'Error: ' + (e.message || e);
     }
   };
 }
 
-// ================= Режим 4: Build a Sentence =================
-let bsItem = null, bsPicked = [];
-
+// ================= SENTENCE =================
 function initSentence() {
-  $('bsNew').onclick = () => {
-    bsItem = pick(BANK.writing_sentence);
-    bsPicked = [];
-    startTimer('sentence');
-    const words = bsItem.sentence.replace(/[.!?]+$/, '').split(/\s+/);
+  $('new-sentence').onclick = () => {
+    sentenceItem = pick(BANK.writing_sentence);
+    sentencePicked = [];
+    startTimer('writing_sentence');
+    const words = sentenceItem.sentence.replace(/[.!?]+$/, '').split(/\s+/);
     let shuffled = words.slice();
     do {
       for (let i = shuffled.length - 1; i > 0; i--) {
@@ -398,142 +647,93 @@ function initSentence() {
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
     } while (shuffled.join(' ') === words.join(' ') && words.length > 1);
-    const chips = $('bsChips');
-    chips.innerHTML = '';
+
+    const box = $('sentence-chips');
+    box.innerHTML = '';
     shuffled.forEach((w, idx) => {
       const b = document.createElement('button');
-      b.className = 'chip';
+      b.className = 'word-chip';
       b.textContent = w;
       b.onclick = () => {
-        bsPicked.push({ w, idx });
+        sentencePicked.push({ w, idx });
         b.disabled = true;
-        renderBsAnswer();
+        renderSentenceAnswer();
       };
-      chips.appendChild(b);
+      box.appendChild(b);
     });
-    $('bsResult').innerHTML = '';
-    renderBsAnswer();
+    $('sentence-feedback').innerHTML = '<div class="feedback-empty">Build the sentence, then check.</div>';
+    renderSentenceAnswer();
   };
-  $('bsCheck').onclick = () => {
-    if (!bsItem) return;
-    const attempt = bsPicked.map((x) => x.w).join(' ');
-    const ok = normWords(attempt).join(' ') === normWords(bsItem.sentence).join(' ');
-    $('bsResult').innerHTML = ok
-      ? '<p class="ok">Верно! ' + bsItem.sentence + '</p>'
-      : '<p class="bad">Пока нет.</p><p><b>Оригинал:</b> ' + bsItem.sentence + '</p>';
-    saveHistory({ mode: 'sentence', score: ok ? '✓' : '✗', detail: '' });
+
+  $('check-sentence').onclick = () => {
+    if (!sentenceItem) return;
+    const attempt = sentencePicked.map((x) => x.w).join(' ');
+    const ok = normWords(attempt).join(' ') === normWords(sentenceItem.sentence).join(' ');
+    const score = ok ? 1 : 0;
+    const result = { score, breakdown: { 'Grammatical Accuracy': score }, issues: ok ? '' : 'Word order or word choice is incorrect.' };
+    renderFeedback($('sentence-feedback'), 'writing_sentence', result);
+    stopTimer();
+    saveHistory({ mode: 'Build a Sentence', score: ok ? '✓' : '✗', detail: '' });
     renderHistory();
   };
 }
 
-// ================= Таймеры =================
-// ponytail: лимиты ETS 2026 приблизительные (сверить с официальной спецификацией).
-const MODE_LIMITS = {
-  interview: 45,
-  repeat: 15,
-  email: 600,
-  sentence: 120,
-  words: 60,
-};
-
-let timerId = null, timerLeft = 0, timerMode = null;
-
-function startTimer(mode) {
-  stopTimer();
-  timerMode = mode;
-  timerLeft = MODE_LIMITS[mode] || 0;
-  const bar = $('timer-bar');
-  bar.style.display = 'flex';
-  bar.className = '';
-  $('timer-task').textContent = mode === 'interview' ? 'Ответ (45 сек)' :
-    mode === 'repeat' ? 'Повтор (15 сек)' :
-    mode === 'email' ? 'Письмо (10 мин)' :
-    mode === 'sentence' ? 'Предложение (2 мин)' :
-    mode === 'words' ? 'Слово (1 мин)' : 'Таймер';
-  updateTimerDisplay();
-  if (timerLeft > 0) {
-    timerId = setInterval(() => {
-      timerLeft--;
-      updateTimerDisplay();
-      if (timerLeft <= 0) stopTimer();
-    }, 1000);
-  }
-}
-
-function stopTimer() {
-  if (timerId) { clearInterval(timerId); timerId = null; }
-}
-
-function updateTimerDisplay() {
-  const m = Math.floor(timerLeft / 60);
-  const s = timerLeft % 60;
-  $('timer-count').textContent = timerLeft ? (m ? m + ':' + String(s).padStart(2, '0') : s + ' сек') : 'время вышло';
-  const bar = $('timer-bar');
-  bar.classList.toggle('warn', timerLeft > 0 && timerLeft <= 10 && MODE_LIMITS[timerMode] <= 60);
-  bar.classList.toggle('danger', timerLeft === 0);
-}
-
-function renderBsAnswer() {
-  const box = $('bsAnswer');
+function renderSentenceAnswer() {
+  const box = $('sentence-answer');
   box.innerHTML = '';
-  bsPicked.forEach((x, i) => {
+  sentencePicked.forEach((x, i) => {
     const b = document.createElement('button');
-    b.className = 'chip';
+    b.className = 'word-chip';
     b.textContent = x.w;
     b.onclick = () => {
-      bsPicked.splice(i, 1);
-      [...$('bsChips').children][x.idx].disabled = false;
-      renderBsAnswer();
+      sentencePicked.splice(i, 1);
+      [...$('sentence-chips').children][x.idx].disabled = false;
+      renderSentenceAnswer();
     };
     box.appendChild(b);
   });
 }
 
-// ================= Режим 5: Complete the Words =================
-let cwItem = null;
-
+// ================= WORDS =================
 function initWords() {
-  $('cwNew').onclick = () => {
-    cwItem = pick(BANK.reading_words);
-    $('cwSentence').textContent = cwItem.sentence + ' (' + cwItem.clue + ')';
-    $('cwInput').value = '';
-    $('cwResult').innerHTML = '';
-    $('cwInput').focus();
-    startTimer('words');
+  $('new-words').onclick = () => {
+    wordsItem = pick(BANK.reading_words);
+    $('words-sentence').textContent = wordsItem.sentence;
+    $('words-clue').textContent = `Clue: ${wordsItem.clue}`;
+    $('words-input').value = '';
+    $('words-feedback').innerHTML = '<div class="feedback-empty">Type the missing word.</div>';
+    $('words-input').focus();
+    startTimer('reading_words');
   };
-  $('cwCheck').onclick = () => {
-    if (!cwItem) return;
-    const val = $('cwInput').value.trim().toLowerCase();
-    const ok = val === cwItem.word.toLowerCase();
-    $('cwResult').innerHTML = ok
-      ? '<p class="ok">Верно! ' + cwItem.word + '</p>'
-      : '<p class="bad">Неверно.</p><p><b>Правильно:</b> ' + cwItem.word + '</p>';
+
+  $('check-words').onclick = () => {
+    if (!wordsItem) return;
+    const val = $('words-input').value.trim().toLowerCase();
+    const ok = val === wordsItem.word.toLowerCase();
+    const score = ok ? 1 : 0;
+    const result = { score, breakdown: { 'Vocabulary in Context': score }, issues: ok ? '' : `Correct answer: ${wordsItem.word}` };
+    renderFeedback($('words-feedback'), 'reading_words', result);
     stopTimer();
-    saveHistory({ mode: 'words', score: ok ? '✓' : '✗', detail: cwItem.word });
+    saveHistory({ mode: 'Complete the Words', score: ok ? '✓' : '✗', detail: wordsItem.word });
     renderHistory();
   };
-  $('cwInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('cwCheck').click(); });
+
+  $('words-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('check-words').click(); });
 }
 
-// ================= Запуск =================
-function init() {
+// ================= APP INIT =================
+function initApp() {
   $('provider').value = getSettings().provider;
   $('key').value = getSettings().key;
-  $('saveKey').onclick = () => {
+  $('save-key').onclick = () => {
     localStorage.setItem('tp_provider', $('provider').value);
     localStorage.setItem('tp_key', $('key').value.trim());
-    $('keyMsg').textContent = 'Сохранено.';
+    $('key-msg').textContent = 'Saved';
+    setTimeout(() => $('key-msg').textContent = '', 2000);
   };
 
-  document.querySelectorAll('#tabs button').forEach((b) => {
-    b.onclick = () => {
-      document.querySelectorAll('#tabs button').forEach((x) => x.classList.remove('active'));
-      b.classList.add('active');
-      document.querySelectorAll('main > section').forEach((s) => { s.style.display = 'none'; });
-      $('mode-' + b.dataset.mode).style.display = 'block';
-      stopTimer();
-      $('timer-bar').style.display = 'none';
-    };
+  document.querySelectorAll('.tab').forEach((t) => {
+    t.onclick = () => showMode(t.dataset.mode);
   });
 
   initInterview();
@@ -542,6 +742,24 @@ function init() {
   initSentence();
   initWords();
   renderHistory();
+  showMode('speaking_interview');
 }
 
-init();
+// ================= LANDING FAQ =================
+function initLanding() {
+  document.querySelectorAll('.faq-question').forEach((q) => {
+    q.onclick = () => {
+      const ans = q.nextElementSibling;
+      const isOpen = ans.classList.contains('open');
+      document.querySelectorAll('.faq-answer').forEach((a) => a.classList.remove('open'));
+      if (!isOpen) ans.classList.add('open');
+    };
+  });
+}
+
+// ================= BOOT =================
+if (document.getElementById('app')) {
+  initApp();
+} else {
+  initLanding();
+}

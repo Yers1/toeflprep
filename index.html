@@ -1,123 +1,196 @@
 <!doctype html>
-<html lang="ru">
+<html lang="en">
 <head>
-<meta charset="utf-8" />
-<title>TOEFL 2026 Prep</title>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  body { max-width: 680px; margin: 24px auto; padding: 0 16px; font: 14px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif; color: #101828; }
-  h1 { font-size: 18px; margin-bottom: 4px; }
-  label { display: block; margin: 8px 0 2px; color: #475467; font-size: 12px; }
-  input, select, textarea { width: 100%; box-sizing: border-box; padding: 6px 8px; border: 1px solid #d0d5dd; border-radius: 8px; font: inherit; }
-  textarea { height: 140px; resize: vertical; }
-  button { margin-top: 8px; padding: 8px 14px; border: 0; border-radius: 8px; background: #1570ef; color: #fff; cursor: pointer; }
-  button:disabled { opacity: 0.4; }
-  button.ghost { background: #eef4ff; color: #1570ef; }
-  #timer-bar { position: sticky; top: 0; z-index: 10; background: #f2f4f7; border-bottom: 1px solid #eaecf0; padding: 8px 16px; margin: 0 -16px 12px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-  #timer-bar.warn { background: #fef3f2; color: #b42318; }
-  #timer-bar.danger { background: #fee4e2; color: #912018; }
-  #tabs { display: flex; gap: 6px; margin: 14px 0; flex-wrap: wrap; }
-  #tabs button { margin: 0; background: #eef4ff; color: #1570ef; }
-  #tabs button.active { background: #1570ef; color: #fff; }
-  .q { font-size: 16px; font-weight: 600; margin: 12px 0 6px; }
-  .live { min-height: 56px; background: #f2f4f7; border-radius: 8px; padding: 10px; margin-top: 8px; white-space: pre-wrap; }
-  .fb { margin-top: 12px; }
-  .band { font-size: 30px; font-weight: 700; color: #1570ef; }
-  .row { font-size: 12px; color: #475467; padding: 4px 0; border-bottom: 1px solid #eaecf0; }
-  .settings { background: #f9fafb; border: 1px solid #eaecf0; border-radius: 12px; padding: 12px; }
-  .hint { font-size: 11px; color: #98a2b3; }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
-  .chip { margin: 0; padding: 6px 10px; background: #eef4ff; color: #101828; border-radius: 16px; font-size: 13px; }
-  .answer { min-height: 44px; border: 1px dashed #98a2b3; border-radius: 8px; padding: 8px; }
-  .ok { color: #1a9c4b; font-weight: 700; }
-  .bad { color: #c43a31; font-weight: 700; }
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TOEFL iBT 2026 Prep — Official-Format Practice</title>
+  <meta name="description" content="Practice the new TOEFL iBT (January 2026) with official task types, ETS-style rubrics, and real-time scoring." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>TOEFL iBT 2026 Prep</h1>
-  <p class="hint">Новый формат (с 21.01.2026). Микрофон работает в Chrome по адресу http://localhost:8000</p>
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark">T</span>
+        <span>TOEFL Prep</span>
+      </a>
+      <nav class="nav">
+        <a href="#modes">Tasks</a>
+        <a href="#scoring">Scoring</a>
+        <a href="#faq">FAQ</a>
+        <a href="app.html" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.85rem;">Start practice</a>
+      </nav>
+    </div>
+  </header>
 
-  <div id="timer-bar" style="display:none">
-    <span id="timer-task">Выбери режим</span>
-    <span id="timer-count">—</span>
-  </div>
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div>
+        <div class="hero-badge">
+          <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;"></span>
+          Updated for the January 2026 test format
+        </div>
+        <h1 class="hero-title">Practice TOEFL iBT <span>the way it is now scored.</span></h1>
+        <p class="hero-desc">Train on the five new task types with official ETS-style rubrics, section timers, and band scoring on the 1–6 scale. No account. Your API key stays in your browser.</p>
+        <div class="hero-cta">
+          <a href="app.html" class="btn btn-primary">Start free practice</a>
+          <a href="#modes" class="btn btn-secondary">See the tasks</a>
+        </div>
+      </div>
+      <div class="hero-card">
+        <div class="hero-card-header">
+          <div class="hero-card-avatar">🎓</div>
+          <div>
+            <h3 class="hero-card-title">New TOEFL iBT score</h3>
+            <p class="hero-card-subtitle">Official 1–6 band scale</p>
+          </div>
+        </div>
+        <div class="score-pill-row">
+          <span class="score-pill">Reading</span>
+          <span class="score-pill">Listening</span>
+          <span class="score-pill">Speaking</span>
+          <span class="score-pill">Writing</span>
+        </div>
+        <div class="score-pill-row">
+          <span class="score-pill warning">1–6 bands</span>
+          <span class="score-pill">CEFR mapped</span>
+        </div>
+        <p style="color:var(--text-secondary); font-size:0.9rem; margin:0;">Scores are computed against official ETS max points per item and converted to the 1–6 scale used on score reports from January 2026.</p>
+      </div>
+    </div>
+  </section>
 
-  <div class="settings">
-    <label>Провайдер</label>
-    <select id="provider">
-      <option value="github">GitHub Models (бесплатно)</option>
-      <option value="gemini">Google Gemini (free tier)</option>
-      <option value="deepseek">DeepSeek</option>
-      <option value="openai">OpenAI</option>
-      <option value="anthropic">Anthropic (Claude)</option>
-    </select>
-    <label>API-ключ (хранится локально в браузере)</label>
-    <input id="key" type="password" placeholder="токен / ключ" />
-    <button id="saveKey">Сохранить</button>
-    <span id="keyMsg" class="hint"></span>
-  </div>
+  <section id="modes" class="section">
+    <div class="container">
+      <h2 class="section-title">Five task types. One real format.</h2>
+      <p class="section-subtitle">Each mode mirrors the task structure, timing, and scoring of the new TOEFL iBT.</p>
+      <div class="modes-list">
+        <div class="mode-row">
+          <div class="mode-row-num">01</div>
+          <div class="mode-row-body">
+            <h3>Take an Interview</h3>
+            <p>Answer four escalating interview questions on everyday or campus topics. Scored on delivery, language use, and topic development.</p>
+          </div>
+          <div class="mode-row-meta">Speaking · 45s</div>
+        </div>
+        <div class="mode-row">
+          <div class="mode-row-num">02</div>
+          <div class="mode-row-body">
+            <h3>Listen and Repeat</h3>
+            <p>Hear a campus-life sentence, repeat it verbatim. Scored on content accuracy, pronunciation, and fluency.</p>
+          </div>
+          <div class="mode-row-meta">Speaking · 15s</div>
+        </div>
+        <div class="mode-row">
+          <div class="mode-row-num">03</div>
+          <div class="mode-row-body">
+            <h3>Write an Email</h3>
+            <p>Respond to a realistic scenario, cover three required points, and use the right tone. Scored on task achievement, organization, grammar, and vocabulary.</p>
+          </div>
+          <div class="mode-row-meta">Writing · 10 min</div>
+        </div>
+        <div class="mode-row">
+          <div class="mode-row-num">04</div>
+          <div class="mode-row-body">
+            <h3>Build a Sentence</h3>
+            <p>Assemble a grammatical sentence from scrambled words. Exact match scoring.</p>
+          </div>
+          <div class="mode-row-meta">Writing · 2 min</div>
+        </div>
+        <div class="mode-row">
+          <div class="mode-row-num">05</div>
+          <div class="mode-row-body">
+            <h3>Complete the Words</h3>
+            <p>Fill in the missing word in a sentence using context and a synonym clue. Exact match scoring.</p>
+          </div>
+          <div class="mode-row-meta">Reading · 1 min</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-  <nav id="tabs">
-    <button data-mode="interview" class="active">Interview</button>
-    <button data-mode="repeat">Listen &amp; Repeat</button>
-    <button data-mode="email">Write an Email</button>
-    <button data-mode="sentence">Build a Sentence</button>
-    <button data-mode="words">Complete the Words</button>
-  </nav>
+  <section id="scoring" class="section" style="background:rgba(30,41,59,0.5);">
+    <div class="container">
+      <h2 class="section-title">Scoring you can trust.</h2>
+      <p class="section-subtitle">We do not invent criteria. Every score is computed from official ETS task specs and converted to the same 1–6 band scale used on real score reports.</p>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-title">Official max points</h3>
+          <p class="feature-desc">Speaking and writing items max out at 5 points; reading and listening items at 1 point — exactly as ETS specifies.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🎯</div>
+          <h3 class="feature-title">Dimension breakdown</h3>
+          <p class="feature-desc">See how you performed on delivery, language use, topic development, task achievement, organization, grammar, and vocabulary.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🌐</div>
+          <h3 class="feature-title">CEFR + 0–120</h3>
+          <p class="feature-desc">Each band maps to a CEFR level and a comparable 0–120 total score, so you know where you stand.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon">🔒</div>
+          <h3 class="feature-title">Your key, your device</h3>
+          <p class="feature-desc">Bring your own LLM key from GitHub Models, Gemini, DeepSeek, OpenAI, or Anthropic. It is stored only in your browser.</p>
+        </div>
+      </div>
 
-  <main>
-    <section id="mode-interview">
-      <label>Тема интервью</label>
-      <select id="topic"></select>
-      <button id="newQ" class="ghost">Новый вопрос</button>
-      <div id="question" class="q">Нажми «Новый вопрос» и отвечай вслух (30–45 сек).</div>
-      <button id="recBtn">● Записать ответ</button>
-      <button id="gradeBtn" disabled>Оценить (1–6)</button>
-      <span id="recTimer" class="hint"></span>
-      <div id="live" class="live"></div>
-      <div id="feedback" class="fb"></div>
-    </section>
+      <h3 style="margin:64px 0 24px; font-size:1.3rem;">What each band means</h3>
+      <div class="score-scale">
+        <div class="scale-card"><div class="scale-card-band">1</div><div class="scale-card-label">Weak</div><div class="scale-card-desc">Limited or unrelated response. A1 CEFR.</div></div>
+        <div class="scale-card"><div class="scale-card-band">2</div><div class="scale-card-label">Limited</div><div class="scale-card-desc">Noticeable problems with language or relevance. A2.</div></div>
+        <div class="scale-card"><div class="scale-card-band">3</div><div class="scale-card-label">Fair</div><div class="scale-card-desc">Intelligible but uneven. Basic development. B1.</div></div>
+        <div class="scale-card"><div class="scale-card-band">4</div><div class="scale-card-label">Good</div><div class="scale-card-desc">Generally clear with minor lapses. B2.</div></div>
+        <div class="scale-card"><div class="scale-card-band">5</div><div class="scale-card-label">Very good</div><div class="scale-card-desc">Well-developed, clear, accurate. C1.</div></div>
+        <div class="scale-card"><div class="scale-card-band">6</div><div class="scale-card-label">Advanced</div><div class="scale-card-desc">Fluent, precise, nuanced. C2.</div></div>
+      </div>
+    </div>
+  </section>
 
-    <section id="mode-repeat" style="display:none">
-      <p class="hint">Слушаешь предложение → повторяешь дословно. Текст скрыт, покажется после попытки.</p>
-      <button id="repNew" class="ghost">Новое предложение</button>
-      <button id="repPlay" disabled>▶ Прослушать</button>
-      <button id="repRec" disabled>● Повторить</button>
-      <span id="repTimer" class="hint"></span>
-      <div id="repLive" class="live"></div>
-      <div id="repResult" class="fb"></div>
-    </section>
+  <section id="faq" class="section">
+    <div class="container">
+      <h2 class="section-title">Questions</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question">Is this an official ETS product?<span>+</span></button>
+          <div class="faq-answer"><div class="faq-answer-inner">No. This is an independent practice tool. Scoring is based on ETS-published specifications and rubrics, but only ETS can issue official scores.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">Why do I need an API key?<span>+</span></button>
+          <div class="faq-answer"><div class="faq-answer-inner">Speaking and writing tasks require evaluating free-form responses. We use your own LLM key (GitHub Models, Gemini, DeepSeek, OpenAI, or Anthropic) so there is no backend cost and your data stays with you.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">Does the microphone work on mobile?<span>+</span></button>
+          <div class="faq-answer"><div class="faq-answer-inner">Speech recognition works best in Chrome, Edge, or Safari on desktop and Android. iOS Safari support varies. For the most reliable experience, use Chrome on a laptop.</div></div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question">Can I practice offline?<span>+</span></button>
+          <div class="faq-answer"><div class="faq-answer-inner">Reading and writing tasks work offline once the page is loaded. Speaking tasks need the browser's speech recognition, which requires a network connection.</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    <section id="mode-email" style="display:none">
-      <button id="emNew" class="ghost">Новый сценарий</button>
-      <div id="emScenario" class="q">Нажми «Новый сценарий».</div>
-      <textarea id="emText" placeholder="Write your email here (80–120 words)..."></textarea>
-      <button id="emGrade">Оценить (1–6)</button>
-      <div id="emFb" class="fb"></div>
-    </section>
+  <section class="section" style="padding-top:0; text-align:center;">
+    <div class="container">
+      <h2 class="section-title" style="margin-bottom:20px;">Ready to practice?</h2>
+      <p class="section-subtitle" style="margin:0 auto 32px;">No signup. Open the app, add your API key, and start with any task.</p>
+      <a href="app.html" class="btn btn-primary" style="font-size:1.1rem; padding:16px 32px;">Open practice app</a>
+    </div>
+  </section>
 
-    <section id="mode-sentence" style="display:none">
-      <p class="hint">Собери грамматичное предложение из слов. Клик — добавить, клик по ответу — убрать.</p>
-      <button id="bsNew" class="ghost">Новое задание</button>
-      <div id="bsChips" class="chips"></div>
-      <div id="bsAnswer" class="answer"></div>
-      <button id="bsCheck">Проверить</button>
-      <div id="bsResult" class="fb"></div>
-    </section>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>© TOEFL Prep 2026. Not affiliated with ETS.</div>
+      <div>Open source · Built for serious learners</div>
+    </div>
+  </footer>
 
-    <section id="mode-words" style="display:none">
-      <p class="hint">Прочитай предложение и вставь пропущенное слово целиком (Reading 2026).</p>
-      <button id="cwNew" class="ghost">Новое предложение</button>
-      <div id="cwSentence" class="q"></div>
-      <input id="cwInput" type="text" placeholder="введи слово" autocomplete="off" />
-      <button id="cwCheck">Проверить</button>
-      <div id="cwResult" class="fb"></div>
-    </section>
-  </main>
-
-  <div id="history"></div>
-
-  <script src="bank/bank.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

@@ -1,47 +1,79 @@
-# toeflprep
+# TOEFL iBT 2026 Prep
 
-Подготовка к **новому TOEFL iBT (формат с 21 января 2026)** — адаптивный тест, шкала 1–6, новые типы заданий.
+Independent practice app for the **new TOEFL iBT format (January 2026)** — adaptive test, 1–6 band scale, new task types.
 
-## Почему новый формат — это окно
+## Why the new format matters
 
-ETS полностью поменял экзамен 21.01.2026: адаптивные Reading/Listening, новые задания (Complete the Words, Listen and Repeat, Take an Interview, Build a Sentence, Write an Email), шкала 1–6 вместо 0–120. Весь старый контент (книги, курсы 2023–2025) устарел — рынок подготовки строится заново.
+ETS changed the exam on 21 January 2026: adaptive Reading/Listening, new tasks (Complete the Words, Listen and Repeat, Take an Interview, Build a Sentence, Write an Email), and a 1–6 scale aligned to CEFR. Older prep content is built for the 0–120 scale and does not match the new tasks.
 
-## Что уже есть
+## Live app
 
-Четыре режима под новый формат:
+https://toeflprep-omega.vercel.app
 
-- **Take an Interview** (Speaking): банк вопросов → запись ответа голосом → LLM оценивает 1–6 как ратер ETS + band-6 образец
-- **Listen and Repeat** (Speaking): TTS озвучивает предложение → повторяешь дословно → объективный скоринг (LCS слов, без LLM)
-- **Write an Email** (Writing): сценарий + получатель + 3 пункта → LLM оценивает 1–6 + band-6 образец
-- **Build a Sentence** (Writing): собираешь предложение из перемешанных слов → точная проверка
+## What you can practice
 
-Банк заданий: фабрика `tools/gen_bank.py` (генерация → LLM-валидация → дедуп) + конвертер `tools/bank_to_js.py` в приложение. Провайдеры: GitHub Models и Gemini (бесплатно), DeepSeek, OpenAI, Anthropic.
+| Task | Section | Official max points | Time limit |
+|------|---------|---------------------|------------|
+| Take an Interview | Speaking | 5 | 45 sec |
+| Listen and Repeat | Speaking | 5 | 15 sec |
+| Write an Email | Writing | 5 | 10 min |
+| Build a Sentence | Writing | 1 | 2 min |
+| Complete the Words | Reading | 1 | 1 min |
 
-## Запуск
+## How scoring works
 
+1. **Raw points** are computed against official ETS max points per item.
+2. **Band 1–6** is derived from the percentage of max points.
+3. **CEFR level** and a **comparable 0–120 total score** are shown for context.
+4. Speaking and writing responses are evaluated by an LLM acting as an ETS rater using official rubric dimensions.
+
+This is not an official ETS score. Only ETS can issue official TOEFL scores.
+
+## Run locally
+
+```bash
+python -m http.server 8000
+# open http://localhost:8000
 ```
-python -m http.server 8000   # из корня репо
-# открыть http://localhost:8000 в Chrome (микрофон требует localhost)
+
+Speech recognition works best in Chrome at `localhost`.
+
+## API key
+
+Speaking and writing tasks need an LLM to evaluate free-form responses. Supported providers:
+
+- GitHub Models (free with GitHub token)
+- Google Gemini (free tier)
+- DeepSeek
+- OpenAI
+- Anthropic (Claude)
+
+Your key is stored only in the browser's `localStorage`.
+
+## Generate more items
+
+```bash
+python tools/gen_bank.py --task speaking_interview --count 5 --key $YOUR_KEY
+python tools/gen_bank.py --task reading_words --count 5 --key $YOUR_KEY
+python tools/bank_to_js.py
 ```
 
-## Дорожная карта
+The app falls back to a built-in bank if `bank/bank.js` is empty.
 
-- [x] Listen and Repeat (Speaking 2026)
-- [x] Build a Sentence + Write an Email (Writing 2026)
-- [x] Complete the Words (Reading 2026) — fallback-банк без API
+## Roadmap
+
+- [x] Take an Interview (Speaking 2026) — ETS rater rubric
+- [x] Listen and Repeat (Speaking 2026) — content + pronunciation dimensions
+- [x] Write an Email (Writing 2026) — task achievement, organization, grammar, vocabulary
+- [x] Build a Sentence (Writing 2026) — exact match
+- [x] Complete the Words (Reading 2026) — exact match
+- [x] Official 1–6 band scale with CEFR mapping
+- [x] Section timers
+- [x] Beautiful landing page and app UI
 - [ ] Read in Daily Life / Academic Passage (Reading 2026)
-- [x] Таймеры по официальным лимитам ETS (сверить со спецификацией)
+- [ ] Listen and Choose a Response / Conversation / Announcement / Academic Talk (Listening 2026)
+- [ ] Write for an Academic Discussion (Writing 2026)
 
-## Таймеры
+## License
 
-В каждом режиме сверху показывается таймер по приблизительным лимитам нового формата:
-
-| Режим | Лимит |
-|-------|-------|
-| Interview | 45 сек |
-| Listen & Repeat | 15 сек |
-| Write an Email | 10 мин |
-| Build a Sentence | 2 мин |
-| Complete the Words | 1 мин |
-
-Точные цифры нужно сверить с официальной спецификацией ETS 2026.
+MIT
