@@ -306,9 +306,11 @@ function renderFeedback(el, modeKey, result) {
   let breakdownHtml = '';
   if (result.breakdown && Object.keys(result.breakdown).length) {
     breakdownHtml = '<div class="score-breakdown">' +
-      Object.entries(result.breakdown).map(([dim, val]) =>
-        `<div class="score-dim"><span class="score-dim-label">${dim}</span><span class="score-dim-value">${val}/5</span></div>`
-      ).join('') +
+      Object.entries(result.breakdown)
+        .filter(([_, val]) => typeof val === 'number')
+        .map(([dim, val]) =>
+          `<div class="score-dim"><span class="score-dim-label">${dim}</span><span class="score-dim-value">${val}/5</span></div>`
+        ).join('') +
       '</div>';
   }
 
@@ -322,7 +324,7 @@ function renderFeedback(el, modeKey, result) {
       ${result.issues ? `<p><strong>Areas to improve:</strong> ${result.issues}</p>` : ''}
       ${result.missing && result.missing.length ? `<p><strong>Missing words:</strong> ${result.missing.join(', ')}</p>` : ''}
     </div>
-    ${result.sample ? `<div class="score-sample"><div class="score-sample-title">Band-6 sample</div><p class="score-sample-text">${result.sample}</p></div>` : ''}
+    ${result.sample ? `<div class="score-sample"><div class="score-sample-title">Band-${formatBand(band)} reference</div><p class="score-sample-text">${result.sample}</p></div>` : ''}
   `;
 }
 
@@ -588,11 +590,10 @@ function scoreRepeat(target, said) {
   const missed = a.filter((w) => !b.includes(w));
   const result = {
     score,
-    breakdown: { 'Content Accuracy': score, 'Pronunciation': '-', 'Fluency': '-' },
+    breakdown: { 'Content Accuracy': score },
     strengths: score >= 4 ? 'High content accuracy.' : '',
     issues: score < 5 ? 'Work on reproducing all words clearly.' : '',
     missing: missed,
-    sample: target,
   };
   renderFeedback($('repeat-feedback'), 'speaking_repeat', result);
   saveHistory({ mode: 'Listen & Repeat', score: formatBand(pointsToBand(score, 5)), detail: pct + '%' });
