@@ -18,7 +18,7 @@ TASKS = {
             "Create {n} original practice sets for the NEW TOEFL iBT (2026 format) Speaking task "
             "'Take an Interview'. Each set: one everyday or campus topic + 4 interview questions "
             "escalating from general to personal opinion, CEFR B1-C1. Return STRICT JSON: "
-            '{"items":[{"topic":"...","questions":["...","...","...","..."]}]}'
+            '{{"items":[{{"topic":"...","questions":["...","...","...","..."]}}]}}'
         ),
     },
     "speaking_repeat": {
@@ -27,7 +27,7 @@ TASKS = {
             "'Listen and Repeat' (student hears a sentence, repeats it verbatim). Natural campus/"
             "daily-life sentences, 8-16 words, varied grammar (conditionals, passives, phrasal "
             "verbs, embedded clauses). Return STRICT JSON: "
-            '{"items":[{"sentence":"..."}]}'
+            '{{"items":[{{"sentence":"..."}}]}}'
         ),
     },
     "writing_email": {
@@ -36,7 +36,7 @@ TASKS = {
             "'Write an Email'. Each: a realistic campus/academic scenario, a recipient "
             "(professor, administrator, club), and 3 points the email must cover. "
             "Return STRICT JSON: "
-            '{"items":[{"scenario":"...","recipient":"...","points":["...","...","..."]}]}'
+            '{{"items":[{{"scenario":"...","recipient":"...","points":["...","...","..."]}}]}}'
         ),
     },
     "writing_sentence": {
@@ -45,7 +45,7 @@ TASKS = {
             "'Build a Sentence' (student assembles a grammatical sentence from given words). "
             "Sentences 8-14 words, B1-C1 grammar variety, everyday academic-adjacent topics. "
             "Return STRICT JSON: "
-            '{"items":[{"sentence":"..."}]}'
+            '{{"items":[{{"sentence":"..."}}]}}'
         ),
     },
     "reading_words": {
@@ -89,13 +89,15 @@ OPENAI_COMPAT = {
 def call_llm(key, provider, prompt, max_tokens=3000):
     if provider in OPENAI_COMPAT:
         url, default_model = OPENAI_COMPAT[provider]
+        body = {
+            "model": os.environ.get("TP_MODEL", default_model),
+            "messages": [{"role": "user", "content": prompt}],
+        }
+        if provider != "deepseek":
+            body["response_format"] = {"type": "json_object"}
         req = urllib.request.Request(
             url,
-            data=json.dumps({
-                "model": os.environ.get("TP_MODEL", default_model),
-                "messages": [{"role": "user", "content": prompt}],
-                "response_format": {"type": "json_object"},
-            }).encode(),
+            data=json.dumps(body).encode(),
             headers={"content-type": "application/json", "authorization": "Bearer " + key},
         )
     else:
@@ -112,10 +114,17 @@ def call_llm(key, provider, prompt, max_tokens=3000):
                 "anthropic-version": "2023-06-01",
             },
         )
-    with urllib.request.urlopen(req, timeout=90) as r:
-        j = json.load(r)
+    try:
+        with urllib.request.urlopen(req, timeout=90) as r:
+            j = json.load(r)
+    except Exception as e:
+        print(f"[gen_bank] API error: {e}", file=sys.stderr)
+        if hasattr(e, "read"):
+            print(e.read().decode("utf-8", errors="replace")[:500], file=sys.stderr)
+        return '{"items":[]}'
     if provider != "anthropic":
-        return j["choices"][0]["message"]["content"]
+        raw = j["choices"][0]["message"]["content"]
+        return raw
     return "".join(b.get("text", "") for b in j["content"])
 
 
