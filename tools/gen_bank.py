@@ -138,6 +138,20 @@ def validate_prompt(task, item):
     )
 
 
+def ask_json(key, provider, prompt, max_tokens=3000, retries=3):
+    """LLM-запрос с повторными попытками, пока не вернёт валидный JSON."""
+    last = None
+    for i in range(retries):
+        try:
+            raw = call_llm(key, provider, prompt, max_tokens=max_tokens)
+            return extract_json(raw)
+        except Exception as e:
+            last = e
+            print(f"[gen_bank] плохой JSON, попытка {i + 2}/{retries}: {e}", file=sys.stderr)
+            time.sleep(2 * (i + 1))
+    raise last
+
+
 def demo():
     """Самопроверка без API: python tools/gen_bank.py --demo"""
     sample = extract_json('some text {"items":[{"sentence":"Hello world."}]} tail')
@@ -178,14 +192,14 @@ def main():
                 if line.strip():
                     seen.add(item_key(json.loads(line)))
 
-    items = extract_json(call_llm(a.key, a.provider, TASKS[a.task]["prompt"].format(n=a.count)))["items"]
+    items = ask_json(a.key, a.provider, TASKS[a.task]["prompt"].format(n=a.count))["items"]
     kept, dropped = [], 0
     for it in items:
         k = item_key(it)
         if k in seen:
             dropped += 1
             continue
-        v = extract_json(call_llm(a.key, a.provider, validate_prompt(a.task, it), max_tokens=200))
+        v = ask_json(a.key, a.provider, validate_prompt(a.task, it), max_tokens=200)
         if int(v.get("score", 0)) >= a.min_score:
             kept.append(it)
             seen.add(k)
