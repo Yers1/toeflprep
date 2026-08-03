@@ -1,196 +1,84 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TOEFL iBT 2026 Prep — Official-Format Practice</title>
-  <meta name="description" content="Practice the new TOEFL iBT (January 2026) with official task types, ETS-style rubrics, and real-time scoring." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <meta name="description" content="Independent practice for every TOEFL iBT task family used from January 2026, with focused sets, progress analytics, and rubric-aligned feedback.">
+  <meta property="og:title" content="TOEFL Prep 2026">
+  <meta property="og:description" content="Practice the current TOEFL iBT format with all 12 task families.">
+  <meta name="theme-color" content="#f5f7f6">
+  <title>TOEFL Prep 2026 | Practice the current test</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">
-        <span class="logo-mark">T</span>
-        <span>TOEFL Prep</span>
-      </a>
-      <nav class="nav">
-        <a href="#modes">Tasks</a>
-        <a href="#scoring">Scoring</a>
-        <a href="#faq">FAQ</a>
-        <a href="app.html" class="btn btn-primary" style="padding: 10px 18px; font-size: 0.85rem;">Start practice</a>
-      </nav>
+      <a href="index.html" class="logo" aria-label="TOEFL Prep home"><span class="logo-mark">T</span><span>TOEFL Prep</span></a>
+      <nav class="nav" aria-label="Primary navigation"><a href="#format">Test format</a><a href="#method">Method</a><a href="#faq">Questions</a></nav>
+      <a href="app.html" class="btn btn-primary btn-small">Open practice</a>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-content">
-      <div>
-        <div class="hero-badge">
-          <span style="width:8px;height:8px;border-radius:50%;background:var(--success);display:inline-block;"></span>
-          Updated for the January 2026 test format
+  <main id="main-content">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-copy">
+          <p class="eyebrow">Built for the January 2026 TOEFL iBT</p>
+          <h1>Practice the test that exists now.</h1>
+          <p class="hero-desc">All 12 task families, original practice material, exam-aware timers, and a clear record of what to work on next.</p>
+          <div class="hero-cta"><a href="app.html" class="btn btn-primary">Start focused practice</a><a href="#format" class="text-button">Review the format</a></div>
+          <p class="trust-line">Independent and open source. No account required. Not affiliated with ETS.</p>
         </div>
-        <h1 class="hero-title">Practice TOEFL iBT <span>the way it is now scored.</span></h1>
-        <p class="hero-desc">Train on the five new task types with official ETS-style rubrics, section timers, and band scoring on the 1–6 scale. No account. Your API key stays in your browser.</p>
-        <div class="hero-cta">
-          <a href="app.html" class="btn btn-primary">Start free practice</a>
-          <a href="#modes" class="btn btn-secondary">See the tasks</a>
+        <div class="hero-product" aria-label="Example preparation dashboard">
+          <div class="product-top"><span>Preparation snapshot</span><strong>Target 5.0</strong></div>
+          <div class="sample-focus"><span>Recommended next</span><strong>Read an Academic Passage</strong><p>Inference accuracy is trailing your other reading skills.</p></div>
+          <div class="sample-sections"><div><span>Reading</span><strong>68%</strong></div><div><span>Listening</span><strong>74%</strong></div><div><span>Speaking</span><strong>4.0</strong></div><div><span>Writing</span><strong>4.5</strong></div></div>
+          <small>Illustrative data. The practice app uses your local attempt history.</small>
         </div>
       </div>
-      <div class="hero-card">
-        <div class="hero-card-header">
-          <div class="hero-card-avatar">🎓</div>
-          <div>
-            <h3 class="hero-card-title">New TOEFL iBT score</h3>
-            <p class="hero-card-subtitle">Official 1–6 band scale</p>
-          </div>
-        </div>
-        <div class="score-pill-row">
-          <span class="score-pill">Reading</span>
-          <span class="score-pill">Listening</span>
-          <span class="score-pill">Speaking</span>
-          <span class="score-pill">Writing</span>
-        </div>
-        <div class="score-pill-row">
-          <span class="score-pill warning">1–6 bands</span>
-          <span class="score-pill">CEFR mapped</span>
-        </div>
-        <p style="color:var(--text-secondary); font-size:0.9rem; margin:0;">Scores are computed against official ETS max points per item and converted to the 1–6 scale used on score reports from January 2026.</p>
-      </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="modes" class="section">
-    <div class="container">
-      <h2 class="section-title">Five task types. One real format.</h2>
-      <p class="section-subtitle">Each mode mirrors the task structure, timing, and scoring of the new TOEFL iBT.</p>
-      <div class="modes-list">
-        <div class="mode-row">
-          <div class="mode-row-num">01</div>
-          <div class="mode-row-body">
-            <h3>Take an Interview</h3>
-            <p>Answer four escalating interview questions on everyday or campus topics. Scored on delivery, language use, and topic development.</p>
-          </div>
-          <div class="mode-row-meta">Speaking · 45s</div>
-        </div>
-        <div class="mode-row">
-          <div class="mode-row-num">02</div>
-          <div class="mode-row-body">
-            <h3>Listen and Repeat</h3>
-            <p>Hear a campus-life sentence, repeat it verbatim. Scored on content accuracy, pronunciation, and fluency.</p>
-          </div>
-          <div class="mode-row-meta">Speaking · 15s</div>
-        </div>
-        <div class="mode-row">
-          <div class="mode-row-num">03</div>
-          <div class="mode-row-body">
-            <h3>Write an Email</h3>
-            <p>Respond to a realistic scenario, cover three required points, and use the right tone. Scored on task achievement, organization, grammar, and vocabulary.</p>
-          </div>
-          <div class="mode-row-meta">Writing · 10 min</div>
-        </div>
-        <div class="mode-row">
-          <div class="mode-row-num">04</div>
-          <div class="mode-row-body">
-            <h3>Build a Sentence</h3>
-            <p>Assemble a grammatical sentence from scrambled words. Exact match scoring.</p>
-          </div>
-          <div class="mode-row-meta">Writing · 2 min</div>
-        </div>
-        <div class="mode-row">
-          <div class="mode-row-num">05</div>
-          <div class="mode-row-body">
-            <h3>Complete the Words</h3>
-            <p>Fill in the missing word in a sentence using context and a synonym clue. Exact match scoring.</p>
-          </div>
-          <div class="mode-row-meta">Reading · 1 min</div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <section class="format-strip" aria-label="Current TOEFL format"><div><strong>~2 hours</strong><span>base test time</span></div><div><strong>1-6</strong><span>current score scale</span></div><div><strong>4 sections</strong><span>Reading to Speaking</span></div><div><strong>Adaptive</strong><span>Reading and Listening</span></div></section>
 
-  <section id="scoring" class="section" style="background:rgba(30,41,59,0.5);">
-    <div class="container">
-      <h2 class="section-title">Scoring you can trust.</h2>
-      <p class="section-subtitle">We do not invent criteria. Every score is computed from official ETS task specs and converted to the same 1–6 band scale used on real score reports.</p>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">📊</div>
-          <h3 class="feature-title">Official max points</h3>
-          <p class="feature-desc">Speaking and writing items max out at 5 points; reading and listening items at 1 point — exactly as ETS specifies.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🎯</div>
-          <h3 class="feature-title">Dimension breakdown</h3>
-          <p class="feature-desc">See how you performed on delivery, language use, topic development, task achievement, organization, grammar, and vocabulary.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🌐</div>
-          <h3 class="feature-title">CEFR + 0–120</h3>
-          <p class="feature-desc">Each band maps to a CEFR level and a comparable 0–120 total score, so you know where you stand.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🔒</div>
-          <h3 class="feature-title">Your key, your device</h3>
-          <p class="feature-desc">Bring your own LLM key from GitHub Models, Gemini, DeepSeek, OpenAI, or Anthropic. It is stored only in your browser.</p>
-        </div>
+    <section id="format" class="section task-map">
+      <div class="section-intro"><p class="eyebrow">Complete coverage</p><h2>Twelve ways the test measures English.</h2><p>The app separates every official task family so you can isolate a weakness before combining skills under time pressure.</p></div>
+      <div class="task-columns">
+        <article><header><span>01</span><h3>Reading</h3><small>up to 50 items</small></header><ul><li>Complete the Words</li><li>Read in Daily Life</li><li>Read an Academic Passage</li></ul></article>
+        <article><header><span>02</span><h3>Listening</h3><small>up to 47 items</small></header><ul><li>Choose a Response</li><li>Conversation</li><li>Announcement</li><li>Academic Talk</li></ul></article>
+        <article><header><span>03</span><h3>Writing</h3><small>up to 12 items</small></header><ul><li>Build a Sentence</li><li>Write an Email</li><li>Academic Discussion</li></ul></article>
+        <article><header><span>04</span><h3>Speaking</h3><small>up to 11 items</small></header><ul><li>Listen and Repeat</li><li>Take an Interview</li></ul></article>
       </div>
+    </section>
 
-      <h3 style="margin:64px 0 24px; font-size:1.3rem;">What each band means</h3>
-      <div class="score-scale">
-        <div class="scale-card"><div class="scale-card-band">1</div><div class="scale-card-label">Weak</div><div class="scale-card-desc">Limited or unrelated response. A1 CEFR.</div></div>
-        <div class="scale-card"><div class="scale-card-band">2</div><div class="scale-card-label">Limited</div><div class="scale-card-desc">Noticeable problems with language or relevance. A2.</div></div>
-        <div class="scale-card"><div class="scale-card-band">3</div><div class="scale-card-label">Fair</div><div class="scale-card-desc">Intelligible but uneven. Basic development. B1.</div></div>
-        <div class="scale-card"><div class="scale-card-band">4</div><div class="scale-card-label">Good</div><div class="scale-card-desc">Generally clear with minor lapses. B2.</div></div>
-        <div class="scale-card"><div class="scale-card-band">5</div><div class="scale-card-label">Very good</div><div class="scale-card-desc">Well-developed, clear, accurate. C1.</div></div>
-        <div class="scale-card"><div class="scale-card-band">6</div><div class="scale-card-label">Advanced</div><div class="scale-card-desc">Fluent, precise, nuanced. C2.</div></div>
-      </div>
-    </div>
-  </section>
+    <section id="method" class="section method-section">
+      <div class="method-lead"><p class="eyebrow">Designed for improvement</p><h2>Practice should produce evidence, not comfort.</h2></div>
+      <ol class="method-list"><li><span>Start narrow</span><div><strong>Train one task family</strong><p>Use original sets and realistic constraints to identify the exact kind of mistake.</p></div></li><li><span>Review deeply</span><div><strong>Explain every distractor</strong><p>Objective tasks reveal the correct answer and reasoning. Extended responses receive optional rubric-aligned AI feedback.</p></div></li><li><span>Follow the data</span><div><strong>Return to the weakest section</strong><p>Your local dashboard recommends a task from recent accuracy and practice coverage.</p></div></li></ol>
+    </section>
 
-  <section id="faq" class="section">
-    <div class="container">
-      <h2 class="section-title">Questions</h2>
+    <section class="section honesty-section">
+      <div><p class="eyebrow">Scoring honesty</p><h2>A useful estimate should admit its limits.</h2></div>
+      <div class="honesty-copy"><p>The live TOEFL is adaptive and statistically equated. A browser app cannot reproduce the official scoring model from a handful of practice questions.</p><p>That is why TOEFL Prep reports task accuracy and a broad practice-band estimate. Only ETS can issue a TOEFL score. AI feedback is optional and your provider key can stay in the current browser tab.</p><a href="app.html#settings-panel" class="text-button">See scoring setup</a></div>
+    </section>
+
+    <section id="faq" class="section faq-section">
+      <div class="section-intro"><p class="eyebrow">Before you begin</p><h2>Common questions</h2></div>
       <div class="faq-list">
-        <div class="faq-item">
-          <button class="faq-question">Is this an official ETS product?<span>+</span></button>
-          <div class="faq-answer"><div class="faq-answer-inner">No. This is an independent practice tool. Scoring is based on ETS-published specifications and rubrics, but only ETS can issue official scores.</div></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question">Why do I need an API key?<span>+</span></button>
-          <div class="faq-answer"><div class="faq-answer-inner">Speaking and writing tasks require evaluating free-form responses. We use your own LLM key (GitHub Models, Gemini, DeepSeek, OpenAI, or Anthropic) so there is no backend cost and your data stays with you.</div></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question">Does the microphone work on mobile?<span>+</span></button>
-          <div class="faq-answer"><div class="faq-answer-inner">Speech recognition works best in Chrome, Edge, or Safari on desktop and Android. iOS Safari support varies. For the most reliable experience, use Chrome on a laptop.</div></div>
-        </div>
-        <div class="faq-item">
-          <button class="faq-question">Can I practice offline?<span>+</span></button>
-          <div class="faq-answer"><div class="faq-answer-inner">Reading and writing tasks work offline once the page is loaded. Speaking tasks need the browser's speech recognition, which requires a network connection.</div></div>
-        </div>
+        <details><summary>Is this an official ETS product?</summary><p>No. It is an independent study tool based on publicly described task families and timing. TOEFL and TOEFL iBT are registered trademarks of ETS.</p></details>
+        <details><summary>Do I need an API key?</summary><p>No key is needed for Reading, Listening, Build a Sentence, Complete the Words, or transcript accuracy. A key is optional for detailed evaluation of free-form speaking and writing.</p></details>
+        <details><summary>Where is my progress stored?</summary><p>Attempt history and your target band are stored in this browser. You can export the history as JSON. No account or project backend is required.</p></details>
+        <details><summary>Will speech recognition work everywhere?</summary><p>It works most reliably in a current version of Chrome or Edge on a laptop. Browser support and transcript accuracy vary, so speaking results remain approximate.</p></details>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section" style="padding-top:0; text-align:center;">
-    <div class="container">
-      <h2 class="section-title" style="margin-bottom:20px;">Ready to practice?</h2>
-      <p class="section-subtitle" style="margin:0 auto 32px;">No signup. Open the app, add your API key, and start with any task.</p>
-      <a href="app.html" class="btn btn-primary" style="font-size:1.1rem; padding:16px 32px;">Open practice app</a>
-    </div>
-  </section>
+    <section class="final-cta"><div><p class="eyebrow">Your next session</p><h2>One focused set. Then review every miss.</h2></div><a href="app.html" class="btn btn-primary">Open the practice app</a></section>
+  </main>
 
-  <footer class="footer">
-    <div class="footer-inner">
-      <div>© TOEFL Prep 2026. Not affiliated with ETS.</div>
-      <div>Open source · Built for serious learners</div>
-    </div>
-  </footer>
-
+  <footer class="footer"><div class="footer-inner"><div><a href="index.html" class="logo"><span class="logo-mark">T</span><span>TOEFL Prep</span></a><p>Independent practice for the current TOEFL iBT.</p></div><div><a href="https://www.ets.org/toefl/test-takers/ibt/about/content.html">Official ETS format</a><a href="https://github.com/Yers1/toeflprep">Source code</a></div></div></footer>
   <script src="app.js"></script>
 </body>
 </html>

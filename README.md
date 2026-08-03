@@ -1,78 +1,65 @@
-# TOEFL iBT 2026 Prep
+# TOEFL Prep 2026
 
-Independent practice app for the **new TOEFL iBT format (January 2026)** — adaptive test, 1–6 band scale, new task types.
+Independent browser-based practice for the TOEFL iBT format used from January 21, 2026.
 
-## Why the new format matters
+Live app: https://toeflprep-omega.vercel.app
 
-ETS changed the exam on 21 January 2026: adaptive Reading/Listening, new tasks (Complete the Words, Listen and Repeat, Take an Interview, Build a Sentence, Write an Email), and a 1–6 scale aligned to CEFR. Older prep content is built for the 0–120 scale and does not match the new tasks.
+## Coverage
 
-## Live app
+The app includes original practice material for all 12 task families described by ETS:
 
-https://toeflprep-omega.vercel.app
+- Reading: Complete the Words, Read in Daily Life, Read an Academic Passage
+- Listening: Listen and Choose a Response, Conversation, Announcement, Academic Talk
+- Speaking: Listen and Repeat, Take an Interview
+- Writing: Build a Sentence, Write an Email, Academic Discussion
 
-## What you can practice
+It also includes:
 
-| Task | Section | Official max points | Time limit |
-|------|---------|---------------------|------------|
-| Take an Interview | Speaking | 5 | 45 sec |
-| Listen and Repeat | Speaking | 5 | 15 sec |
-| Write an Email | Writing | 5 | 10 min |
-| Build a Sentence | Writing | 1 | 2 min |
-| Complete the Words | Reading | 1 | 1 min |
+- a local preparation dashboard and weakest-section recommendation
+- objective answer explanations and task accuracy
+- optional rubric-aligned AI feedback for free-form speaking and writing
+- attempt history, streaks, target band, and JSON export
+- an API-key option that defaults to the current browser tab instead of permanent storage
+- responsive and keyboard-accessible layouts
 
-## How scoring works
+## Scoring limits
 
-1. **Raw points** are computed against official ETS max points per item.
-2. **Band 1–6** is derived from the percentage of max points.
-3. **CEFR level** and a **comparable 0–120 total score** are shown for context.
-4. Speaking and writing responses are evaluated by an LLM acting as an ETS rater using official rubric dimensions.
-
-This is not an official ETS score. Only ETS can issue official TOEFL scores.
+This app does not issue or reproduce an official TOEFL score. The live test is adaptive and statistically equated. Objective sets report accuracy; free-form tasks use an approximate 0-5 rubric evaluation and a broad practice-band estimate. Only ETS can issue TOEFL scores.
 
 ## Run locally
 
 ```bash
-python -m http.server 8000
+npm start
 # open http://localhost:8000
 ```
 
-Speech recognition works best in Chrome at `localhost`.
+No installation step is required. The project uses vanilla HTML, CSS, and JavaScript.
 
-## API key
-
-Speaking and writing tasks need an LLM to evaluate free-form responses. Supported providers:
-
-- GitHub Models (free with GitHub token)
-- Google Gemini (free tier)
-- DeepSeek
-- OpenAI
-- Anthropic (Claude)
-
-Your key is stored only in the browser's `localStorage`.
-
-## Generate more items
+## Validate
 
 ```bash
-python tools/gen_bank.py --task speaking_interview --count 5 --key $YOUR_KEY
-python tools/gen_bank.py --task reading_words --count 5 --key $YOUR_KEY
-python tools/bank_to_js.py
+npm test
 ```
 
-The app falls back to a built-in bank if `bank/bank.js` is empty.
+The validator checks JavaScript syntax, all 12 task panels, content answer keys, and DOM IDs referenced by the application.
 
-## Roadmap
+## Optional AI feedback
 
-- [x] Take an Interview (Speaking 2026) — ETS rater rubric
-- [x] Listen and Repeat (Speaking 2026) — content + pronunciation dimensions
-- [x] Write an Email (Writing 2026) — task achievement, organization, grammar, vocabulary
-- [x] Build a Sentence (Writing 2026) — exact match
-- [x] Complete the Words (Reading 2026) — exact match
-- [x] Official 1–6 band scale with CEFR mapping
-- [x] Section timers
-- [x] Beautiful landing page and app UI
-- [ ] Read in Daily Life / Academic Passage (Reading 2026)
-- [ ] Listen and Choose a Response / Conversation / Announcement / Academic Talk (Listening 2026)
-- [ ] Write for an Academic Discussion (Writing 2026)
+Speaking and extended Writing can use one of these user-supplied providers:
+
+- GitHub Models
+- Google Gemini
+- DeepSeek
+- OpenAI
+- Anthropic
+
+Objective tasks work without any key. By default, a key is stored in `sessionStorage` and disappears when the browser tab closes. Permanent local storage is opt-in and should not be used on shared computers.
+
+## Content policy
+
+Practice questions in `content.js` are original. The project uses public ETS specifications to model task families, not copied ETS test questions.
+
+TOEFL and TOEFL iBT are registered trademarks of ETS. This project is not affiliated with or endorsed by ETS.
 
 ## License
 

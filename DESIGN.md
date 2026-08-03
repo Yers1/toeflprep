@@ -1,50 +1,41 @@
-# DESIGN.md
+# Design system
 
-## Color
+## Direction
 
-Background: `#0f172a` (deep slate)  
-Surface: `#1e293b` (slate 800)  
-Elevated: `#334155` (slate 700)  
-Primary accent: `#38bdf8` (sky 400)  
-Success: `#34d399` (emerald 400)  
-Warning: `#fbbf24` (amber 400)  
-Danger: `#f87171` (red 400)  
-Text primary: `#f8fafc` (slate 50)  
-Text secondary: `#94a3b8` (slate 400)  
-Text muted: `#64748b` (slate 500)
+Calm academic instrument. The visual language should feel closer to a well-edited research notebook than a gamified language app or AI startup.
 
-Dark mode only. No light theme.
+## Tokens
+
+- Background: `#f5f7f6`
+- Surface: `#ffffff`
+- Ink: `#14211d`
+- Body text: `#33443e`
+- Muted text: `#697a74`
+- Line: `#d9e1de`
+- Accent: `#087f5b`
+- Accent dark: `#056346`
+- Accent soft: `#def1e9`
+- Danger: `#a23b32`
 
 ## Typography
 
-- Headings: `Inter`, weights 600–800.
-- Body: `Inter`, weight 400–500.
-- Mono: `JetBrains Mono` for code/scores/timers.
-- Hero H1: `clamp(2.5rem, 6vw, 4.5rem)`.
-- Body: `16px / 1.6`.
-
-## Spacing
-
-- Container max-width: `1120px`.
-- Section vertical padding: `80px` desktop, `56px` mobile.
-- Component gaps: `16px` base, `24px` for feature groups.
+- Primary: Geist
+- Scores and timers: JetBrains Mono
+- Headlines use tight tracking and compact line height.
+- Body copy stays below roughly 65 characters per line when possible.
 
 ## Components
 
-- **Cards**: 1px border `#334155`, radius `16px`, background surface.
-- **Buttons**: radius `12px`; primary filled accent; secondary bordered.
-- **Inputs**: surface bg, 1px border, radius `12px`, focus ring accent.
-- **Timer bar**: sticky top, mono font, amber → red countdown states.
-- **Score badge**: circular, mono font, size `64px`.
+- Buttons and inputs use a 12px radius.
+- Main practice surfaces use a 20px radius.
+- Cards appear only for distinct functional surfaces.
+- One green accent is used throughout the product.
+- Correct and incorrect states never rely on color alone; explanations are always shown.
 
-## Motion
+## Interaction
 
-- Page sections fade-in on load.
-- Cards lift `translateY(-2px)` on hover.
-- Timer pulses softly under 10s.
-- Reduced motion: disable all transforms and pulses.
-
-## Layout
-
-- Landing: hero → features → mode preview → scoring explanation → FAQ → CTA.
-- App: tabbed modes, each as a focused card with prompt, response area, and feedback panel.
+- Timers remain sticky during practice.
+- Pressed controls move by 1px for tactile feedback.
+- Loading and error feedback stays inline.
+- Audio practice states clearly distinguish ready, playing, and played.
+- Reduced-motion preference disables nonessential transitions and pulsing.

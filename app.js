@@ -1,13 +1,13 @@
 'use strict';
 
-// ================= OFFICIAL TOEFL iBT 2026 SCORING =================
-// Source: ETS TOEFL iBT Test Blueprint and Specifications Document (2026)
-// Speaking/Writing AI-scored items: 0-5 points -> 1-6 band scale
-// Reading/Listening machine-scored items: 0-1 point -> 1-6 band scale
+// ================= TOEFL iBT 2026 PRACTICE MODEL =================
+// Source: ETS TOEFL iBT Test Blueprint and Specifications Document (2026).
+// The real exam is adaptive and statistically equated. The band conversion in
+// this independent trainer is a progress estimate, never an official score.
 
 const SECTION_WEIGHTS = {
-  reading: { items: 30, time: 18 * 60 + 21 },     // 18-21 min
-  listening: { items: 47, time: 18 * 60 },         // 18 min
+  reading: { items: 50, time: 30 * 60 },
+  listening: { items: 47, time: 29 * 60 },
   writing: { items: 12, time: 23 * 60 },           // 23 min
   speaking: { items: 11, time: 8 * 60 },           // 8 min
 };
@@ -17,16 +17,11 @@ const CEFR_LEVELS = {
   3.5: 'B2', 4: 'B2', 4.5: 'B2-C1', 5: 'C1', 5.5: 'C1-C2', 6: 'C2'
 };
 
-// Official 1-6 to 0-120 comparison table (overall total)
-const BAND_TO_TOTAL_120 = {
-  1: '0+', 1.5: '12+', 2: '24+', 2.5: '34+', 3: '44+', 3.5: '58+',
-  4: '72+', 4.5: '86+', 5: '95+', 5.5: '107+', 6: '114+'
-};
-
-// Convert raw points (0..max) to 1-6 band
+// Convert practice accuracy (0..max) to a broad progress band. ETS does not
+// publish a simple percentage-to-band conversion for the adaptive live test.
 function pointsToBand(score, max) {
   const pct = max > 0 ? score / max : 0;
-  // ETS-style mapping based on percentage of max points
+  // Broad in-app progress mapping based on practice accuracy.
   if (pct >= 0.97) return 6;
   if (pct >= 0.90) return 5.5;
   if (pct >= 0.84) return 5;
@@ -113,6 +108,21 @@ const RUBRICS = {
       0: 'Incorrect or missing word.',
     },
   },
+  writing_discussion: {
+    title: 'Write for an Academic Discussion',
+    section: 'writing',
+    maxPoints: 5,
+    time: 600,
+    dimensions: ['Task Fulfillment', 'Development', 'Organization', 'Language Use'],
+    bands: {
+      5: 'Advanced: clear, well-supported contribution with precise and varied language.',
+      4: 'Good: relevant and developed with generally effective organization and language.',
+      3: 'Fair: relevant but uneven in development, organization, or language control.',
+      2: 'Limited: partially developed with frequent language problems or weak connections.',
+      1: 'Weak: minimal relevant content and serious language limitations.',
+      0: 'No response, copied response, or unrelated content.'
+    }
+  },
 };
 
 // ================= DATA =================
@@ -184,8 +194,8 @@ const OPENAI_COMPAT = {
 
 function getSettings() {
   return {
-    provider: localStorage.getItem('tp_provider') || 'github',
-    key: localStorage.getItem('tp_key') || '',
+    provider: localStorage.getItem('tp_provider') || sessionStorage.getItem('tp_provider') || 'github',
+    key: sessionStorage.getItem('tp_key') || localStorage.getItem('tp_key') || '',
   };
 }
 
@@ -241,8 +251,8 @@ function buildPrompt(modeKey, item, response) {
 
   if (modeKey === 'speaking_interview') {
     return [
-      'You are a certified ETS rater for the NEW TOEFL iBT (January 2026) Speaking task "Take an Interview".',
-      'Score the spoken response on the official 0-5 scale (whole numbers only).',
+      'You are a careful language evaluator applying the published criteria for the TOEFL iBT 2026 Speaking task "Take an Interview".',
+      'Estimate the response on a 0-5 practice scale (whole numbers only). Do not claim this is an official ETS score.',
       `Dimensions: ${rubric.dimensions.join(', ')}.`,
       `Score descriptions:\n${bandDesc}`,
       `Question: "${item.q}"`,
@@ -255,8 +265,8 @@ function buildPrompt(modeKey, item, response) {
 
   if (modeKey === 'speaking_repeat') {
     return [
-      'You are a certified ETS rater for the NEW TOEFL iBT (January 2026) Speaking task "Listen and Repeat".',
-      'Score the repeated sentence on the official 0-5 scale (whole numbers only).',
+      'You are a careful language evaluator applying the published criteria for the TOEFL iBT 2026 Speaking task "Listen and Repeat".',
+      'Estimate the response on a 0-5 practice scale (whole numbers only). Do not claim this is an official ETS score.',
       `Dimensions: ${rubric.dimensions.join(', ')}.`,
       `Score descriptions:\n${bandDesc}`,
       `Original sentence: "${item.sentence}"`,
@@ -268,8 +278,8 @@ function buildPrompt(modeKey, item, response) {
 
   if (modeKey === 'writing_email') {
     return [
-      'You are a certified ETS rater for the NEW TOEFL iBT (January 2026) Writing task "Write an Email".',
-      'Score the email on the official 0-5 scale (whole numbers only).',
+      'You are a careful language evaluator applying the published criteria for the TOEFL iBT 2026 Writing task "Write an Email".',
+      'Estimate the email on a 0-5 practice scale (whole numbers only). Do not claim this is an official ETS score.',
       `Dimensions: ${rubric.dimensions.join(', ')}.`,
       `Score descriptions:\n${bandDesc}`,
       `Scenario: ${item.scenario}`,
@@ -278,6 +288,22 @@ function buildPrompt(modeKey, item, response) {
       'Student email:', '"""', response, '"""',
       'Return STRICT JSON:',
       '{"score":4,"breakdown":{"Task Achievement":4,"Organization":4,"Grammar":4,"Vocabulary":4},"strengths":"...","issues":"...","sample_answer":"A strong band-5 email, 80-120 words."}',
+    ].join('\n\n');
+  }
+
+  if (modeKey === 'writing_discussion') {
+    return [
+      'You are a careful language evaluator applying the published criteria for the TOEFL iBT 2026 Writing task "Write for an Academic Discussion".',
+      'Estimate the response on a 0-5 practice scale (whole numbers only). Do not claim this is an official ETS score.',
+      `Dimensions: ${rubric.dimensions.join(', ')}.`,
+      `Score descriptions:\n${bandDesc}`,
+      `Course: ${item.course}`,
+      `Professor question: ${item.question}`,
+      `Student response 1: ${item.studentA}`,
+      `Student response 2: ${item.studentB}`,
+      'Student contribution:', '"""', response, '"""',
+      'Return STRICT JSON:',
+      '{"score":4,"breakdown":{"Task Fulfillment":4,"Development":4,"Organization":4,"Language Use":4},"strengths":"...","issues":"...","sample_answer":"A strong original response of 110-140 words."}'
     ].join('\n\n');
   }
 
@@ -301,7 +327,6 @@ function renderFeedback(el, modeKey, result) {
   const rubric = RUBRICS[modeKey];
   const band = pointsToBand(result.score, rubric.maxPoints);
   const cefr = CEFR_LEVELS[band] || '-';
-  const legacy = BAND_TO_TOTAL_120[band] || '-';
 
   let breakdownHtml = '';
   if (result.breakdown && Object.keys(result.breakdown).length) {
@@ -309,7 +334,7 @@ function renderFeedback(el, modeKey, result) {
       Object.entries(result.breakdown)
         .filter(([_, val]) => typeof val === 'number')
         .map(([dim, val]) =>
-          `<div class="score-dim"><span class="score-dim-label">${dim}</span><span class="score-dim-value">${val}/5</span></div>`
+          `<div class="score-dim"><span class="score-dim-label">${escapeHtml(dim)}</span><span class="score-dim-value">${val}/5</span></div>`
         ).join('') +
       '</div>';
   }
@@ -318,13 +343,14 @@ function renderFeedback(el, modeKey, result) {
     <div class="score-ring"><div><div class="score-value">${formatBand(band)}</div><div class="score-label">of 6</div></div></div>
     ${breakdownHtml}
     <div class="score-text">
-      <p><strong>CEFR:</strong> ${cefr} &nbsp;·&nbsp; <strong>Comparable TOEFL iBT:</strong> ${legacy}</p>
-      <p><strong>Raw score:</strong> ${result.score} / ${rubric.maxPoints}</p>
-      ${result.strengths ? `<p><strong>Strengths:</strong> ${result.strengths}</p>` : ''}
-      ${result.issues ? `<p><strong>Areas to improve:</strong> ${result.issues}</p>` : ''}
-      ${result.missing && result.missing.length ? `<p><strong>Missing words:</strong> ${result.missing.join(', ')}</p>` : ''}
+      <p><strong>Estimated practice band:</strong> ${formatBand(band)} &nbsp;·&nbsp; <strong>CEFR reference:</strong> ${cefr}</p>
+      <p><strong>Task score:</strong> ${result.score} / ${rubric.maxPoints}</p>
+      <p class="estimate-note">Practice estimate only. The live adaptive test is statistically equated by ETS.</p>
+      ${result.strengths ? `<p><strong>Strengths:</strong> ${escapeHtml(result.strengths)}</p>` : ''}
+      ${result.issues ? `<p><strong>Areas to improve:</strong> ${escapeHtml(result.issues)}</p>` : ''}
+      ${result.missing && result.missing.length ? `<p><strong>Missing words:</strong> ${result.missing.map(escapeHtml).join(', ')}</p>` : ''}
     </div>
-    ${result.sample ? `<div class="score-sample"><div class="score-sample-title">Band-${formatBand(band)} reference</div><p class="score-sample-text">${result.sample}</p></div>` : ''}
+    ${result.sample ? `<div class="score-sample"><div class="score-sample-title">Stronger response example</div><p class="score-sample-text">${escapeHtml(result.sample)}</p></div>` : ''}
   `;
 }
 
@@ -334,7 +360,7 @@ let rec = null, recording = false, finalTranscript = '', timerId = null;
 
 function startSpeechRec(onLive, onEnd) {
   if (!SR) {
-    alert('Speech recognition requires Chrome. Use a Chromium-based browser.');
+    showInlineStatus('Speech recognition is unavailable. Use current Chrome or Edge on a laptop.');
     return false;
   }
   rec = new SR();
@@ -383,9 +409,16 @@ function speak(text, onend) {
 const TIMERS = {
   speaking_interview: 45,
   speaking_repeat: 15,
-  writing_email: 600,
+  writing_email: 420,
+  writing_discussion: 600,
   writing_sentence: 120,
-  reading_words: 60,
+  reading_words: 180,
+  reading_daily: 240,
+  reading_academic: 420,
+  listening_response: 20,
+  listening_conversation: 240,
+  listening_announcement: 180,
+  listening_academic: 300,
 };
 
 let activeTimer = null, timeLeft = 0;
@@ -395,7 +428,7 @@ function startTimer(modeKey) {
   const limit = TIMERS[modeKey] || 0;
   timeLeft = limit;
   const bar = $('timer-bar');
-  const rubric = RUBRICS[modeKey];
+  const rubric = RUBRICS[modeKey] || MODE_META[modeKey] || { title: 'Practice' };
   bar.classList.remove('hidden', 'warn', 'danger', 'idle');
   $('timer-task').textContent = rubric.title;
   updateTimerDisplay();
@@ -428,8 +461,22 @@ function updateTimerDisplay() {
 // ================= HISTORY =================
 function saveHistory(entry) {
   const log = JSON.parse(localStorage.getItem('tp_log') || '[]');
-  log.unshift({ ts: new Date().toISOString().slice(0, 16), ...entry });
-  localStorage.setItem('tp_log', JSON.stringify(log.slice(0, 100)));
+  log.unshift({ ts: new Date().toISOString(), ...entry });
+  localStorage.setItem('tp_log', JSON.stringify(log.slice(0, 250)));
+  renderDashboard();
+}
+
+async function evaluateResponse(modeKey, item, response, maxTokens = 1000) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return parseOfficialResult(await callLLM(buildPrompt(modeKey, item, response), maxTokens));
+    } catch (error) {
+      lastError = error;
+      if (/401|403|Enter your API key/.test(String(error?.message || error))) break;
+    }
+  }
+  throw lastError || new Error('Feedback provider did not return a valid result.');
 }
 
 function renderHistory() {
@@ -442,8 +489,9 @@ function renderHistory() {
   }
   el.innerHTML = log.map((e) => `
     <div class="history-item">
-      <div class="history-meta"><strong>${e.mode}</strong> · ${e.ts}${e.detail ? ' · ' + e.detail : ''}</div>
-      <div class="history-score">${e.score}</div>
+      <div class="history-meta"><strong>${escapeHtml(e.mode)}</strong><span>${formatHistoryDate(e.ts)}${e.detail ? ' · ' + escapeHtml(e.detail) : ''}</span></div>
+      <div class="history-section-tag">${escapeHtml(capitalize(e.section || inferSection(e.mode)))}</div>
+      <div class="history-score">${escapeHtml(e.score)}</div>
     </div>
   `).join('');
 }
@@ -451,6 +499,58 @@ function renderHistory() {
 // ================= UTILS =================
 const $ = (id) => document.getElementById(id);
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const CONTENT = window.TP_2026_CONTENT || {};
+const SECTION_LABELS = { reading: 'Reading', listening: 'Listening', speaking: 'Speaking', writing: 'Writing' };
+const MODE_META = {
+  reading_words: { title: 'Complete the Words', section: 'reading' },
+  reading_daily: { title: 'Read in Daily Life', section: 'reading' },
+  reading_academic: { title: 'Read an Academic Passage', section: 'reading' },
+  listening_response: { title: 'Listen and Choose a Response', section: 'listening' },
+  listening_conversation: { title: 'Listen to a Conversation', section: 'listening' },
+  listening_announcement: { title: 'Listen to an Announcement', section: 'listening' },
+  listening_academic: { title: 'Listen to an Academic Talk', section: 'listening' },
+  speaking_repeat: { title: 'Listen and Repeat', section: 'speaking' },
+  speaking_interview: { title: 'Take an Interview', section: 'speaking' },
+  writing_sentence: { title: 'Build a Sentence', section: 'writing' },
+  writing_email: { title: 'Write an Email', section: 'writing' },
+  writing_discussion: { title: 'Academic Discussion', section: 'writing' }
+};
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>'"]/g, (character) => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+  })[character]);
+}
+
+function capitalize(value) {
+  const text = String(value || '');
+  return text ? text[0].toUpperCase() + text.slice(1) : '';
+}
+
+function inferSection(mode = '') {
+  const value = mode.toLowerCase();
+  if (value.includes('read') || value.includes('word')) return 'reading';
+  if (value.includes('listen') || value.includes('conversation') || value.includes('announcement')) return 'listening';
+  if (value.includes('interview') || value.includes('repeat')) return 'speaking';
+  return 'writing';
+}
+
+function formatHistoryDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return escapeHtml(String(value).slice(0, 16));
+  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date);
+}
+
+function wordCount(value) {
+  return String(value || '').trim().split(/\s+/).filter(Boolean).length;
+}
+
+function showInlineStatus(message, tone = 'error') {
+  const target = $('key-msg') || $('timer-task');
+  if (!target) return;
+  target.textContent = message;
+  target.dataset.tone = tone;
+}
 
 function normWords(s) {
   return s.toLowerCase().replace(/[^a-z0-9'\s]/g, ' ').split(/\s+/).filter(Boolean);
@@ -473,13 +573,14 @@ function getActiveMode() {
   return document.querySelector('.tab.active')?.dataset.mode || 'speaking_interview';
 }
 
-function showMode(modeKey) {
+function showMode(modeKey, shouldScroll = true) {
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.mode === modeKey));
   document.querySelectorAll('.mode-panel').forEach((p) => p.classList.toggle('hidden', p.dataset.mode !== modeKey));
   stopTimer();
   $('timer-bar').classList.add('idle');
-  $('timer-count').textContent = '—';
-  $('timer-task').textContent = 'Select a task to begin';
+  $('timer-count').textContent = '--';
+  $('timer-task').textContent = `${MODE_META[modeKey]?.title || 'Practice'} · ready`;
+  if (shouldScroll) document.querySelector('#practice')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 // ================= MODE STATE =================
@@ -488,6 +589,9 @@ let repeatItem = null;
 let emailItem = null;
 let sentenceItem = null, sentencePicked = [];
 let wordsItem = null;
+let wordsGapAnswers = [];
+let discussionItem = null;
+const genericState = {};
 
 // ================= INTERVIEW =================
 function initInterview() {
@@ -527,11 +631,10 @@ function initInterview() {
     $('interview-feedback').innerHTML = '<div class="feedback-empty">Rater is evaluating...</div>';
     stopTimer();
     try {
-      const raw = await callLLM(buildPrompt('speaking_interview', interviewQ, text), 900);
-      const res = parseOfficialResult(raw);
+      const res = await evaluateResponse('speaking_interview', interviewQ, text, 900);
       renderFeedback($('interview-feedback'), 'speaking_interview', res);
       const band = formatBand(pointsToBand(res.score, 5));
-      saveHistory({ mode: 'Interview', score: band, detail: interviewQ.topic });
+      saveHistory({ mode: 'Interview', modeKey: 'speaking_interview', section: 'speaking', score: band, percent: res.score / 5, detail: interviewQ.topic });
       renderHistory();
     } catch (e) {
       $('interview-feedback').textContent = 'Error: ' + (e.message || e);
@@ -596,7 +699,7 @@ function scoreRepeat(target, said) {
     missing: missed,
   };
   renderFeedback($('repeat-feedback'), 'speaking_repeat', result);
-  saveHistory({ mode: 'Listen & Repeat', score: formatBand(pointsToBand(score, 5)), detail: pct + '%' });
+  saveHistory({ mode: 'Listen & Repeat', modeKey: 'speaking_repeat', section: 'speaking', score: formatBand(pointsToBand(score, 5)), percent: score / 5, detail: pct + '% words' });
   renderHistory();
 }
 
@@ -608,25 +711,27 @@ function initEmail() {
     $('email-recipient').textContent = `To: ${emailItem.recipient}`;
     $('email-points').innerHTML = emailItem.points.map((p) => `<li>${p}</li>`).join('');
     $('email-text').value = '';
+    updateWordCounter('email-text', 'email-word-count');
     $('email-feedback').innerHTML = '<div class="feedback-empty">Your ETS-style score will appear here.</div>';
     startTimer('writing_email');
   };
+
+  $('email-text').addEventListener('input', () => updateWordCounter('email-text', 'email-word-count'));
 
   $('grade-email').onclick = async () => {
     if (!emailItem) return;
     const text = $('email-text').value.trim();
     if (text.split(/\s+/).length < 20) {
-      $('email-feedback').innerHTML = '<div class="score-text"><p>Write at least ~20 words (target 80–120).</p></div>';
+      $('email-feedback').innerHTML = '<div class="score-text"><p>Write enough to cover all three points in complete sentences before requesting feedback.</p></div>';
       return;
     }
     $('email-feedback').innerHTML = '<div class="feedback-empty">Rater is evaluating...</div>';
     stopTimer();
     try {
-      const raw = await callLLM(buildPrompt('writing_email', emailItem, text), 1100);
-      const res = parseOfficialResult(raw);
+      const res = await evaluateResponse('writing_email', emailItem, text, 1100);
       renderFeedback($('email-feedback'), 'writing_email', res);
       const band = formatBand(pointsToBand(res.score, 5));
-      saveHistory({ mode: 'Write an Email', score: band, detail: text.split(/\s+/).length + ' words' });
+      saveHistory({ mode: 'Write an Email', modeKey: 'writing_email', section: 'writing', score: band, percent: res.score / 5, detail: wordCount(text) + ' words' });
       renderHistory();
     } catch (e) {
       $('email-feedback').textContent = 'Error: ' + (e.message || e);
@@ -640,6 +745,7 @@ function initSentence() {
     sentenceItem = pick(BANK.writing_sentence);
     sentencePicked = [];
     startTimer('writing_sentence');
+    $('sentence-context').textContent = sentenceItem.context || 'Arrange every word into one grammatical sentence.';
     const words = sentenceItem.sentence.replace(/[.!?]+$/, '').split(/\s+/);
     let shuffled = words.slice();
     do {
@@ -674,7 +780,7 @@ function initSentence() {
     const result = { score, breakdown: { 'Grammatical Accuracy': score }, issues: ok ? '' : 'Word order or word choice is incorrect.' };
     renderFeedback($('sentence-feedback'), 'writing_sentence', result);
     stopTimer();
-    saveHistory({ mode: 'Build a Sentence', score: ok ? '✓' : '✗', detail: '' });
+    saveHistory({ mode: 'Build a Sentence', modeKey: 'writing_sentence', section: 'writing', score: ok ? 'Correct' : 'Review', percent: score, detail: '' });
     renderHistory();
   };
 }
@@ -698,52 +804,359 @@ function renderSentenceAnswer() {
 // ================= WORDS =================
 function initWords() {
   $('new-words').onclick = () => {
-    wordsItem = pick(BANK.reading_words);
-    $('words-sentence').textContent = wordsItem.sentence;
-    $('words-clue').textContent = `Clue: ${wordsItem.clue}`;
-    $('words-input').value = '';
-    $('words-feedback').innerHTML = '<div class="feedback-empty">Type the missing word.</div>';
-    $('words-input').focus();
+    wordsItem = pick(CONTENT.reading_words_passages || []);
+    if (!wordsItem) return;
+    $('words-title').textContent = wordsItem.title;
+    renderClozePassage(wordsItem);
+    $('words-feedback').innerHTML = '<div class="feedback-empty">Complete every missing letter group, then check.</div>';
     startTimer('reading_words');
   };
 
   $('check-words').onclick = () => {
     if (!wordsItem) return;
-    const val = $('words-input').value.trim().toLowerCase();
-    const ok = val === wordsItem.word.toLowerCase();
-    const score = ok ? 1 : 0;
-    const result = { score, breakdown: { 'Vocabulary in Context': score }, issues: ok ? '' : `Correct answer: ${wordsItem.word}` };
-    renderFeedback($('words-feedback'), 'reading_words', result);
+    const inputs = [...$('words-passage').querySelectorAll('input')];
+    let correct = 0;
+    const corrections = [];
+    inputs.forEach((input, index) => {
+      const expected = wordsGapAnswers[index];
+      const ok = input.value.trim().toLowerCase() === expected.missing.toLowerCase();
+      input.classList.toggle('correct', ok);
+      input.classList.toggle('incorrect', !ok);
+      if (ok) correct++;
+      else corrections.push(expected.answer);
+    });
+    const percent = inputs.length ? correct / inputs.length : 0;
+    renderObjectiveFeedback($('words-feedback'), correct, inputs.length, corrections.length ? `Review: ${corrections.join(', ')}.` : 'Every word is correct.');
     stopTimer();
-    saveHistory({ mode: 'Complete the Words', score: ok ? '✓' : '✗', detail: wordsItem.word });
+    saveHistory({ mode: 'Complete the Words', modeKey: 'reading_words', section: 'reading', score: `${correct}/${inputs.length}`, percent, detail: wordsItem.title });
     renderHistory();
   };
+}
 
-  $('words-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('check-words').click(); });
+function renderClozePassage(item) {
+  const root = $('words-passage');
+  root.innerHTML = '';
+  wordsGapAnswers = [];
+  const parts = item.text.split(/(\b[A-Za-z]*_{2,}[A-Za-z]*\b)/g);
+  let gapIndex = 0;
+  parts.forEach((part) => {
+    if (!part.includes('__')) {
+      root.append(document.createTextNode(part));
+      return;
+    }
+    const answer = item.answers[gapIndex] || '';
+    const first = part.indexOf('_');
+    const last = part.lastIndexOf('_');
+    const prefix = part.slice(0, first);
+    const suffix = part.slice(last + 1);
+    const missing = answer.slice(prefix.length, answer.length - suffix.length || undefined);
+    const wrapper = document.createElement('span');
+    wrapper.className = 'cloze-word';
+    wrapper.append(document.createTextNode(prefix));
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.maxLength = Math.max(1, missing.length);
+    input.size = Math.max(2, missing.length);
+    input.autocomplete = 'off';
+    input.setAttribute('aria-label', `Missing letters in word ${gapIndex + 1}`);
+    wrapper.append(input, document.createTextNode(suffix));
+    root.append(wrapper);
+    wordsGapAnswers.push({ answer, missing });
+    gapIndex++;
+  });
+  root.querySelector('input')?.focus();
+}
+
+function renderObjectiveFeedback(el, correct, total, message) {
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+  const band = pointsToBand(correct, total || 1);
+  el.innerHTML = `<div class="objective-result"><strong>${correct}/${total}</strong><span>${pct}% accuracy · practice band ${formatBand(band)}</span><p>${escapeHtml(message)}</p><small>This practice band is not an official TOEFL score.</small></div>`;
+}
+
+// ================= READING + LISTENING SETS =================
+function initGenericModes() {
+  ['reading_daily', 'reading_academic', 'listening_response', 'listening_conversation', 'listening_announcement', 'listening_academic']
+    .forEach((modeKey) => renderGenericMode(modeKey));
+}
+
+function renderGenericMode(modeKey) {
+  const root = document.querySelector(`[data-generic="${modeKey}"]`);
+  if (!root) return;
+  const meta = MODE_META[modeKey];
+  const isListening = meta.section === 'listening';
+  const items = CONTENT[modeKey] || [];
+  const item = pick(items);
+  genericState[modeKey] = { item, played: false };
+  if (!item) {
+    root.innerHTML = '<div class="feedback-empty">No practice items are available for this task yet.</div>';
+    return;
+  }
+  const questions = modeKey === 'listening_response' ? [{ q: 'Choose the best response.', ...item }] : item.questions;
+  const source = isListening
+    ? `<div class="audio-stage"><span>Audio prompt</span><strong>${escapeHtml(item.title || meta.title)}</strong><button class="btn btn-primary play-generic" type="button">Play once</button><small>Questions appear after the audio ends.</small></div>`
+    : `<article class="reading-passage"><h3>${escapeHtml(item.title)}</h3><p>${escapeHtml(item.text)}</p></article>`;
+  root.innerHTML = `
+    <div class="mode-header"><div><span class="task-type">${escapeHtml(meta.section)}</span><h2 class="mode-title">${escapeHtml(meta.title)}</h2><p class="mode-instructions">${isListening ? 'Listen carefully and take notes. The audio plays once in exam-style mode.' : 'Read for purpose, detail, vocabulary, and inference.'}</p></div><span class="task-time">Focused set</span></div>
+    ${source}
+    ${isListening && modeKey !== 'listening_response' ? '<label class="notes-field">Notes<textarea class="listening-notes" placeholder="Take brief notes while listening..."></textarea></label>' : ''}
+    <form class="question-set${isListening ? ' questions-locked' : ''}">${renderQuestions(questions, modeKey)}</form>
+    <div class="controls"><button class="btn btn-secondary new-generic" type="button">New set</button><button class="btn btn-primary check-generic" type="button">Check answers</button></div>
+    <div class="feedback-panel generic-feedback"><div class="feedback-empty">Complete the set, then check your answers.</div></div>`;
+
+  root.querySelector('.new-generic').onclick = () => renderGenericMode(modeKey);
+  const playButton = root.querySelector('.play-generic');
+  if (playButton) playButton.onclick = () => playGenericAudio(modeKey, root, questions);
+  root.querySelector('.check-generic').onclick = () => checkGenericMode(modeKey, root, questions);
+  if (!isListening) startTimer(modeKey);
+}
+
+function renderQuestions(questions, modeKey) {
+  return questions.map((question, questionIndex) => `
+    <fieldset class="question-block" data-question="${questionIndex}"><legend><span>${questionIndex + 1}</span>${escapeHtml(question.q)}</legend>
+      <div class="choice-list">${question.choices.map((choice, choiceIndex) => `<label><input type="radio" name="${modeKey}-${questionIndex}" value="${choiceIndex}"><span>${escapeHtml(choice)}</span></label>`).join('')}</div>
+      <p class="answer-explanation hidden"></p>
+    </fieldset>`).join('');
+}
+
+function playGenericAudio(modeKey, root) {
+  const state = genericState[modeKey];
+  if (!state || state.played) return;
+  state.played = true;
+  const button = root.querySelector('.play-generic');
+  button.disabled = true;
+  button.textContent = 'Playing';
+  const script = modeKey === 'listening_response' ? state.item.prompt : state.item.script;
+  speak(script, () => {
+    button.textContent = 'Played once';
+    root.querySelector('.question-set')?.classList.remove('questions-locked');
+    startTimer(modeKey);
+  });
+}
+
+function checkGenericMode(modeKey, root, questions) {
+  if (MODE_META[modeKey].section === 'listening' && !genericState[modeKey]?.played) {
+    root.querySelector('.generic-feedback').innerHTML = '<div class="feedback-empty error-state">Play the audio before checking answers.</div>';
+    return;
+  }
+  let correct = 0;
+  let answered = 0;
+  questions.forEach((question, index) => {
+    const block = root.querySelector(`[data-question="${index}"]`);
+    const checked = block.querySelector('input:checked');
+    if (checked) answered++;
+    const selected = Number(checked?.value);
+    const ok = checked && selected === question.answer;
+    if (ok) correct++;
+    block.classList.toggle('answer-correct', Boolean(ok));
+    block.classList.toggle('answer-wrong', Boolean(checked && !ok));
+    const explanation = block.querySelector('.answer-explanation');
+    explanation.classList.remove('hidden');
+    explanation.textContent = `${ok ? 'Correct.' : `Correct answer: ${question.choices[question.answer]}.`} ${question.explanation}`;
+  });
+  if (answered < questions.length) {
+    root.querySelector('.generic-feedback').innerHTML = `<div class="feedback-empty error-state">Answer all ${questions.length} questions before finishing the set.</div>`;
+    return;
+  }
+  stopTimer();
+  const percent = correct / questions.length;
+  renderObjectiveFeedback(root.querySelector('.generic-feedback'), correct, questions.length, correct === questions.length ? 'Strong set. Explain why every distractor is wrong before moving on.' : 'Review the explanations and identify whether the miss was purpose, detail, inference, or vocabulary.');
+  const meta = MODE_META[modeKey];
+  saveHistory({ mode: meta.title, modeKey, section: meta.section, score: `${correct}/${questions.length}`, percent, detail: genericState[modeKey].item.title || 'response set' });
+  renderHistory();
+}
+
+// ================= ACADEMIC DISCUSSION =================
+function initDiscussion() {
+  $('new-discussion').onclick = () => {
+    discussionItem = pick(CONTENT.writing_discussion || []);
+    if (!discussionItem) return;
+    $('discussion-prompt').innerHTML = `<div class="discussion-professor"><span>${escapeHtml(discussionItem.course)} · ${escapeHtml(discussionItem.professor)}</span><strong>${escapeHtml(discussionItem.question)}</strong></div><div class="student-posts"><p>${escapeHtml(discussionItem.studentA)}</p><p>${escapeHtml(discussionItem.studentB)}</p></div>`;
+    $('discussion-text').value = '';
+    updateWordCounter('discussion-text', 'discussion-word-count');
+    $('discussion-feedback').innerHTML = '<div class="feedback-empty">Write at least 100 original words, then request feedback.</div>';
+    startTimer('writing_discussion');
+  };
+  $('grade-discussion').onclick = async () => {
+    if (!discussionItem) return;
+    const text = $('discussion-text').value.trim();
+    if (wordCount(text) < 100) {
+      $('discussion-feedback').innerHTML = '<div class="feedback-empty error-state">The official practice direction recommends at least 100 words.</div>';
+      return;
+    }
+    $('discussion-feedback').innerHTML = '<div class="feedback-empty loading-state">Evaluating your contribution...</div>';
+    stopTimer();
+    try {
+      const res = await evaluateResponse('writing_discussion', discussionItem, text, 1200);
+      renderFeedback($('discussion-feedback'), 'writing_discussion', res);
+      const band = formatBand(pointsToBand(res.score, 5));
+      saveHistory({ mode: 'Academic Discussion', modeKey: 'writing_discussion', section: 'writing', score: band, percent: res.score / 5, detail: `${wordCount(text)} words` });
+      renderHistory();
+    } catch (error) {
+      $('discussion-feedback').innerHTML = `<div class="feedback-empty error-state">${escapeHtml(error.message || error)}</div>`;
+    }
+  };
+  $('discussion-text').addEventListener('input', () => updateWordCounter('discussion-text', 'discussion-word-count'));
+}
+
+function updateWordCounter(inputId, outputId) {
+  const count = wordCount($(inputId).value);
+  $(outputId).textContent = `${count} word${count === 1 ? '' : 's'}`;
 }
 
 // ================= APP INIT =================
-function initApp() {
-  $('provider').value = getSettings().provider;
-  $('key').value = getSettings().key;
-  $('save-key').onclick = () => {
-    localStorage.setItem('tp_provider', $('provider').value);
-    localStorage.setItem('tp_key', $('key').value.trim());
-    $('key-msg').textContent = 'Saved';
-    setTimeout(() => $('key-msg').textContent = '', 2000);
-  };
+function getPracticeLog() {
+  try { return JSON.parse(localStorage.getItem('tp_log') || '[]'); }
+  catch { return []; }
+}
 
+function renderDashboard() {
+  if (!$('metric-attempts')) return;
+  const log = getPracticeLog();
+  $('metric-attempts').textContent = log.length;
+  const dayKeys = [...new Set(log.map((entry) => String(entry.ts).slice(0, 10)))].sort().reverse();
+  $('metric-days').textContent = dayKeys.length;
+  const streak = calculateStreak(dayKeys);
+  $('metric-streak').textContent = streak ? `${streak}-day streak` : 'Complete one task today';
+  const stats = calculateSectionStats(log);
+  const focus = Object.entries(stats).sort((a, b) => {
+    if (a[1].attempts === 0 && b[1].attempts > 0) return -1;
+    if (b[1].attempts === 0 && a[1].attempts > 0) return 1;
+    return a[1].average - b[1].average;
+  })[0]?.[0] || 'reading';
+  $('metric-focus').textContent = SECTION_LABELS[focus];
+  $('metric-target').textContent = localStorage.getItem('tp_target_band') || '5.0';
+  $('section-progress').innerHTML = Object.entries(stats).map(([section, value]) => {
+    const pct = Math.round(value.average * 100);
+    return `<article><div><strong>${SECTION_LABELS[section]}</strong><span>${value.attempts ? `${pct}% recent accuracy` : 'No evidence yet'}</span></div><progress max="100" value="${pct}" aria-label="${SECTION_LABELS[section]} ${pct} percent"></progress><small>${value.attempts} attempt${value.attempts === 1 ? '' : 's'}</small></article>`;
+  }).join('');
+  $('recommended-start').dataset.mode = recommendedMode(focus, log);
+}
+
+function calculateSectionStats(log) {
+  const result = Object.fromEntries(Object.keys(SECTION_LABELS).map((section) => [section, { attempts: 0, average: 0 }]));
+  Object.keys(result).forEach((section) => {
+    const entries = log.filter((entry) => (entry.section || inferSection(entry.mode)) === section && Number.isFinite(Number(entry.percent))).slice(0, 12);
+    result[section].attempts = entries.length;
+    result[section].average = entries.length ? entries.reduce((sum, entry) => sum + Number(entry.percent), 0) / entries.length : 0;
+  });
+  return result;
+}
+
+function calculateStreak(dayKeys) {
+  if (!dayKeys.length) return 0;
+  const oneDay = 86400000;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const latest = new Date(`${dayKeys[0]}T00:00:00`);
+  if ((today - latest) / oneDay > 1) return 0;
+  let streak = 1;
+  for (let index = 1; index < dayKeys.length; index++) {
+    const previous = new Date(`${dayKeys[index - 1]}T00:00:00`);
+    const current = new Date(`${dayKeys[index]}T00:00:00`);
+    if (Math.round((previous - current) / oneDay) !== 1) break;
+    streak++;
+  }
+  return streak;
+}
+
+function recommendedMode(section, log) {
+  const modes = Object.entries(MODE_META).filter(([, meta]) => meta.section === section).map(([key]) => key);
+  return modes.sort((a, b) => log.filter((entry) => entry.modeKey === a).length - log.filter((entry) => entry.modeKey === b).length)[0] || modes[0];
+}
+
+function initDashboard() {
+  renderDashboard();
+  $('recommended-start').onclick = (event) => showMode(event.currentTarget.dataset.mode || 'reading_daily');
+  $('diagnostic-start').onclick = () => {
+    localStorage.setItem('tp_diagnostic_started', new Date().toISOString());
+    showInlineStatus('Diagnostic started: complete one set in Reading, Listening, Speaking, and Writing.', 'success');
+    showMode('reading_daily');
+  };
+  $('edit-goal').onclick = () => {
+    $('target-band').value = localStorage.getItem('tp_target_band') || '5.0';
+    $('goal-dialog').classList.remove('hidden');
+  };
+  $('close-goal').onclick = () => $('goal-dialog').classList.add('hidden');
+  $('save-goal').onclick = () => {
+    localStorage.setItem('tp_target_band', $('target-band').value);
+    $('goal-dialog').classList.add('hidden');
+    renderDashboard();
+  };
+}
+
+function initSettings() {
+  const settings = getSettings();
+  $('provider').value = settings.provider;
+  $('key').value = settings.key;
+  $('remember-key').checked = Boolean(localStorage.getItem('tp_key'));
+  $('settings-toggle').onclick = () => {
+    const isHidden = $('settings-panel').classList.toggle('hidden');
+    $('settings-toggle').setAttribute('aria-expanded', String(!isHidden));
+  };
+  $('toggle-key').onclick = () => {
+    const show = $('key').type === 'password';
+    $('key').type = show ? 'text' : 'password';
+    $('toggle-key').textContent = show ? 'Hide' : 'Show';
+  };
+  $('save-key').onclick = () => {
+    const storage = $('remember-key').checked ? localStorage : sessionStorage;
+    const otherStorage = $('remember-key').checked ? sessionStorage : localStorage;
+    storage.setItem('tp_provider', $('provider').value);
+    storage.setItem('tp_key', $('key').value.trim());
+    otherStorage.removeItem('tp_key');
+    otherStorage.removeItem('tp_provider');
+    $('key-msg').textContent = $('remember-key').checked ? 'Saved on this device. Do not use this option on a shared computer.' : 'Saved for this browser tab only.';
+    $('key-msg').dataset.tone = 'success';
+  };
+}
+
+function initHistoryTools() {
+  $('export-history').onclick = () => {
+    const payload = { exportedAt: new Date().toISOString(), targetBand: localStorage.getItem('tp_target_band') || '5.0', attempts: getPracticeLog() };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `toefl-practice-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+  let confirmTimer = null;
+  $('clear-history').onclick = () => {
+    if ($('clear-history').dataset.confirm !== 'true') {
+      $('clear-history').dataset.confirm = 'true';
+      $('clear-history').textContent = 'Click again to confirm';
+      clearTimeout(confirmTimer);
+      confirmTimer = setTimeout(() => {
+        $('clear-history').dataset.confirm = 'false';
+        $('clear-history').textContent = 'Clear history';
+      }, 4000);
+      return;
+    }
+    localStorage.removeItem('tp_log');
+    $('clear-history').dataset.confirm = 'false';
+    $('clear-history').textContent = 'Clear history';
+    renderHistory();
+    renderDashboard();
+  };
+}
+
+function initApp() {
+  initSettings();
   document.querySelectorAll('.tab').forEach((t) => {
     t.onclick = () => showMode(t.dataset.mode);
   });
-
   initInterview();
   initRepeat();
   initEmail();
   initSentence();
   initWords();
+  initGenericModes();
+  initDiscussion();
+  initDashboard();
+  initHistoryTools();
   renderHistory();
-  showMode('speaking_interview');
+  showMode('speaking_repeat', false);
 }
 
 // ================= LANDING FAQ =================
