@@ -18,6 +18,11 @@ window.TP_2026_CONTENT = {
       title: 'Citizen science',
       text: 'Large research projects sometimes depend on volunteers to collect observations. In citizen-science programs, members of the p__lic may count birds, measure rainfall, or classify images online. A single observation can be unre__able, but thousands of reports can reveal broad patt__ns. Scientists still need to check data quality and account for uneven participation. When carefully des__ned, however, these projects expand both scientific kn__ledge and public involvement in research.',
       answers: ['public', 'unreliable', 'patterns', 'designed', 'knowledge']
+    },
+    {
+      title: 'Why we misremember details',
+      text: "Memory is not a perfect recording of events. Every time we recall something, the brain may reconstruct the scene, and new information can quietly change the original story. Researchers have found that witnesses who discuss an event before giving a statement sometimes adopt details suggested by other people. This is why interviewers try to ask open questions and avoid leading ph__es. A single suggested detail, such as a wrong color or object, can become part of a person's memory without their awaren__s. Understanding this process matters far beyond the courtroom, because the same reconstructive effect shapes how we remember conversations, news, and even our own decisions.",
+      answers: ['phrases', 'awareness']
     }
   ],
 
@@ -45,6 +50,15 @@ window.TP_2026_CONTENT = {
       questions: [
         { q: 'Who will receive feedback during the workshop?', choices: ['Everyone who attends', 'Students with completed posters', 'The first 30 registered students', 'Only Science Center students'], answer: 2, explanation: 'The first 30 registrants receive feedback during the session.' },
         { q: 'What should every participant bring?', choices: ['A printed poster', 'A laptop and research description', 'A registration receipt', 'A list of appointments'], answer: 1, explanation: 'The page explicitly requests a laptop and one paragraph about the topic.' }
+      ]
+    },
+    {
+      title: 'Campus shuttle schedule change',
+      text: 'Starting next week, the campus shuttle will run every 15 minutes during peak hours instead of every 10 minutes. Service between the library and the athletic center will end at 9:00 p.m. instead of 10:00 p.m. Evening service to the residence halls is unchanged. Students who use the shuttle after dark should review the updated schedule posted at each stop.',
+      questions: [
+        { q: 'What is the main change to the shuttle?', choices: ['The route will be longer', 'Buses will run less often during peak hours', 'The shuttle will stop at the athletic center', 'Fares will increase'], answer: 1, explanation: 'The interval changes from every 10 minutes to every 15 minutes.' },
+        { q: 'Which service is unchanged?', choices: ['The library to athletic center route', 'Peak-hour frequency', 'Evening service to residence halls', 'The 10:00 p.m. departure'], answer: 2, explanation: 'The notice says evening service to the residence halls is unchanged.' },
+        { q: 'Where can students find the updated schedule?', choices: ['At each stop', 'On the athletic center desk', 'In the library only', 'From their instructor'], answer: 0, explanation: 'The revised schedule is posted at each stop.' }
       ]
     }
   ],
@@ -78,7 +92,9 @@ window.TP_2026_CONTENT = {
     { prompt: 'I thought the advising office closed at five.', choices: ['It usually does, but today it closes at four.', 'The adviser gave me useful advice.', 'Five students work in that office.', 'I will close the document.'], answer: 0, explanation: 'The response naturally corrects or qualifies the assumption.' },
     { prompt: 'Would you mind watching my bag for a minute?', choices: ['I bought the bag yesterday.', 'Not at all. I\'ll stay here.', 'The watch is in my bag.', 'It only takes a minute to walk there.'], answer: 1, explanation: '"Not at all" accepts the request.' },
     { prompt: 'The statistics workshop has been moved online.', choices: ['Then I\'ll look for the meeting link.', 'Statistics has several branches.', 'The workshop room is very large.', 'I moved here last year.'], answer: 0, explanation: 'Looking for the link is the relevant next action.' },
-    { prompt: 'How did your presentation go?', choices: ['It is going to the auditorium.', 'About twelve minutes.', 'Better than I expected, actually.', 'I used three presentation slides tomorrow.'], answer: 2, explanation: 'The question asks for an evaluation of the presentation.' }
+    { prompt: 'How did your presentation go?', choices: ['It is going to the auditorium.', 'About twelve minutes.', 'Better than I expected, actually.', 'I used three presentation slides tomorrow.'], answer: 2, explanation: 'The question asks for an evaluation of the presentation.' },
+    { prompt: 'The printer in the computer lab is out of paper again.', choices: ['I will let the lab attendant know.', 'The printer paper is very thin.', 'The computer lab closes at midnight.', 'I printed two copies yesterday.'], answer: 0, explanation: 'Reporting the issue is the relevant next action.' },
+    { prompt: 'Do you want to join the running club?', choices: ['I ran to class this morning.', 'The club meets on Saturdays.', 'Thanks, but I already train with a team.', 'Running is good exercise.'], answer: 2, explanation: 'The response politely declines the invitation.' }
   ],
 
   listening_conversation: [
@@ -98,6 +114,15 @@ window.TP_2026_CONTENT = {
         { q: 'What problem does the student have?', choices: ['A course appears full', 'A credit is categorized too generally', 'The summer syllabus was lost', 'The adviser rejected an override'], answer: 1, explanation: 'The statistics course appears only as general mathematics.' },
         { q: 'What should the student do first?', choices: ['Retake Applied Statistics', 'Wait until registration closes', 'Email the syllabus', 'Change the summer record alone'], answer: 2, explanation: 'The adviser asks for the syllabus by email today.' },
         { q: 'What will happen while the professor reviews the material?', choices: ['A place can be held', 'The student must leave the course', 'The summer program will respond', 'Registration will be extended for everyone'], answer: 0, explanation: 'The adviser says they can hold a place.' }
+      ]
+    },
+    {
+      title: 'Borrowing a camera for a project',
+      script: 'Student: I need to film interviews for my sociology project, but the equipment office said the checkout requires a deposit. Adviser: The deposit is refundable and can be paid by card. Reservations go quickly before midterms, so book at least a week ahead. Student: Is training required to use the camera? Adviser: The basic camera only needs a short online safety tutorial. If you also want the external microphone, you must complete a longer training session.',
+      questions: [
+        { q: 'What problem does the student mention?', choices: ['The camera is broken', 'A deposit is required to borrow equipment', 'The project was rejected', 'The office is closed'], answer: 1, explanation: 'The student says a checkout deposit is required.' },
+        { q: 'What does the adviser recommend about timing?', choices: ['Return equipment the same day', 'Reserve about a week ahead', 'Film before 9:00 a.m.', 'Use a personal camera'], answer: 1, explanation: 'Reservations fill quickly before midterms, so advance booking is advised.' },
+        { q: 'When must the student complete the longer training session?', choices: ['To use the basic camera', 'To borrow the external microphone', 'To pay the deposit', 'To reserve equipment'], answer: 1, explanation: 'The longer session is required only when the microphone is borrowed as well.' }
       ]
     }
   ],
@@ -119,6 +144,15 @@ window.TP_2026_CONTENT = {
         { q: 'Which classes will definitely move online?', choices: ['All classes tomorrow', 'Classes before 10:00 a.m.', 'Classes after 10:00 a.m.', 'Only classes near the library'], answer: 1, explanation: 'The announcement explicitly moves early classes online.' },
         { q: 'What should students do before traveling?', choices: ['Call a bus driver', 'Check the alert page', 'Park in the north lot', 'Contact every professor'], answer: 1, explanation: 'Students are asked to check for updates.' },
         { q: 'Why will buses use a different stop?', choices: ['The library is closed', 'The north parking lot is closed', 'Classes end earlier', 'Freezing rain has ended'], answer: 1, explanation: 'The lot closure changes the bus stop.' }
+      ]
+    },
+    {
+      title: 'Gym locker renewal',
+      script: 'Attention members. Locker assignments in the fitness center expire on the last day of the month. Renewal can be completed at the front desk or through the member portal. Members who do not renew by the deadline should remove their belongings, because unassigned lockers will be opened and emptied during the first week of the following month. Contact the front desk if you need a temporary locker for a single session.',
+      questions: [
+        { q: 'When do locker assignments expire?', choices: ['At the end of each week', 'On the last day of the month', 'After one year', 'When the member renews'], answer: 1, explanation: 'Assignments expire at the end of the month.' },
+        { q: 'What happens to unassigned lockers?', choices: ['They are locked permanently', 'They are opened and emptied', 'They become temporary lockers', 'They are sold to new members'], answer: 1, explanation: 'Unassigned lockers are opened and emptied in the first week.' },
+        { q: 'How can members renew?', choices: ['By phone only', 'At the front desk or online', 'Through their employer', 'At the main office downtown'], answer: 1, explanation: 'Renewal is available at the front desk or through the member portal.' }
       ]
     }
   ],
@@ -142,6 +176,16 @@ window.TP_2026_CONTENT = {
         { q: 'Why can a small reduction in cars noticeably improve traffic?', choices: ['Roads become longer', 'Congestion increases nonlinearly near capacity', 'Drivers receive discounts', 'Public transport becomes free'], answer: 1, explanation: 'Near capacity, each extra vehicle produces a large delay.' },
         { q: 'What concern do critics raise?', choices: ['Fees may affect lower-income commuters unfairly', 'Traffic will become too fast', 'Air quality cannot be measured', 'Road capacity will disappear'], answer: 0, explanation: 'Distributional fairness is the stated criticism.' },
         { q: 'What does the speaker suggest about evaluation?', choices: ['Revenue is the only useful measure', 'Traffic speed should be ignored', 'Several social and environmental outcomes matter', 'Programs cannot be compared'], answer: 2, explanation: 'The final sentence lists multiple outcomes.' }
+      ]
+    },
+    {
+      title: 'Why flamingos stand on one leg',
+      script: 'Flamingos frequently rest while standing on a single leg, and researchers have debated why. One early explanation suggested that the posture reduces heat loss, because a tucked leg exposes less body surface to cool water. A second proposal linked the behavior to balance, since flamingos can even sleep in this position. Recent work measuring sway in captive birds found that the one-legged posture actually requires less muscular effort, because the body weight aligns over the supporting leg in a stable way. The researchers do not claim the behavior has a single cause. Different conditions may favor one-legged standing for different reasons, and the habit probably combines several advantages.',
+      questions: [
+        { q: 'What does the first explanation suggest about one-legged standing?', choices: ['It helps flamingos fly faster', 'It reduces heat loss', 'It improves eyesight', 'It attracts mates'], answer: 1, explanation: 'The tucked leg exposes less body surface to cool water.' },
+        { q: 'What did the recent study measure?', choices: ['Body sway in captive birds', 'Feather thickness', 'Nest construction time', 'Food intake'], answer: 0, explanation: 'The researchers measured how much the birds swayed.' },
+        { q: 'What did the study conclude about the posture?', choices: ['It requires more energy than standing on two legs', 'It is impossible to maintain while sleeping', 'It uses less muscular effort', 'It is unique to flamingos'], answer: 2, explanation: 'The one-legged posture requires less muscular effort.' },
+        { q: 'What does the speaker say about the explanations?', choices: ['Only the heat-loss theory is correct', 'The behavior probably combines several advantages', 'Researchers have abandoned the debate', 'The evidence supports no explanation'], answer: 1, explanation: 'The speaker says different conditions may favor it for different reasons.' }
       ]
     }
   ],
@@ -167,6 +211,13 @@ window.TP_2026_CONTENT = {
       question: 'Is giving consumers detailed environmental information an effective way to reduce pollution, or are government rules more important?',
       studentA: 'Samira: Clear labels let people reward cleaner companies, and businesses respond when demand changes.',
       studentB: 'Jon: Many consumers cannot research every purchase. Regulations create a minimum standard that applies even when buyers lack time or money.'
+    },
+    {
+      course: 'Public health',
+      professor: 'Professor Adeyemi',
+      question: 'Should employers be allowed to offer financial rewards to workers who meet health goals such as daily step counts or regular checkups? Why or why not?',
+      studentA: 'Lina: Incentives can motivate people who would otherwise skip checkups, and small rewards are a low-cost way to improve population health.',
+      studentB: 'Omar: Rewards can pressure employees to share private health data and may punish workers with conditions they cannot control.'
     }
   ]
 };

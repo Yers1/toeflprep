@@ -33,7 +33,10 @@ for (const key of ['reading_daily', 'reading_academic', 'listening_conversation'
   }
 }
 
-for (const item of content.listening_response) validateQuestion(item, 'listening_response');
+for (const item of content.listening_response) {
+  assert.ok(item.prompt, 'listening_response item needs a prompt');
+  validateQuestion(item, 'listening_response');
+}
 
 for (const item of content.reading_words_passages) {
   const gaps = item.text.match(/\b[A-Za-z]*_{2,}[A-Za-z]*\b/g) || [];

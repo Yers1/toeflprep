@@ -913,6 +913,7 @@ function renderGenericMode(modeKey) {
 function renderQuestions(questions, modeKey) {
   return questions.map((question, questionIndex) => `
     <fieldset class="question-block" data-question="${questionIndex}"><legend><span>${questionIndex + 1}</span>${escapeHtml(question.q)}</legend>
+      ${question.prompt ? `<p class="prompt-text">${escapeHtml(question.prompt)}</p>` : ''}
       <div class="choice-list">${question.choices.map((choice, choiceIndex) => `<label><input type="radio" name="${modeKey}-${questionIndex}" value="${choiceIndex}"><span>${escapeHtml(choice)}</span></label>`).join('')}</div>
       <p class="answer-explanation hidden"></p>
     </fieldset>`).join('');
