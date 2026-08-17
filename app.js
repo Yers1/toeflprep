@@ -463,7 +463,42 @@ function saveHistory(entry) {
   const log = JSON.parse(localStorage.getItem('tp_log') || '[]');
   log.unshift({ ts: new Date().toISOString(), ...entry });
   localStorage.setItem('tp_log', JSON.stringify(log.slice(0, 250)));
+  trackDiagnostic(entry);
   renderDashboard();
+}
+
+// ================= DIAGNOSTIC =================
+function getDiagnostic() {
+  try { return JSON.parse(localStorage.getItem('tp_diagnostic_done') || '{}'); }
+  catch { return {}; }
+}
+
+function trackDiagnostic(entry) {
+  if (!localStorage.getItem('tp_diagnostic_started') || !entry.section) return;
+  const done = getDiagnostic() || {};
+  done[entry.section] = true;
+  localStorage.setItem('tp_diagnostic_done', JSON.stringify(done));
+  renderDiagnosticProgress();
+}
+
+function renderDiagnosticProgress() {
+  const el = $('diagnostic-progress');
+  if (!el) return;
+  const started = localStorage.getItem('tp_diagnostic_started');
+  if (!started) {
+    el.classList.add('hidden');
+    el.innerHTML = '';
+    return;
+  }
+  const done = getDiagnostic() || {};
+  const complete = Object.keys(SECTION_LABELS).every((section) => done[section]);
+  const remaining = Object.keys(SECTION_LABELS).filter((section) => !done[section]).length;
+  el.classList.remove('hidden');
+  if (complete) {
+    el.innerHTML = '<div class="diagnostic-progress-inner"><div class="diag-head"><strong>Quick diagnostic complete</strong><span>all four sections</span></div><p>One set done in Reading, Listening, Speaking, and Writing. Use the current-focus card above and recent accuracy below to decide what to practice next.</p></div>';
+    return;
+  }
+  el.innerHTML = `<div class="diagnostic-progress-inner"><div class="diag-head"><strong>Quick diagnostic</strong><span>${remaining} of 4 sections left</span></div><div class="diag-sections">${Object.keys(SECTION_LABELS).map((section) => `<span class="${done[section] ? 'diag-done' : ''}">${SECTION_LABELS[section]}</span>`).join('')}</div><small>Complete one set in each section to map your weakest area.</small></div>`;
 }
 
 async function evaluateResponse(modeKey, item, response, maxTokens = 1000) {
@@ -1031,6 +1066,7 @@ function renderDashboard() {
     return `<article><div><strong>${SECTION_LABELS[section]}</strong><span>${value.attempts ? `${pct}% recent accuracy` : 'No evidence yet'}</span></div><progress max="100" value="${pct}" aria-label="${SECTION_LABELS[section]} ${pct} percent"></progress><small>${value.attempts} attempt${value.attempts === 1 ? '' : 's'}</small></article>`;
   }).join('');
   $('recommended-start').dataset.mode = recommendedMode(focus, log);
+  renderDiagnosticProgress();
 }
 
 function calculateSectionStats(log) {
@@ -1070,7 +1106,9 @@ function initDashboard() {
   $('recommended-start').onclick = (event) => showMode(event.currentTarget.dataset.mode || 'reading_daily');
   $('diagnostic-start').onclick = () => {
     localStorage.setItem('tp_diagnostic_started', new Date().toISOString());
+    localStorage.setItem('tp_diagnostic_done', '{}');
     showInlineStatus('Diagnostic started: complete one set in Reading, Listening, Speaking, and Writing.', 'success');
+    renderDiagnosticProgress();
     showMode('reading_daily');
   };
   $('edit-goal').onclick = () => {

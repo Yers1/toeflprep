@@ -168,6 +168,15 @@ progress { width: 100%; height: .35rem; margin: .7rem 0; border: 0; border-radiu
 progress::-webkit-progress-bar { background: var(--line); }
 progress::-webkit-progress-value { background: var(--accent); }
 progress::-moz-progress-bar { background: var(--accent); }
+.diagnostic-progress { grid-column: 1 / -1; margin-top: 1.5rem; padding: 1.1rem 1.25rem; border: 1px solid var(--line); border-radius: var(--radius-md); background: rgba(255, 255, 255, .6); }
+.diagnostic-progress-inner { display: flex; flex-wrap: wrap; align-items: center; gap: .4rem 1.2rem; }
+.diag-head strong { display: block; font-size: .9rem; }
+.diag-head span { color: var(--muted); font-size: .72rem; }
+.diag-sections { display: flex; flex-wrap: wrap; gap: .4rem; }
+.diag-sections span { padding: .2rem .65rem; border: 1px solid var(--line); border-radius: 999px; color: var(--muted); font-size: .72rem; font-weight: 650; }
+.diag-sections .diag-done { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-dark); }
+.diagnostic-progress p, .diagnostic-progress small { margin: 0; color: var(--text); font-size: .78rem; }
+.diagnostic-progress small { width: 100%; color: var(--muted); }
 
 .practice-workspace { padding-top: 4.5rem; border-top: 1px solid var(--line); scroll-margin-top: 7rem; }
 .workspace-heading { display: grid; grid-template-columns: 1fr minmax(20rem, 30rem); align-items: end; gap: 3rem; margin-bottom: 2.4rem; }
@@ -273,6 +282,7 @@ input.incorrect { border-color: var(--danger); background: #f9e8e5; }
   .hero-content, .section-intro, .method-section, .honesty-section, .faq-section, .study-dashboard, .settings-card, .workspace-heading { grid-template-columns: 1fr; }
   .hero-product { transform: none; }
   .section-progress { grid-column: auto; }
+  .diagnostic-progress { grid-column: auto; }
   .method-lead { position: static; }
   .task-navigation { grid-template-columns: 1fr; }
   .honesty-section { gap: 1rem; padding: 2rem; }
