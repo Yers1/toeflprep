@@ -21,7 +21,7 @@ for (const mode of expectedModes) {
   assert.match(appHtml, new RegExp(`data-mode=["']${mode}["']`), `Missing panel or tab for ${mode}`);
 }
 
-for (const key of ['reading_daily', 'reading_academic', 'listening_response', 'listening_conversation', 'listening_announcement', 'listening_academic', 'writing_discussion']) {
+for (const key of ['reading_words_passages', 'reading_daily', 'reading_academic', 'listening_response', 'listening_conversation', 'listening_announcement', 'listening_academic', 'writing_discussion']) {
   assert.ok(Array.isArray(content[key]) && content[key].length > 0, `${key} needs practice content`);
 }
 
