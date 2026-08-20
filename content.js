@@ -23,6 +23,16 @@ window.TP_2026_CONTENT = {
       title: 'Why we misremember details',
       text: "Memory is not a perfect recording of events. Every time we recall something, the brain may reconstruct the scene, and new information can quietly change the original story. Researchers have found that witnesses who discuss an event before giving a statement sometimes adopt details suggested by other people. This is why interviewers try to ask open questions and avoid leading ph__es. A single suggested detail, such as a wrong color or object, can become part of a person's memory without their awaren__s. Understanding this process matters far beyond the courtroom, because the same reconstructive effect shapes how we remember conversations, news, and even our own decisions.",
       answers: ['phrases', 'awareness']
+    },
+    {
+      title: 'The benefits of spaced repetition',
+      text: 'Cramming the night before an exam may feel productive, but research suggests that spreading study sessions over time is more eff__tive. When you review material after a delay, the brain has to work harder to rec__l it, and that effort strengthens the memory. Short sessions repeated across several days also reduce fatigue and keep motivation h__h. The key is to schedule reviews before you forget, rather than waiting until the material is completely g__e. Many students find that a simple calendar reminder is enough to build this habit.',
+      answers: ['effective', 'recall', 'high', 'gone']
+    },
+    {
+      title: 'How cities reduce noise',
+      text: 'Traffic, construction, and crowded streets make cities noisy, and constant noise can raise stress and disturb sl__p. Cities use several methods to reduce the problem. Barriers such as walls and dense vegetation can bl__k sound before it reaches homes. Building materials that absorb sound, rather than reflect it, help inside buildings. Planners also separate noisy roads from quiet areas such as parks and schools. Even small changes, like using quieter pavement or limiting truck routes at night, can make a measurable diff___nce. Because noise travels in many directions, the most eff__tive plans combine several of these approaches.',
+      answers: ['sleep', 'block', 'difference', 'effective']
     }
   ],
 
@@ -60,6 +70,42 @@ window.TP_2026_CONTENT = {
         { q: 'Which service is unchanged?', choices: ['The library to athletic center route', 'Peak-hour frequency', 'Evening service to residence halls', 'The 10:00 p.m. departure'], answer: 2, explanation: 'The notice says evening service to the residence halls is unchanged.' },
         { q: 'Where can students find the updated schedule?', choices: ['At each stop', 'On the athletic center desk', 'In the library only', 'From their instructor'], answer: 0, explanation: 'The revised schedule is posted at each stop.' }
       ]
+    },
+    {
+      title: 'Apartment sublet notice',
+      text: 'Sublet available: one bedroom in a two-bedroom apartment near the north campus gate, from June 1 to August 15. Rent is 450 per month, including water and internet. Electricity is billed separately. The apartment is furnished, and the current tenant will store personal items in the closet. Interested students should contact the tenant by email and include their move-in date. A short viewing can be arranged on weekday evenings.',
+      questions: [
+        { q: 'What is included in the rent?', choices: ['Electricity', 'Water and internet', 'Furniture rental', 'Parking'], answer: 1, explanation: 'The notice says water and internet are included; electricity is separate.' },
+        { q: 'When can the apartment be viewed?', choices: ['Any weekend morning', 'On weekday evenings', 'Only on June 1', 'During business hours'], answer: 1, explanation: 'Viewings can be arranged on weekday evenings.' },
+        { q: 'What should interested students include in their email?', choices: ['A reference letter', 'Their move-in date', 'A copy of their lease', 'Their class schedule'], answer: 1, explanation: 'The notice asks for the move-in date.' }
+      ]
+    },
+    {
+      title: 'Grocery delivery schedule',
+      text: 'The campus grocery service delivers orders to the residence halls every Tuesday and Friday. Orders must be placed by 8:00 p.m. the evening before delivery. A minimum order of 15 is required, and a 2 delivery fee is added to orders below 25. Students can pay by card at checkout or in cash when the order arrives. Items that are out of stock are refunded automatically and do not appear on the receipt.',
+      questions: [
+        { q: 'On which days does the service deliver?', choices: ['Monday and Thursday', 'Tuesday and Friday', 'Wednesday and Saturday', 'Every day'], answer: 1, explanation: 'Deliveries occur on Tuesdays and Fridays.' },
+        { q: 'When must an order be placed?', choices: ['The morning of delivery', 'By 8:00 p.m. the night before', 'At least a week in advance', 'Any time on delivery day'], answer: 1, explanation: 'Orders close at 8:00 p.m. the evening before delivery.' },
+        { q: 'What happens to out-of-stock items?', choices: ['They are replaced with similar items', 'They are refunded automatically', 'They are added to the next order', 'The customer is called'], answer: 1, explanation: 'Out-of-stock items are refunded automatically.' }
+      ]
+    },
+    {
+      title: 'Course waitlist email',
+      text: 'Dear Ms. Rivera, You are third on the waitlist for Psychology 210, which begins next Monday. Two students have already been admitted from the waitlist, and one more seat may open after the first class. If you are offered a place, you will receive an email with a registration link that expires in 24 hours. Please check your inbox regularly. If you no longer wish to remain on the waitlist, reply to this message with the subject line "Remove me." - Office of the Registrar',
+      questions: [
+        { q: 'What is the student\'s current position on the waitlist?', choices: ['First', 'Second', 'Third', 'Fourth'], answer: 2, explanation: 'The email states the student is third on the waitlist.' },
+        { q: 'How long does the registration link remain valid?', choices: ['One hour', '12 hours', '24 hours', 'One week'], answer: 2, explanation: 'The link expires in 24 hours.' },
+        { q: 'What should the student do to leave the waitlist?', choices: ['Call the registrar', 'Reply with a specific subject line', 'Attend the first class', 'Wait for the link to expire'], answer: 1, explanation: 'The email asks for a reply with the subject line "Remove me."' }
+      ]
+    },
+    {
+      title: 'Gym class cancellation',
+      text: 'The 6:00 p.m. spin class on Thursday will be cancelled because the instructor is attending a conference. Members with a reservation for that class may use the open gym instead, or they may book the 7:00 p.m. class, which still has space. Reservations for the cancelled class will be released automatically at noon on Thursday. The regular schedule resumes on Friday.',
+      questions: [
+        { q: 'Why is the spin class cancelled?', choices: ['The room is being repaired', 'The instructor is away at a conference', 'Not enough members registered', 'The gym closes early'], answer: 1, explanation: 'The instructor is attending a conference.' },
+        { q: 'What happens to reservations for the cancelled class?', choices: ['They are moved to Friday', 'They are released automatically', 'They are refunded', 'They are kept for next week'], answer: 1, explanation: 'Reservations are released automatically at noon on Thursday.' },
+        { q: 'What option is available to affected members?', choices: ['A private session', 'The 7:00 p.m. class', 'A free month', 'The open gym only'], answer: 1, explanation: 'Members may use the open gym or book the 7:00 p.m. class.' }
+      ]
     }
   ],
 
@@ -83,6 +129,26 @@ window.TP_2026_CONTENT = {
         { q: 'What difficulty must engineers address?', choices: ['Selecting an exact transformation temperature', 'Preventing every type of deformation', 'Making the alloy dissolve in blood', 'Replacing all rigid materials'], answer: 0, explanation: 'The transformation must happen neither too early nor too late.' },
         { q: 'Which application is mentioned in the passage?', choices: ['Solar panels', 'Aircraft fuel', 'Robotic mechanisms', 'Concrete foundations'], answer: 2, explanation: 'Small robotic mechanisms appear in the final sentence.' }
       ]
+    },
+    {
+      title: 'Why rivers meander',
+      text: 'Most rivers do not flow in straight lines. Even on gentle slopes, a river often develops a series of curves called meanders. The process begins with a small irregularity, such as a fallen tree or a patch of harder rock, that deflects the current toward one bank. Water moving faster on the outside of the curve erodes that bank, while slower water on the inside deposits sediment. Over time the curve grows wider and the river shifts sideways across its floodplain. A meander can eventually become so curved that the river cuts across the narrow neck of land between two bends, abandoning the old loop. The abandoned channel, called an oxbow lake, gradually fills with sediment and vegetation. Meandering therefore does not simply move water; it reshapes the surrounding landscape over decades and centuries.',
+      questions: [
+        { q: 'What starts the formation of a meander?', choices: ['A change in rainfall', 'A small irregularity that deflects the current', 'The river reaching the ocean', 'A rise in water temperature'], answer: 1, explanation: 'The passage says a small irregularity deflects the current toward one bank.' },
+        { q: 'What happens on the inside of a curve?', choices: ['Erosion increases', 'Sediment is deposited', 'The water speeds up', 'The bank collapses'], answer: 1, explanation: 'Slower water on the inside deposits sediment.' },
+        { q: 'What is an oxbow lake?', choices: ['A lake formed by a glacier', 'An abandoned river loop that fills with sediment', 'A reservoir built for irrigation', 'A pond created by beavers'], answer: 1, explanation: 'An oxbow lake is an abandoned channel that gradually fills.' },
+        { q: 'The word "abandoning" in the passage is closest in meaning to', choices: ['repairing', 'leaving', 'widening', 'measuring'], answer: 1, explanation: 'The river leaves the old loop behind.' }
+      ]
+    },
+    {
+      title: 'How plants defend themselves',
+      text: 'Plants cannot run away from danger, but they are far from defenseless. Many species produce chemical compounds that make their leaves taste unpleasant or even toxic to herbivores. Some of these defenses are always present, while others are activated only after an attack. When a leaf is damaged, the plant may release volatile chemicals that warn neighboring plants, which then begin producing their own protective compounds. Other plants use physical defenses, such as thorns, tough fibers, or tiny hairs that irritate the mouths of grazing animals. A few species even recruit helpers: certain trees emit signals that attract predatory insects, which feed on the herbivores damaging the tree. These strategies are not mutually exclusive. A single plant may combine chemical, physical, and indirect defenses, adjusting the mix as conditions change.',
+      questions: [
+        { q: 'What is the main idea of the passage?', choices: ['Plants compete with each other for light', 'Plants use several kinds of defenses against herbivores', 'Herbivores have no effect on plant growth', 'Chemical defenses are always toxic to humans'], answer: 1, explanation: 'The passage surveys chemical, physical, and indirect defenses.' },
+        { q: 'What do volatile chemicals released by a damaged leaf do?', choices: ['They attract herbivores', 'They warn neighboring plants', 'They harden the soil', 'They slow down photosynthesis'], answer: 1, explanation: 'The chemicals warn nearby plants to produce defenses.' },
+        { q: 'How do some trees recruit helpers?', choices: ['By growing taller', 'By attracting predatory insects', 'By producing sweet fruit', 'By dropping their leaves'], answer: 1, explanation: 'Signals attract predatory insects that feed on the herbivores.' },
+        { q: 'The phrase "mutually exclusive" in the passage is closest in meaning to', choices: ['unable to occur together', 'difficult to observe', 'equally important', 'widely studied'], answer: 0, explanation: 'The strategies can be combined, so they are not mutually exclusive.' }
+      ]
     }
   ],
 
@@ -94,7 +160,13 @@ window.TP_2026_CONTENT = {
     { prompt: 'The statistics workshop has been moved online.', choices: ['Then I\'ll look for the meeting link.', 'Statistics has several branches.', 'The workshop room is very large.', 'I moved here last year.'], answer: 0, explanation: 'Looking for the link is the relevant next action.' },
     { prompt: 'How did your presentation go?', choices: ['It is going to the auditorium.', 'About twelve minutes.', 'Better than I expected, actually.', 'I used three presentation slides tomorrow.'], answer: 2, explanation: 'The question asks for an evaluation of the presentation.' },
     { prompt: 'The printer in the computer lab is out of paper again.', choices: ['I will let the lab attendant know.', 'The printer paper is very thin.', 'The computer lab closes at midnight.', 'I printed two copies yesterday.'], answer: 0, explanation: 'Reporting the issue is the relevant next action.' },
-    { prompt: 'Do you want to join the running club?', choices: ['I ran to class this morning.', 'The club meets on Saturdays.', 'Thanks, but I already train with a team.', 'Running is good exercise.'], answer: 2, explanation: 'The response politely declines the invitation.' }
+    { prompt: 'Do you want to join the running club?', choices: ['I ran to class this morning.', 'The club meets on Saturdays.', 'Thanks, but I already train with a team.', 'Running is good exercise.'], answer: 2, explanation: 'The response politely declines the invitation.' },
+    { prompt: 'Could you send me the notes from Tuesday\'s lecture?', choices: ['The lecture was about climate policy.', 'Sure, I\'ll email them to you tonight.', 'Tuesday is my busiest day.', 'I took the notes in pencil.'], answer: 1, explanation: 'The response agrees to share the notes.' },
+    { prompt: 'The cafeteria is serving pasta for lunch.', choices: ['Then I\'ll head over before it gets busy.', 'Pasta is made from wheat.', 'The cafeteria opened last year.', 'I had lunch at home.'], answer: 0, explanation: 'The response reacts to the news with a relevant plan.' },
+    { prompt: 'Have you finished the reading for tomorrow?', choices: ['The reading room is on the third floor.', 'Almost, just the last section.', 'I read a book last summer.', 'Tomorrow is a holiday.'], answer: 1, explanation: 'The response directly reports progress.' },
+    { prompt: 'I can\'t find my student ID anywhere.', choices: ['The ID office issues replacements.', 'I found the answer to the problem.', 'My ID has my photo on it.', 'The library is open late.'], answer: 0, explanation: 'The response offers a relevant solution.' },
+    { prompt: 'Do you think the exam will be difficult?', choices: ['The exam room is on the second floor.', 'I studied the review slides twice.', 'Difficult is a long word.', 'The exam was last week.'], answer: 1, explanation: 'The response answers the question about preparation.' },
+    { prompt: 'The bus to the airport leaves at six.', choices: ['Then we should leave the dorm by five.', 'The airport is far from campus.', 'I took the bus yesterday.', 'Six is my lucky number.'], answer: 0, explanation: 'The response draws the practical conclusion.' }
   ],
 
   listening_conversation: [
@@ -123,6 +195,24 @@ window.TP_2026_CONTENT = {
         { q: 'What problem does the student mention?', choices: ['The camera is broken', 'A deposit is required to borrow equipment', 'The project was rejected', 'The office is closed'], answer: 1, explanation: 'The student says a checkout deposit is required.' },
         { q: 'What does the adviser recommend about timing?', choices: ['Return equipment the same day', 'Reserve about a week ahead', 'Film before 9:00 a.m.', 'Use a personal camera'], answer: 1, explanation: 'Reservations fill quickly before midterms, so advance booking is advised.' },
         { q: 'When must the student complete the longer training session?', choices: ['To use the basic camera', 'To borrow the external microphone', 'To pay the deposit', 'To reserve equipment'], answer: 1, explanation: 'The longer session is required only when the microphone is borrowed as well.' }
+      ]
+    },
+    {
+      title: 'Requesting a transcript',
+      script: 'Student: I need an official transcript for a scholarship application, but the deadline is in ten days. Office worker: Standard processing takes two weeks, but we can rush it for a fee. Student: How much is the rush fee? Office worker: Twenty dollars, and the transcript is ready in three business days. Student: That works. Do I need to fill out a form? Office worker: Yes, the request form is online. You can pay by card when you submit it.',
+      questions: [
+        { q: 'Why does the student need the transcript?', choices: ['For a job interview', 'For a scholarship application', 'To register for a course', 'To change majors'], answer: 1, explanation: 'The student mentions a scholarship application.' },
+        { q: 'How long does rush processing take?', choices: ['One day', 'Three business days', 'One week', 'Two weeks'], answer: 1, explanation: 'The rush service takes three business days.' },
+        { q: 'What must the student do to request the transcript?', choices: ['Visit the office in person', 'Fill out an online form', 'Call the registrar', 'Bring a photo'], answer: 1, explanation: 'The request form is online.' }
+      ]
+    },
+    {
+      title: 'Changing a meal plan',
+      script: 'Student: I want to switch from the 14-meal plan to the 10-meal plan. Dining office: The change is allowed before the end of the second week of the semester. Student: I\'m still within that window. How does the refund work? Dining office: The difference is credited to your student account, not returned in cash. Student: When will the new plan start? Dining office: It takes effect at the beginning of next week. Your current card will keep working until then.',
+      questions: [
+        { q: 'What does the student want to do?', choices: ['Cancel the meal plan entirely', 'Move to a smaller meal plan', 'Add more meals to the plan', 'Transfer the plan to a friend'], answer: 1, explanation: 'The student wants to switch from 14 to 10 meals.' },
+        { q: 'How is the refund issued?', choices: ['In cash', 'As a credit to the student account', 'As a dining card bonus', 'It is not refundable'], answer: 1, explanation: 'The difference is credited to the student account.' },
+        { q: 'When does the new plan take effect?', choices: ['Immediately', 'At the start of next week', 'At the end of the semester', 'After the second week'], answer: 1, explanation: 'The new plan begins at the start of next week.' }
       ]
     }
   ],
@@ -153,6 +243,24 @@ window.TP_2026_CONTENT = {
         { q: 'When do locker assignments expire?', choices: ['At the end of each week', 'On the last day of the month', 'After one year', 'When the member renews'], answer: 1, explanation: 'Assignments expire at the end of the month.' },
         { q: 'What happens to unassigned lockers?', choices: ['They are locked permanently', 'They are opened and emptied', 'They become temporary lockers', 'They are sold to new members'], answer: 1, explanation: 'Unassigned lockers are opened and emptied in the first week.' },
         { q: 'How can members renew?', choices: ['By phone only', 'At the front desk or online', 'Through their employer', 'At the main office downtown'], answer: 1, explanation: 'Renewal is available at the front desk or through the member portal.' }
+      ]
+    },
+    {
+      title: 'Library extended hours',
+      script: 'Attention students. Beginning this Sunday, the main library will extend its hours during the final examination period. The building will remain open until 2:00 a.m. on weekdays and until midnight on weekends. The 24-hour study room on the ground floor is unaffected. Please note that the coffee shop closes at 10:00 p.m., and only the ground and first floors will be staffed after midnight. Regular hours resume after the last exam.',
+      questions: [
+        { q: 'What is the announcement about?', choices: ['A new library building', 'Extended hours during exams', 'A coffee shop opening', 'A change in library fees'], answer: 1, explanation: 'The library stays open later during the exam period.' },
+        { q: 'Until what time is the library open on weekdays?', choices: ['10:00 p.m.', 'Midnight', '2:00 a.m.', '6:00 a.m.'], answer: 2, explanation: 'Weekday hours extend to 2:00 a.m.' },
+        { q: 'What is true about the 24-hour study room?', choices: ['It closes at midnight', 'It is unaffected by the change', 'It is only for graduate students', 'It moves to the first floor'], answer: 1, explanation: 'The study room is unaffected.' }
+      ]
+    },
+    {
+      title: 'Campus shuttle detour',
+      script: 'Attention riders. Due to road work on College Avenue, the campus shuttle will follow a detour from Monday through Friday. During the detour, the shuttle will not stop at the bookstore. Passengers for the bookstore should use the stop outside the student center, which is a five-minute walk away. The detour adds about ten minutes to the full loop, so please allow extra time. Regular service resumes on Saturday morning.',
+      questions: [
+        { q: 'Why is the shuttle using a detour?', choices: ['A shuttle broke down', 'Road work on College Avenue', 'The bookstore is closed', 'A new stop was added'], answer: 1, explanation: 'Road work on College Avenue causes the detour.' },
+        { q: 'Where should passengers for the bookstore go?', choices: ['The student center stop', 'The library stop', 'The athletic center', 'The main gate'], answer: 0, explanation: 'The student center stop is a five-minute walk from the bookstore.' },
+        { q: 'How much time does the detour add?', choices: ['Five minutes', 'Ten minutes', 'Fifteen minutes', 'Twenty minutes'], answer: 1, explanation: 'The detour adds about ten minutes to the loop.' }
       ]
     }
   ],
@@ -187,6 +295,26 @@ window.TP_2026_CONTENT = {
         { q: 'What did the study conclude about the posture?', choices: ['It requires more energy than standing on two legs', 'It is impossible to maintain while sleeping', 'It uses less muscular effort', 'It is unique to flamingos'], answer: 2, explanation: 'The one-legged posture requires less muscular effort.' },
         { q: 'What does the speaker say about the explanations?', choices: ['Only the heat-loss theory is correct', 'The behavior probably combines several advantages', 'Researchers have abandoned the debate', 'The evidence supports no explanation'], answer: 1, explanation: 'The speaker says different conditions may favor it for different reasons.' }
       ]
+    },
+    {
+      title: 'The psychology of habit formation',
+      script: 'Psychologists describe a habit as a behavior that has become automatic through repetition. When a behavior is repeated in a stable context, the brain begins to associate the situation with the action, so the action can be triggered with little conscious effort. This is why habits are easier to form when the cue is consistent, such as always studying at the same desk. Researchers have found that the strength of a habit depends more on the number of repetitions than on the time that passes. Missing a single day does not usually destroy a habit, but long gaps can weaken it. Changing a habit is often harder than forming one, because the old cue-action link must be replaced rather than simply removed. One common strategy is to keep the cue but attach a new action to it.',
+      questions: [
+        { q: 'What makes a behavior become a habit?', choices: ['A single strong experience', 'Repetition in a stable context', 'A conscious decision each time', 'A change in environment'], answer: 1, explanation: 'Repetition in a stable context builds automatic associations.' },
+        { q: 'What matters most for habit strength?', choices: ['The time between repetitions', 'The number of repetitions', 'The difficulty of the action', 'The time of day'], answer: 1, explanation: 'Strength depends more on repetition count than elapsed time.' },
+        { q: 'Why is changing a habit often harder than forming one?', choices: ['New habits require more energy', 'The old cue-action link must be replaced', 'People forget their cues', 'Habits are genetic'], answer: 1, explanation: 'The old link must be replaced, not simply removed.' },
+        { q: 'What strategy does the speaker suggest for changing a habit?', choices: ['Remove the cue entirely', 'Keep the cue but attach a new action', 'Wait for the habit to fade', 'Repeat the old action more often'], answer: 1, explanation: 'Keeping the cue and changing the action is a common strategy.' }
+      ]
+    },
+    {
+      title: 'Why some lakes are salty',
+      script: 'Most lakes contain fresh water, but a few are noticeably salty. The salt usually comes from the rocks and soil in the surrounding watershed. Rainwater, which is slightly acidic, slowly dissolves minerals and carries them into the lake through streams and groundwater. In a lake with an outlet, the dissolved minerals are carried away, so the water stays fresh. A lake without an outlet, however, loses water mainly by evaporation. When water evaporates, the minerals remain behind, and over thousands of years their concentration rises. The Great Salt Lake and the Dead Sea are extreme examples of this process. Their salinity is so high that few organisms can survive, and swimmers float easily because the dense water provides strong buoyancy.',
+      questions: [
+        { q: 'Where does the salt in salty lakes come from?', choices: ['From ocean tides', 'From minerals dissolved in the watershed', 'From fish waste', 'From rainfall alone'], answer: 1, explanation: 'Minerals dissolve from surrounding rocks and soil.' },
+        { q: 'Why do lakes with outlets stay fresh?', choices: ['They receive less rain', 'Dissolved minerals are carried away', 'Their water evaporates quickly', 'They are very deep'], answer: 1, explanation: 'An outlet carries dissolved minerals out of the lake.' },
+        { q: 'What happens when lake water evaporates?', choices: ['The lake becomes deeper', 'Minerals remain behind', 'The water becomes colder', 'The outlet closes'], answer: 1, explanation: 'Evaporation removes water but leaves minerals.' },
+        { q: 'Why do swimmers float easily in the Dead Sea?', choices: ['The water is very warm', 'The dense water provides strong buoyancy', 'The lake is shallow', 'The water contains no minerals'], answer: 1, explanation: 'High salinity makes the water dense and buoyant.' }
+      ]
     }
   ],
 
@@ -218,6 +346,27 @@ window.TP_2026_CONTENT = {
       question: 'Should employers be allowed to offer financial rewards to workers who meet health goals such as daily step counts or regular checkups? Why or why not?',
       studentA: 'Lina: Incentives can motivate people who would otherwise skip checkups, and small rewards are a low-cost way to improve population health.',
       studentB: 'Omar: Rewards can pressure employees to share private health data and may punish workers with conditions they cannot control.'
+    },
+    {
+      course: 'Business management',
+      professor: 'Professor Alvarez',
+      question: 'Should companies allow employees to work from home on a regular basis, or is being in the office important for teamwork and productivity?',
+      studentA: 'Priya: Remote work saves commuting time and lets people focus, and many teams already coordinate well online.',
+      studentB: 'Tom: Spontaneous conversations in the office build trust and solve problems faster than scheduled video calls.'
+    },
+    {
+      course: 'Public policy',
+      professor: 'Professor Nguyen',
+      question: 'Should governments spend more public money on the arts, such as theaters, museums, and music programs, even when budgets are tight?',
+      studentA: 'Aisha: The arts strengthen communities and attract visitors, so public funding pays back in cultural and economic value.',
+      studentB: 'Daniel: When budgets are tight, governments should prioritize health, housing, and education over programs that mainly benefit a small audience.'
+    },
+    {
+      course: 'Media studies',
+      professor: 'Professor Silva',
+      question: 'Is social media a reliable source of news for young people, or should they rely mainly on traditional news organizations?',
+      studentA: 'Mei: Social media reaches people quickly and lets them see many perspectives, including local voices that traditional outlets ignore.',
+      studentB: 'Omar: Algorithms reward outrage and repetition, so young people often see misleading or unverified stories before the facts are checked.'
     }
   ]
 };
