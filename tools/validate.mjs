@@ -1,60 +1,101 @@
+// Validates the v3 content bank and mock tests before every deploy.
+// Run: npm test
+
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import vm from 'node:vm';
+import { BANK, TESTS } from '../content/index.js';
+import { TASKS } from '../src/tasks/index.js';
+import { makeCTest } from '../src/tasks/reading.js';
+import { isCorrect } from '../src/tasks/writing.js';
+import { moduleBlocks, productiveBlocks } from '../src/core/testmodel.js';
 
-const appHtml = fs.readFileSync(new URL('../app.html', import.meta.url), 'utf8');
-const appJs = fs.readFileSync(new URL('../app.js', import.meta.url), 'utf8');
-const contentSource = fs.readFileSync(new URL('../content.js', import.meta.url), 'utf8');
+let checks = 0;
+const check = (cond, msg) => { checks++; assert.ok(cond, msg); };
 
-const sandbox = { window: {} };
-vm.runInNewContext(contentSource, sandbox, { filename: 'content.js' });
-const content = sandbox.window.TP_2026_CONTENT;
-
-const expectedModes = [
-  'reading_words', 'reading_daily', 'reading_academic',
-  'listening_response', 'listening_conversation', 'listening_announcement', 'listening_academic',
-  'speaking_repeat', 'speaking_interview',
-  'writing_sentence', 'writing_email', 'writing_discussion'
-];
-
-for (const mode of expectedModes) {
-  assert.match(appHtml, new RegExp(`data-mode=["']${mode}["']`), `Missing panel or tab for ${mode}`);
-}
-
-for (const key of ['reading_words_passages', 'reading_daily', 'reading_academic', 'listening_response', 'listening_conversation', 'listening_announcement', 'listening_academic', 'writing_discussion']) {
-  assert.ok(Array.isArray(content[key]) && content[key].length > 0, `${key} needs practice content`);
-}
-
-for (const key of ['reading_daily', 'reading_academic', 'listening_conversation', 'listening_announcement', 'listening_academic']) {
-  for (const item of content[key]) {
-    assert.ok(item.title, `${key} item needs a title`);
-    assert.ok(Array.isArray(item.questions) && item.questions.length > 0, `${key} item needs questions`);
-    for (const question of item.questions) validateQuestion(question, key);
+// ---- practice bank ----------------------------------------------------
+for (const task of Object.keys(TASKS)) {
+  const list = BANK[task] || [];
+  check(list.length > 0, `${task}: no practice sets`);
+  const ids = new Set();
+  for (const item of list) {
+    check(item.id && !ids.has(item.id), `${task}: duplicate or missing id (${item.id})`);
+    ids.add(item.id);
+    validateItem(task, item);
   }
 }
 
-for (const item of content.listening_response) {
-  assert.ok(item.prompt, 'listening_response item needs a prompt');
-  validateQuestion(item, 'listening_response');
+function validateItem(task, item) {
+  if (task === 'reading_ctw') {
+    const ct = makeCTest(item.text, item.blanks || 10);
+    check(ct.blanks.length >= 5, `${item.id}: too few C-test blanks (${ct.blanks.length})`);
+    ct.blanks.forEach((b) => check(/^[a-z]+$/.test(b.missing) && b.missing.length >= 2, `${item.id}: bad blank "${b.missing}"`));
+  } else if (task === 'reading_daily' || task === 'reading_academic') {
+    check(item.questions?.length > 0, `${item.id}: no questions`);
+    item.questions.forEach((q, i) => validateMcq(item.id, i, q));
+  } else if (task === 'listening_response') {
+    check(item.items?.length > 0, `${item.id}: no response items`);
+    item.items.forEach((p, i) => {
+      check(p.prompt, `${item.id}[${i}]: missing prompt`);
+      check(p.choices?.length === 4, `${item.id}[${i}]: needs 4 choices`);
+      check(p.answer >= 0 && p.answer < 4, `${item.id}[${i}]: bad answer index`);
+    });
+  } else if (task === 'listening_conversation' || task === 'listening_announcement' || task === 'listening_academic') {
+    check(item.lines?.length > 0, `${item.id}: no script lines`);
+    item.lines.forEach((l) => check(l.speaker && l.text, `${item.id}: line missing speaker/text`));
+    const speakers = new Set(item.lines.map((l) => l.speaker));
+    speakers.forEach((s) => check(item.roles?.[s], `${item.id}: no voice role for speaker "${s}"`));
+    check(item.questions?.length > 0, `${item.id}: no questions`);
+    item.questions.forEach((q, i) => validateMcq(item.id, i, q));
+  } else if (task === 'writing_sentence') {
+    check(item.items?.length === 10, `${item.id}: expected 10 Build-a-Sentence items, got ${item.items?.length}`);
+    item.items.forEach((q, i) => {
+      check(q.context?.text, `${item.id}[${i}]: missing context line`);
+      check(q.tiles?.length >= 4, `${item.id}[${i}]: too few tiles`);
+      check(isCorrect(q, q.tiles.map((_, k) => k)), `${item.id}[${i}]: correct order does not self-validate`);
+    });
+  } else if (task === 'writing_email') {
+    check(item.scenario && item.to && item.goals?.length === 3, `${item.id}: incomplete email prompt`);
+    check(item.model?.text?.length > 150, `${item.id}: missing/short model response`);
+  } else if (task === 'writing_discussion') {
+    check(item.professor?.text && item.students?.length === 2, `${item.id}: incomplete discussion prompt`);
+  } else if (task === 'speaking_repeat') {
+    check(item.sentences?.length === 7, `${item.id}: expected 7 sentences, got ${item.sentences?.length}`);
+  } else if (task === 'speaking_interview') {
+    check(item.questions?.length === 4, `${item.id}: expected 4 questions, got ${item.questions?.length}`);
+  }
 }
 
-for (const item of content.reading_words_passages) {
-  const gaps = item.text.match(/\b[A-Za-z]*_{2,}[A-Za-z]*\b/g) || [];
-  assert.equal(gaps.length, item.answers.length, `Cloze gap count mismatch in ${item.title}`);
+function validateMcq(id, i, q) {
+  check(q.q && q.choices?.length === 4, `${id} q${i}: needs a question and 4 choices`);
+  check(Number.isInteger(q.answer) && q.answer >= 0 && q.answer < 4, `${id} q${i}: bad answer index`);
+  check(new Set(q.choices).size === 4, `${id} q${i}: duplicate choices`);
 }
 
-const htmlIds = new Set([...appHtml.matchAll(/\bid=["']([^"']+)["']/g)].map((match) => match[1]));
-const referencedIds = new Set([...appJs.matchAll(/\$\(['"]([^'"]+)['"]\)/g)].map((match) => match[1]));
-for (const id of referencedIds) assert.ok(htmlIds.has(id), `app.js references missing #${id}`);
+// ---- mock tests ---------------------------------------------------------
+check(TESTS.length >= 2, 'need at least 2 full mock tests');
+const testIds = new Set();
+for (const t of TESTS) {
+  check(t.id && !testIds.has(t.id), `duplicate test id ${t.id}`);
+  testIds.add(t.id);
+  check(t.title && t.description, `${t.id}: missing title/description`);
 
-assert.doesNotMatch(appHtml, /bank\/bank\.js/, 'Missing generated bank should not be loaded');
-assert.match(appJs, /writing_email:\s*420/, 'Write an Email timer must be 7 minutes');
-
-function validateQuestion(question, key) {
-  assert.ok(question.q || question.prompt, `${key} question needs text`);
-  assert.ok(Array.isArray(question.choices) && question.choices.length >= 3, `${key} question needs choices`);
-  assert.ok(Number.isInteger(question.answer) && question.answer >= 0 && question.answer < question.choices.length, `${key} answer index is invalid`);
-  assert.ok(question.explanation, `${key} question needs an explanation`);
+  for (const key of ['m1', 'hard', 'easy']) {
+    const blocks = moduleBlocks(t, 'reading', key);
+    const q = blocks.reduce((s, b) => s + TASKS[b.task].engine.count(b.item), 0);
+    check(q >= 8, `${t.id} reading.${key}: only ${q} questions`);
+    blocks.forEach((b) => validateItem(b.task, b.item));
+  }
+  for (const key of ['m1', 'hard', 'easy']) {
+    const blocks = moduleBlocks(t, 'listening', key);
+    const q = blocks.reduce((s, b) => s + TASKS[b.task].engine.count(b.item), 0);
+    check(q >= 8, `${t.id} listening.${key}: only ${q} questions`);
+    blocks.forEach((b) => validateItem(b.task, b.item));
+  }
+  const wr = productiveBlocks(t, 'writing');
+  check(wr.length === 3 && wr.map((b) => b.task).join(',') === 'writing_sentence,writing_email,writing_discussion', `${t.id}: writing block order/count wrong`);
+  wr.forEach((b) => validateItem(b.task, b.item));
+  const sp = productiveBlocks(t, 'speaking');
+  check(sp.length === 2 && sp.map((b) => b.task).join(',') === 'speaking_repeat,speaking_interview', `${t.id}: speaking block order/count wrong`);
+  sp.forEach((b) => validateItem(b.task, b.item));
 }
 
-console.log(`Validated ${expectedModes.length} task families and all authored answer keys.`);
+console.log(`OK — ${checks} checks passed across ${Object.keys(TASKS).length} task types and ${TESTS.length} mock tests.`);

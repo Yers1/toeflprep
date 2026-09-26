@@ -3,82 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TOEFL Prep 2026</title>
+  <meta name="description" content="Free practice for the January 2026 TOEFL iBT: full adaptive mock tests, rubric-based Writing and Speaking feedback, and a personal study plan.">
+  <meta name="theme-color" content="#0f766e">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
-  <meta name="description" content="Independent practice for every TOEFL iBT task family used from January 2026, with focused sets, progress analytics, and rubric-aligned feedback.">
-  <meta property="og:title" content="TOEFL Prep 2026">
-  <meta property="og:description" content="Practice the current TOEFL iBT format with all 12 task families.">
-  <meta name="theme-color" content="#f5f7f6">
-  <title>TOEFL Prep 2026 | Practice the current test</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles/app.css">
 </head>
 <body>
-  <a class="skip-link" href="#main-content">Skip to content</a>
-  <header class="header">
-    <div class="header-inner">
-      <a href="index.html" class="logo" aria-label="TOEFL Prep home"><span class="logo-mark">T</span><span>TOEFL Prep</span></a>
-      <nav class="nav" aria-label="Primary navigation"><a href="#format">Test format</a><a href="#method">Method</a><a href="#faq">Questions</a></nav>
-      <a href="app.html" class="btn btn-primary btn-small">Open practice</a>
-    </div>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="topbar">
+    <a class="brand" href="#/" aria-label="TOEFL Prep 2026 home">
+      <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><path d="M9 11h14M16 11v12M11 23h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+      <span>TOEFL Prep <em>2026</em></span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="#/" data-nav="home">Dashboard</a>
+      <a href="#/practice" data-nav="practice">Practice</a>
+      <a href="#/tests" data-nav="tests">Tests</a>
+      <a href="#/criteria" data-nav="criteria">Scoring criteria</a>
+      <a href="#/plan" data-nav="plan">Plan</a>
+      <a href="#/resources" data-nav="resources">Resources</a>
+      <a href="#/history" data-nav="history">History</a>
+      <a href="#/settings" data-nav="settings" class="nav-icon" aria-label="Settings">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.1 4.6-.1-1.1 1.9-1.5-1.8-3.1-2.3.8a7 7 0 0 0-1.9-1.1L15.5 4h-3.6l-.4 2.1a7 7 0 0 0-1.9 1.1l-2.3-.8-1.8 3.1L7.4 11l-.1 1.1.1 1-1.9 1.5 1.8 3.1 2.3-.8c.6.5 1.2.8 1.9 1.1l.4 2.1h3.6l.4-2.1c.7-.3 1.3-.6 1.9-1.1l2.3.8 1.8-3.1-1.9-1.5.1-.9Z"/></svg>
+        <span class="nav-label">Settings</span>
+      </a>
+    </nav>
   </header>
-
-  <main id="main-content">
-    <section class="hero">
-      <div class="hero-content">
-        <div class="hero-copy">
-          <p class="eyebrow">Built for the January 2026 TOEFL iBT</p>
-          <h1>Practice the test that exists now.</h1>
-          <p class="hero-desc">All 12 task families, original practice material, exam-aware timers, and a clear record of what to work on next.</p>
-          <div class="hero-cta"><a href="app.html" class="btn btn-primary">Start focused practice</a><a href="#format" class="text-button">Review the format</a></div>
-          <p class="trust-line">Independent and open source. No account required. Not affiliated with ETS.</p>
-        </div>
-        <div class="hero-product" aria-label="Example preparation dashboard">
-          <div class="product-top"><span>Preparation snapshot</span><strong>Target 5.0</strong></div>
-          <div class="sample-focus"><span>Recommended next</span><strong>Read an Academic Passage</strong><p>Inference accuracy is trailing your other reading skills.</p></div>
-          <div class="sample-sections"><div><span>Reading</span><strong>68%</strong></div><div><span>Listening</span><strong>74%</strong></div><div><span>Speaking</span><strong>4.0</strong></div><div><span>Writing</span><strong>4.5</strong></div></div>
-          <small>Illustrative data. The practice app uses your local attempt history.</small>
-        </div>
-      </div>
-    </section>
-
-    <section class="format-strip" aria-label="Current TOEFL format"><div><strong>~2 hours</strong><span>base test time</span></div><div><strong>1-6</strong><span>current score scale</span></div><div><strong>4 sections</strong><span>Reading to Speaking</span></div><div><strong>Adaptive</strong><span>Reading and Listening</span></div></section>
-
-    <section id="format" class="section task-map">
-      <div class="section-intro"><p class="eyebrow">Complete coverage</p><h2>Twelve ways the test measures English.</h2><p>The app separates every official task family so you can isolate a weakness before combining skills under time pressure.</p></div>
-      <div class="task-columns">
-        <article><header><span>01</span><h3>Reading</h3><small>up to 50 items</small></header><ul><li>Complete the Words</li><li>Read in Daily Life</li><li>Read an Academic Passage</li></ul></article>
-        <article><header><span>02</span><h3>Listening</h3><small>up to 47 items</small></header><ul><li>Choose a Response</li><li>Conversation</li><li>Announcement</li><li>Academic Talk</li></ul></article>
-        <article><header><span>03</span><h3>Writing</h3><small>up to 12 items</small></header><ul><li>Build a Sentence</li><li>Write an Email</li><li>Academic Discussion</li></ul></article>
-        <article><header><span>04</span><h3>Speaking</h3><small>up to 11 items</small></header><ul><li>Listen and Repeat</li><li>Take an Interview</li></ul></article>
-      </div>
-    </section>
-
-    <section id="method" class="section method-section">
-      <div class="method-lead"><p class="eyebrow">Designed for improvement</p><h2>Practice should produce evidence, not comfort.</h2></div>
-      <ol class="method-list"><li><span>Start narrow</span><div><strong>Train one task family</strong><p>Use original sets and realistic constraints to identify the exact kind of mistake.</p></div></li><li><span>Review deeply</span><div><strong>Explain every distractor</strong><p>Objective tasks reveal the correct answer and reasoning. Extended responses receive optional rubric-aligned AI feedback.</p></div></li><li><span>Follow the data</span><div><strong>Return to the weakest section</strong><p>Your local dashboard recommends a task from recent accuracy and practice coverage.</p></div></li></ol>
-    </section>
-
-    <section class="section honesty-section">
-      <div><p class="eyebrow">Scoring honesty</p><h2>A useful estimate should admit its limits.</h2></div>
-      <div class="honesty-copy"><p>The live TOEFL is adaptive and statistically equated. A browser app cannot reproduce the official scoring model from a handful of practice questions.</p><p>That is why TOEFL Prep reports task accuracy and a broad practice-band estimate. Only ETS can issue a TOEFL score. AI feedback is optional and your provider key can stay in the current browser tab.</p><a href="app.html#settings-panel" class="text-button">See scoring setup</a></div>
-    </section>
-
-    <section id="faq" class="section faq-section">
-      <div class="section-intro"><p class="eyebrow">Before you begin</p><h2>Common questions</h2></div>
-      <div class="faq-list">
-        <details><summary>Is this an official ETS product?</summary><p>No. It is an independent study tool based on publicly described task families and timing. TOEFL and TOEFL iBT are registered trademarks of ETS.</p></details>
-        <details><summary>Do I need an API key?</summary><p>No key is needed for Reading, Listening, Build a Sentence, Complete the Words, or transcript accuracy. A key is optional for detailed evaluation of free-form speaking and writing.</p></details>
-        <details><summary>Where is my progress stored?</summary><p>Attempt history and your target band are stored in this browser. You can export the history as JSON. No account or project backend is required.</p></details>
-        <details><summary>Will speech recognition work everywhere?</summary><p>It works most reliably in a current version of Chrome or Edge on a laptop. Browser support and transcript accuracy vary, so speaking results remain approximate.</p></details>
-      </div>
-    </section>
-
-    <section class="final-cta"><div><p class="eyebrow">Your next session</p><h2>One focused set. Then review every miss.</h2></div><a href="app.html" class="btn btn-primary">Open the practice app</a></section>
-  </main>
-
-  <footer class="footer"><div class="footer-inner"><div><a href="index.html" class="logo"><span class="logo-mark">T</span><span>TOEFL Prep</span></a><p>Independent practice for the current TOEFL iBT.</p></div><div><a href="https://www.ets.org/toefl/test-takers/ibt/about/content.html">Official ETS format</a><a href="https://github.com/Yers1/toeflprep">Source code</a></div></div></footer>
-  <script src="app.js"></script>
+  <main id="main" tabindex="-1"></main>
+  <footer class="footer">
+    <p>Independent practice tool. Not affiliated with or endorsed by ETS. TOEFL and TOEFL iBT are registered trademarks of ETS. Scores shown here are practice estimates, not official scores.</p>
+  </footer>
+  <noscript><p class="page">This app needs JavaScript.</p></noscript>
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>

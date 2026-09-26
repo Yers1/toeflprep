@@ -1,7 +1,8 @@
 {
   "name": "toeflprep-2026",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "start": "python -m http.server 8000",
     "test": "node tools/validate.mjs"
