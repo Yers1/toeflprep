@@ -1,7 +1,7 @@
 import { html, mount, $, toast, confirmDialog } from '../core/ui.js';
 import { settings, updateSettings, getApiKey, setApiKey, resetAll } from '../core/store.js';
 import { PROVIDERS, serverAvailable, aiMode, evaluate } from '../core/ai.js';
-import { loadVoices, speak, support } from '../core/audio.js';
+import { loadVoices, speak, support, hasNaturalVoice } from '../core/audio.js';
 
 function statusLine(mode) {
   if (mode.mode === 'server') return { tone: 'good', text: 'Active: server-side AI — no key needed for this deployment.' };
@@ -15,6 +15,7 @@ export default async function settingsView(outlet) {
   const mode = await aiMode();
   const status = statusLine(mode);
   const voices = await loadVoices();
+  const isEdge = typeof navigator !== 'undefined' && /Edg\//.test(navigator.userAgent);
   const key = getApiKey();
 
   mount(outlet, html`
@@ -47,6 +48,9 @@ export default async function settingsView(outlet) {
       <form class="card js-voice-form">
         <h2>Audio</h2>
         ${!support.tts ? html`<p class="notice">This browser has no speech synthesis. Listening prompts will be shown as text.</p>` : html`
+          ${!hasNaturalVoice(voices) ? html`<p class="notice">${isEdge
+            ? 'Every voice here sounds robotic (Windows’ default desktop voices). Windows Settings → Time & Language → Speech → Manage voices lets you add an "Online (Natural)" voice for free — then reload this page.'
+            : 'Every voice here sounds robotic — this browser only exposes Windows’ default desktop voices. Microsoft Edge (free, usually already installed) exposes natural neural voices with no signup: open this app in Edge and check Settings again.'}</p>` : ''}
           <div class="form-grid">
             <label class="field"><span>Voice A (usually female speakers)</span>
               <select name="voiceA"><option value="">Automatic</option>${voices.map((v) => html`<option ${v.name === st.voiceA ? 'selected' : ''}>${v.name}</option>`)}</select></label>

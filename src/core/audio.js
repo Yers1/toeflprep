@@ -37,13 +37,25 @@ export function loadVoices() {
   });
 }
 
+const NATURAL_RE = /natural|neural|online|premium|enhanced/i;
+const GOOGLE_RE = /google/i;
+
 function rankVoice(v) {
   let s = 0;
   if (/en[-_]US/i.test(v.lang)) s += 3;
   else if (/en[-_](GB|CA|AU)/i.test(v.lang)) s += 2;
-  if (/natural|neural|online|premium|enhanced/i.test(v.name)) s += 3;
-  if (/google/i.test(v.name)) s += 1;
+  if (NATURAL_RE.test(v.name)) s += 3;
+  if (GOOGLE_RE.test(v.name)) s += 1;
   return s;
+}
+
+// Legacy desktop voices (Microsoft David/Zira, etc.) are the only ones some
+// browsers expose and they sound robotic; true "Natural"/"Online"/neural or
+// Google voices sound much more human. Settings uses this to nudge users
+// toward a browser that offers them, instead of pretending ranking alone
+// can fix a voice list that has no good options at all.
+export function hasNaturalVoice(list) {
+  return list.some((v) => NATURAL_RE.test(v.name) || GOOGLE_RE.test(v.name));
 }
 
 export async function pickVoices() {
