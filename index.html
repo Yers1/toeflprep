@@ -14,32 +14,34 @@
 </head>
 <body>
   <a class="skip" href="#main">Skip to content</a>
-  <header class="topbar">
-    <a class="brand" href="#/" aria-label="TOEFL Prep 2026 home">
-      <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><path d="M9 11h14M16 11v12M11 23h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
-      <span>TOEFL Prep <em>2026</em></span>
-    </a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
-    <nav class="nav" id="nav" aria-label="Main">
-      <a href="#/" data-nav="home">Dashboard</a>
-      <a href="#/practice" data-nav="practice">Practice</a>
-      <a href="#/tests" data-nav="tests">Tests</a>
-      <a href="#/criteria" data-nav="criteria">Scoring criteria</a>
-      <a href="#/plan" data-nav="plan">Plan</a>
-      <a href="#/resources" data-nav="resources">Resources</a>
-      <a href="#/history" data-nav="history">History</a>
-      <a href="#/settings" data-nav="settings" class="nav-icon" aria-label="Settings">
-        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.1 4.6-.1-1.1 1.9-1.5-1.8-3.1-2.3.8a7 7 0 0 0-1.9-1.1L15.5 4h-3.6l-.4 2.1a7 7 0 0 0-1.9 1.1l-2.3-.8-1.8 3.1L7.4 11l-.1 1.1.1 1-1.9 1.5 1.8 3.1 2.3-.8c.6.5 1.2.8 1.9 1.1l.4 2.1h3.6l.4-2.1c.7-.3 1.3-.6 1.9-1.1l2.3.8 1.8-3.1-1.9-1.5.1-.9Z"/></svg>
-        <span class="nav-label">Settings</span>
+  <div class="shell">
+    <aside class="sidebar">
+      <a class="brand" href="#/" aria-label="TOEFL Prep 2026 home">
+        <svg viewBox="0 0 32 32" width="28" height="28" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--accent)"/><path d="M9 11h14M16 11v12M11 23h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>
+        <span>TOEFL Prep <em>2026</em></span>
       </a>
-    </nav>
-  </header>
-  <main id="main" tabindex="-1"></main>
-  <footer class="footer">
-    <p>Independent practice tool. Not affiliated with or endorsed by ETS. TOEFL and TOEFL iBT are registered trademarks of ETS. Scores shown here are practice estimates, not official scores.</p>
-  </footer>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav" id="nav" aria-label="Main">
+        <a href="#/" data-nav="home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 4l8 7.5M6 10v9h5v-5h2v5h5v-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Dashboard</span></a>
+        <a href="#/practice" data-nav="practice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19v16H6.5A2.5 2.5 0 0 0 4 21.5V5.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H19" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span>Practice</span></a>
+        <a href="#/tests" data-nav="tests"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3v18M6 4h10l-2 3.5 2 3.5H6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Tests</span></a>
+        <a href="#/flashcards" data-nav="flashcards"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="8" width="13" height="10" rx="2" transform="rotate(-8 11.5 13)" fill="none" stroke="currentColor" stroke-width="1.8"/><rect x="6" y="7" width="13" height="10" rx="2" fill="var(--surface)" stroke="currentColor" stroke-width="1.8"/></svg><span>Flashcards</span></a>
+        <a href="#/plan" data-nav="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3.5 9.5h17M8 3v4M16 3v4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Plan</span></a>
+        <a href="#/criteria" data-nav="criteria"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="1" fill="currentColor"/></svg><span>Scoring criteria</span></a>
+        <a href="#/resources" data-nav="resources"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 15l6-6M10 6.5 11 5.5a4 4 0 1 1 5.5 5.5L15.5 12M14 17.5l-1 1a4 4 0 1 1-5.5-5.5L8.5 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Resources</span></a>
+        <a href="#/history" data-nav="history"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5l3.2 1.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>History</span></a>
+        <a href="#/settings" data-nav="settings" class="nav-settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.1 4.6-.1-1.1 1.9-1.5-1.8-3.1-2.3.8a7 7 0 0 0-1.9-1.1L15.5 4h-3.6l-.4 2.1a7 7 0 0 0-1.9 1.1l-2.3-.8-1.8 3.1L7.4 11l-.1 1.1.1 1-1.9 1.5 1.8 3.1 2.3-.8c.6.5 1.2.8 1.9 1.1l.4 2.1h3.6l.4-2.1c.7-.3 1.3-.6 1.9-1.1l2.3.8 1.8-3.1-1.9-1.5.1-.9Z"/></svg><span>Settings</span></a>
+      </nav>
+    </aside>
+    <div class="shell-main">
+      <main id="main" tabindex="-1"></main>
+      <footer class="footer">
+        <p>Independent practice tool. Not affiliated with or endorsed by ETS. TOEFL and TOEFL iBT are registered trademarks of ETS. Scores shown here are practice estimates, not official scores.</p>
+      </footer>
+    </div>
+  </div>
   <noscript><p class="page">This app needs JavaScript.</p></noscript>
   <script type="module" src="src/main.js"></script>
 </body>

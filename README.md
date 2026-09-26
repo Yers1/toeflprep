@@ -27,6 +27,8 @@ See [`docs/RESEARCH.md`](docs/RESEARCH.md) for the format/scoring research and
   sections, with daily tasks and two built-in mock tests.
 - **A resources directory** (`#/resources`) linking every official and third-party practice
   test we could find for the 2026 format.
+- **Flashcards** (`#/flashcards`) — spaced-repetition (Leitner) practice for academic
+  vocabulary, in 6 decks, with example sentences and translations.
 - Local history, JSON export/import, and a log for tests you take elsewhere (ETS, Magoosh, etc.).
 
 Live app: https://toeflprep-omega.vercel.app

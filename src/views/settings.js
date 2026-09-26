@@ -1,11 +1,19 @@
 import { html, mount, $, toast, confirmDialog } from '../core/ui.js';
 import { settings, updateSettings, getApiKey, setApiKey, resetAll } from '../core/store.js';
-import { PROVIDERS, serverAvailable, evaluate } from '../core/ai.js';
+import { PROVIDERS, serverAvailable, aiMode, evaluate } from '../core/ai.js';
 import { loadVoices, speak, support } from '../core/audio.js';
+
+function statusLine(mode) {
+  if (mode.mode === 'server') return { tone: 'good', text: 'Active: server-side AI — no key needed for this deployment.' };
+  if (mode.mode === 'byok') return { tone: 'good', text: `Active: ${PROVIDERS[mode.provider].label} (detected from your key).` };
+  return { tone: '', text: 'Off — only the local rubric estimate runs. Add a key below, or pick Gemini or GitHub Models for a free option.' };
+}
 
 export default async function settingsView(outlet) {
   const st = settings();
   const server = await serverAvailable();
+  const mode = await aiMode();
+  const status = statusLine(mode);
   const voices = await loadVoices();
   const key = getApiKey();
 
@@ -16,7 +24,7 @@ export default async function settingsView(outlet) {
       <form class="card js-ai-form" autocomplete="off">
         <h2>AI feedback for Writing and Speaking</h2>
         <p class="muted">Without AI, you still get the local rubric estimate. With AI, each response gets criterion scores, corrections and a level-5 rewrite.</p>
-        ${server ? html`<p class="notice good">This deployment provides AI feedback on the server — no key needed.</p>` : ''}
+        <p class="notice ${status.tone}">${status.text}</p>
         <label class="field"><span>Provider</span>
           <select name="provider">
             <option value="auto" ${st.provider === 'auto' ? 'selected' : ''}>Automatic ${server ? '(server)' : '(detect from key)'}</option>
@@ -24,11 +32,11 @@ export default async function settingsView(outlet) {
             <option value="off" ${st.provider === 'off' ? 'selected' : ''}>Off — local estimates only</option>
           </select></label>
         <label class="field"><span>API key</span>
-          <input name="key" type="password" value="${key}" placeholder="Paste your key" spellcheck="false" autocomplete="off"></label>
+          <input name="key" type="password" value="${key}" placeholder="${PROVIDERS[mode.provider]?.keyHint || 'Paste your key'}" spellcheck="false" autocomplete="off"></label>
         <label class="check"><input type="checkbox" name="remember" ${st.rememberKey ? 'checked' : ''}> Remember the key on this device (otherwise it is cleared when the tab closes). Do not use on shared computers.</label>
         <label class="field"><span>Model (optional)</span>
           <input type="text" name="model" value="${st.model}" placeholder="Default for the provider" spellcheck="false"></label>
-        <p class="small muted">Where to get a key: ${Object.values(PROVIDERS).map((p, i) => html`${i ? ' · ' : ''}<a href="${p.docs}" target="_blank" rel="noopener">${p.label}</a>`)}. Your key is sent only to the provider you choose.</p>
+        <p class="small muted">Where to get a key: ${Object.values(PROVIDERS).map((p, i) => html`${i ? ' · ' : ''}<a href="${p.docs}" target="_blank" rel="noopener">${p.label}</a>`)}. Gemini and GitHub Models have free tiers. Your key is sent only to the provider you choose.</p>
         <div class="row gap-s">
           <button class="btn btn-primary" type="submit">Save</button>
           <button class="btn btn-ghost js-test" type="button">Test AI</button>
@@ -65,7 +73,7 @@ export default async function settingsView(outlet) {
     </section>`);
 
   const aiForm = $('.js-ai-form', outlet);
-  const status = $('.js-ai-status', outlet);
+  const testStatus = $('.js-ai-status', outlet);
   aiForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const f = new FormData(aiForm);
@@ -73,10 +81,15 @@ export default async function settingsView(outlet) {
     updateSettings({ provider: f.get('provider'), model: String(f.get('model')).trim(), rememberKey: remember });
     setApiKey(String(f.get('key')).trim(), remember);
     toast('Saved');
+    settingsView(outlet); // re-render so the "Active: ..." line reflects the new key/provider
+  });
+  $('select[name="provider"]', aiForm).addEventListener('change', (e) => {
+    const p = PROVIDERS[e.target.value];
+    $('input[name="key"]', aiForm).placeholder = p ? p.keyHint : 'Paste your key';
   });
   $('.js-test', outlet).addEventListener('click', async () => {
     aiForm.requestSubmit();
-    status.textContent = 'Testing…';
+    testStatus.textContent = 'Testing…';
     try {
       const r = await evaluate({
         task: 'writing_email',
@@ -84,9 +97,9 @@ export default async function settingsView(outlet) {
         response: 'Dear Professor Kim, I am sorry but I cannot come on Tuesday because I have a doctor appointment. Could we meet on Thursday at 3 pm instead? Thank you, Alex',
         metrics: { words: 36 },
       });
-      status.textContent = `Working — test response scored ${r.overall}/5 (${r.provider}).`;
+      testStatus.textContent = `Working — test response scored ${r.overall}/5 (${r.provider}).`;
     } catch (err) {
-      status.textContent = err.message;
+      testStatus.textContent = err.message;
     }
   });
 

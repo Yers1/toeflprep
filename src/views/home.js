@@ -1,13 +1,32 @@
 import { html, mount, fmtDateTime } from '../core/ui.js';
-import { attempts, plan as getPlan, settings } from '../core/store.js';
+import { attempts, plan as getPlan, settings, cards as cardStates } from '../core/store.js';
 import { fmtBand, CEFR, roundHalf, attemptBand } from '../core/scoring.js';
 import { itemDone, planItemHref, todayIso, daysBetween } from '../core/planner.js';
 import { SECTIONS, TASKS } from '../tasks/index.js';
 import { RUBRICS } from '../data/rubrics.js';
 import { TESTS } from '../../content/index.js';
+import { VOCAB } from '../../content/vocab.js';
 import { estimateSections } from './estimates.js';
 
 const SECS = ['reading', 'listening', 'writing', 'speaking'];
+
+function flashcardsDue() {
+  const states = cardStates();
+  const now = Date.now();
+  let due = 0, started = false;
+  for (const c of VOCAB) {
+    const st = states[c.id];
+    if (st) { started = true; if (st.due <= now) due++; }
+  }
+  return { due, started };
+}
+
+function flashcardsNotice() {
+  const fc = flashcardsDue();
+  if (fc.due > 0) return html`<a class="notice good" href="#/flashcards">📇 ${fc.due} flashcard${fc.due === 1 ? '' : 's'} due today — review now</a>`;
+  if (!fc.started) return html`<a class="notice" href="#/flashcards">Start learning TOEFL vocabulary with flashcards</a>`;
+  return '';
+}
 
 function criteriaInsights() {
   const out = [];
@@ -57,6 +76,7 @@ function welcome() {
       <a class="feature" href="#/practice/writing_discussion"><h3>Academic Discussion</h3><p>Professor + two classmates. Get a rubric score, corrections and a level-5 rewrite.</p></a>
       <a class="feature" href="#/practice/speaking_interview"><h3>Take an Interview</h3><p>Four questions, 45 seconds each. Measures pace, pauses and development; plays back your recording.</p></a>
       <a class="feature" href="#/practice/speaking_repeat"><h3>Listen and Repeat</h3><p>Seven sentences per scene, word-by-word comparison mapped to the official 0–5 levels.</p></a>
+      <a class="feature" href="#/flashcards"><h3>Flashcards</h3><p>Spaced-repetition practice for academic vocabulary that shows up across all four sections.</p></a>
     </section>`;
 }
 
@@ -93,6 +113,8 @@ export default function home(outlet) {
           <div><strong>${all.filter((a) => a.kind === 'test').length}</strong><span>tests</span></div>
         </div>
       </header>
+
+      ${flashcardsNotice()}
 
       <div class="section-cards">
         ${SECS.map((s) => {

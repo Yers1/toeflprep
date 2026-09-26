@@ -45,6 +45,9 @@ function guessProvider(key) {
   if (key.startsWith('sk-ant-')) return 'anthropic';
   if (key.startsWith('AIza')) return 'gemini';
   if (key.startsWith('github_pat_') || key.startsWith('ghp_')) return 'github';
+  // DeepSeek keys are also "sk-" + 32 hex chars, with no separate prefix of
+  // their own — check that shape before falling back to OpenAI.
+  if (/^sk-[a-f0-9]{32}$/.test(key)) return 'deepseek';
   if (key.startsWith('sk-')) return 'openai';
   return null;
 }

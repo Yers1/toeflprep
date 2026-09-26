@@ -3,6 +3,7 @@
 
 import assert from 'node:assert/strict';
 import { BANK, TESTS } from '../content/index.js';
+import { VOCAB, DECKS } from '../content/vocab.js';
 import { TASKS } from '../src/tasks/index.js';
 import { makeCTest } from '../src/tasks/reading.js';
 import { isCorrect } from '../src/tasks/writing.js';
@@ -20,6 +21,20 @@ for (const task of Object.keys(TASKS)) {
     check(item.id && !ids.has(item.id), `${task}: duplicate or missing id (${item.id})`);
     ids.add(item.id);
     validateItem(task, item);
+  }
+}
+
+// ---- flashcard vocabulary ----------------------------------------------
+{
+  const deckIds = new Set(DECKS.map((d) => d.id));
+  const vocabIds = new Set();
+  check(VOCAB.length > 0, 'vocab: no flashcards');
+  for (const c of VOCAB) {
+    check(c.id && !vocabIds.has(c.id), `vocab: duplicate or missing id (${c.id})`);
+    vocabIds.add(c.id);
+    check(deckIds.has(c.deck), `vocab ${c.id}: unknown deck "${c.deck}"`);
+    check(c.word && c.pos && c.def && c.ex && c.ru, `vocab ${c.id}: missing field`);
+    check(c.ex.toLowerCase().includes(c.word.toLowerCase()), `vocab ${c.id}: example does not contain the word`);
   }
 }
 

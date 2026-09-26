@@ -35,6 +35,9 @@ carried only by small dots/borders, never full-color blocks.
   the visual state indicator
 - Rubric result card: fixed layout — big score chip, level label, per-criterion meter row,
   then progressively-disclosed strengths/fixes/corrections/improved-version blocks
+- Navigation is a persistent left sidebar (icon + label per item, active item as an
+  accent-soft "pill"), not a top bar; it collapses to a slim top bar with a dropdown menu
+  below 920px, and hides entirely in exam mode
 
 ## Interaction
 

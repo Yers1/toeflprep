@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
 };
 
 function blank() {
-  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {} };
+  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {} };
 }
 
 let cache = null;
@@ -171,6 +171,7 @@ export function importData(text) {
     d.external = [...parsed.external.filter((x) => x && !ext.has(x.id)), ...d.external];
   }
   if (!d.plan && parsed.plan) d.plan = parsed.plan;
+  if (parsed.cards) for (const [id, st] of Object.entries(parsed.cards)) if (!d.cards[id]) d.cards[id] = st;
   persist();
   return incoming.length;
 }
@@ -178,4 +179,30 @@ export function importData(text) {
 export function resetAll() {
   cache = blank();
   persist();
+}
+
+// ---- flashcards (Leitner spaced repetition) --------------------------------
+// box 0..5: interval in days before the card is due again.
+
+const BOX_DAYS = [0, 1, 3, 7, 16, 35];
+
+export function cards() {
+  return load().cards;
+}
+
+export function cardState(id) {
+  return load().cards[id];
+}
+
+export function gradeCard(id, grade) {
+  const d = load();
+  const cur = d.cards[id]?.box ?? -1;
+  const box =
+    grade === 'again' ? 0 :
+    grade === 'hard' ? Math.max(0, cur) :
+    grade === 'easy' ? Math.min(BOX_DAYS.length - 1, cur + 2) :
+    Math.min(BOX_DAYS.length - 1, cur + 1); // good
+  d.cards[id] = { box, due: Date.now() + BOX_DAYS[box] * 86_400_000 };
+  persist();
+  return d.cards[id];
 }
