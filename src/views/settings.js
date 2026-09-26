@@ -27,7 +27,7 @@ export default async function settingsView(outlet) {
           <input name="key" type="password" value="${key}" placeholder="Paste your key" spellcheck="false" autocomplete="off"></label>
         <label class="check"><input type="checkbox" name="remember" ${st.rememberKey ? 'checked' : ''}> Remember the key on this device (otherwise it is cleared when the tab closes). Do not use on shared computers.</label>
         <label class="field"><span>Model (optional)</span>
-          <input name="model" value="${st.model}" placeholder="Default for the provider" spellcheck="false"></label>
+          <input type="text" name="model" value="${st.model}" placeholder="Default for the provider" spellcheck="false"></label>
         <p class="small muted">Where to get a key: ${Object.values(PROVIDERS).map((p, i) => html`${i ? ' · ' : ''}<a href="${p.docs}" target="_blank" rel="noopener">${p.label}</a>`)}. Your key is sent only to the provider you choose.</p>
         <div class="row gap-s">
           <button class="btn btn-primary" type="submit">Save</button>

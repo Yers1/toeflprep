@@ -43,7 +43,7 @@ export const ctw = {
         <p class="instruction">Fill in the missing letters to complete the text.</p>
         <p class="ctw-text">${ct.parts.map((p) => p.blank == null
           ? p.t
-          : html`<span class="ctw-word">${p.prefix}<input class="ctw-input" data-b="${p.blank}" maxlength="${p.missing.length}" size="${p.missing.length}"
+          : html`<span class="ctw-word">${p.prefix}<input type="text" class="ctw-input" data-b="${p.blank}" maxlength="${p.missing.length}" size="${p.missing.length}"
               style="--n:${p.missing.length}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Missing letters (${p.missing.length}) after ${p.prefix}"></span>`)}</p>
       </article>`);
     const inputs = $$('.ctw-input', root);

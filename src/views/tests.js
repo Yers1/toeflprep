@@ -56,7 +56,7 @@ export default function tests(outlet) {
           <h2>Tests taken elsewhere</h2>
           <p class="muted">Log a score from the free ETS test, TestReady, Magoosh or any other source so the dashboard tracks it alongside your practice here. See <a href="#/resources">Resources</a> for the full list of practice tests.</p>
           <form class="ext-form" autocomplete="off">
-            <label class="field"><span>Source</span><input name="source" required placeholder="e.g. ETS free practice test" maxlength="80"></label>
+            <label class="field"><span>Source</span><input type="text" name="source" required placeholder="e.g. ETS free practice test" maxlength="80"></label>
             <label class="field"><span>Date</span><input name="date" type="date" required></label>
             ${SECS.map((s) => html`<label class="field field-s"><span>${SECTIONS[s].name}</span>
               <select name="${s}"><option value="">—</option>${BANDS.map((b) => html`<option value="${b}">${b.toFixed(1)}</option>`)}</select></label>`)}

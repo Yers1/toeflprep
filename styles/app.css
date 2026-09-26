@@ -324,9 +324,13 @@ input[type="range"] { accent-color: var(--accent); width: 100%; }
 .doc-menu .passage-body, .doc-schedule .passage-body, .doc-receipt .passage-body { font-family: var(--mono); font-size: .9rem; }
 
 .ctw-text { line-height: 2.2; font-size: 1.05rem; }
-.ctw-word { white-space: nowrap; }
-.ctw-input {
-  width: calc(var(--n) * 1.05ch + 1.1rem); min-width: 2.2rem; padding: .1rem .3rem; border-radius: 6px;
+.ctw-word { display: inline-flex; align-items: baseline; white-space: nowrap; }
+/* Compound selector (0,2,0) so this reliably beats the generic
+   `input[type="text"], input:not([type]), ...` field rule above (0,1,1),
+   which would otherwise force these into full-width block fields. */
+.ctw-word .ctw-input {
+  display: inline-block; width: calc(var(--n) * 1.05ch + 1.1rem); min-width: 2.2rem;
+  padding: .1rem .3rem; border-radius: 6px;
   font: 1.02rem var(--mono); letter-spacing: .08em; border: 1px solid var(--line-strong); border-bottom: 2px solid var(--accent);
   background: var(--accent-soft); color: var(--ink); vertical-align: baseline;
 }
