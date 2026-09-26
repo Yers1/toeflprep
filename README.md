@@ -29,6 +29,9 @@ See [`docs/RESEARCH.md`](docs/RESEARCH.md) for the format/scoring research and
   test we could find for the 2026 format.
 - **Flashcards** (`#/flashcards`) — spaced-repetition (Leitner) practice for academic
   vocabulary, in 6 decks, with example sentences and translations.
+- **Listening Drill** (`#/drill`) — a daily recall-speed trainer: hear a sentence once at an
+  adjustable playback speed, type back what you remember, see a word-by-word diff, and track
+  words recalled per day. Reuses the Listen and Repeat sentence bank; no microphone needed.
 - Local history, JSON export/import, and a log for tests you take elsewhere (ETS, Magoosh, etc.).
 
 Live app: https://toeflprep-omega.vercel.app

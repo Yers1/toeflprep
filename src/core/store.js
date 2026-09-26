@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
 };
 
 function blank() {
-  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {} };
+  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {}, drill: { speed: 1, lastUsed: {}, log: {} } };
 }
 
 let cache = null;
@@ -172,6 +172,7 @@ export function importData(text) {
   }
   if (!d.plan && parsed.plan) d.plan = parsed.plan;
   if (parsed.cards) for (const [id, st] of Object.entries(parsed.cards)) if (!d.cards[id]) d.cards[id] = st;
+  if (parsed.drill?.log) for (const [day, st] of Object.entries(parsed.drill.log)) if (!d.drill.log[day]) d.drill.log[day] = st;
   persist();
   return incoming.length;
 }
@@ -205,4 +206,36 @@ export function gradeCard(id, grade) {
   d.cards[id] = { box, due: Date.now() + BOX_DAYS[box] * 86_400_000 };
   persist();
   return d.cards[id];
+}
+
+// ---- listening drill --------------------------------------------------
+// speed: current playback rate. lastUsed: sentence id -> timestamp, so a
+// session can prefer sentences that haven't been practiced recently.
+// log: dateIso -> cumulative words recalled that day.
+
+export function drillState() {
+  return load().drill;
+}
+
+export function setDrillSpeed(speed) {
+  load().drill.speed = speed;
+  persist();
+}
+
+export function drillTouch(ids) {
+  const d = load();
+  const now = Date.now();
+  for (const id of ids) d.drill.lastUsed[id] = now;
+  persist();
+}
+
+export function drillAddResult(dateIso, { correct, total }) {
+  const d = load();
+  const day = d.drill.log[dateIso] || { correct: 0, total: 0, sentences: 0 };
+  day.correct += correct;
+  day.total += total;
+  day.sentences += 1;
+  d.drill.log[dateIso] = day;
+  persist();
+  return day;
 }

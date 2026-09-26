@@ -77,6 +77,7 @@ function welcome() {
       <a class="feature" href="#/practice/speaking_interview"><h3>Take an Interview</h3><p>Four questions, 45 seconds each. Measures pace, pauses and development; plays back your recording.</p></a>
       <a class="feature" href="#/practice/speaking_repeat"><h3>Listen and Repeat</h3><p>Seven sentences per scene, word-by-word comparison mapped to the official 0–5 levels.</p></a>
       <a class="feature" href="#/flashcards"><h3>Flashcards</h3><p>Spaced-repetition practice for academic vocabulary that shows up across all four sections.</p></a>
+      <a class="feature" href="#/drill"><h3>Listening Drill</h3><p>Hear a sentence once, type back what you remember, then speed up the audio as recall improves.</p></a>
     </section>`;
 }
 

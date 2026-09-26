@@ -10,6 +10,7 @@ const routes = [
   { path: /^\/practice\/([a-z_]+)\/?$/, view: () => import('./views/practice-task.js'), nav: 'practice', title: 'Practice', keys: ['task'] },
   { path: /^\/tests\/?$/, view: () => import('./views/tests.js'), nav: 'tests', title: 'Practice tests' },
   { path: /^\/flashcards\/?$/, view: () => import('./views/flashcards.js'), nav: 'flashcards', title: 'Flashcards' },
+  { path: /^\/drill\/?$/, view: () => import('./views/drill.js'), nav: 'drill', title: 'Listening Drill' },
   { path: /^\/test\/([\w-]+)\/?$/, view: () => import('./views/test-runner.js'), nav: 'tests', title: 'Test', keys: ['id'], focus: true },
   { path: /^\/report\/([\w-]+)\/?$/, view: () => import('./views/report.js'), nav: 'tests', title: 'Score report', keys: ['id'] },
   { path: /^\/criteria\/?$/, view: () => import('./views/criteria.js'), nav: 'criteria', title: 'Scoring criteria' },
