@@ -115,7 +115,7 @@ export const repeat = {
           ${levelMeter()}
           <p class="live muted small" aria-live="polite"></p>
         </div>`);
-      if (support.tts) await speak(sentence, { role: i % 2 ? 'B' : 'A', signal: ctl.signal });
+      if (support.tts) await speak(sentence, { role: i % 2 ? 'B' : 'A', rate: ctx.rate, signal: ctl.signal });
       else { $('.stage-state', stage).textContent = `Read, then repeat from memory: “${sentence}”`; await wait(3500, ctl.signal); }
       if (ctl.signal.aborted) return;
       $('.stage-state', stage).textContent = 'Speak now';

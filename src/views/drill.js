@@ -1,14 +1,13 @@
 // Listening Drill: a daily recall-speed trainer, not one of the 12 official
-// task types. Play a sentence once, type back everything you remember, see
-// a word-by-word diff. Reuses the Listen and Repeat sentence bank and its
-// word-alignment scorer — no new content, just a lower-pressure, typed
-// (no microphone) way to drill listening recall and playback speed.
+// task types. Same mechanic as Listen and Repeat — hear a sentence once
+// (at an adjustable speed), then repeat it out loud — reusing that task's
+// own recording/scoring engine (src/tasks/speaking.js: repeat), just wired
+// to a bigger, rotating pool of sentences and a daily words-recalled log
+// instead of one fixed 7-sentence scene.
 
 import { html, mount, $, pct } from '../core/ui.js';
 import { drillState, setDrillSpeed, drillTouch, drillAddResult } from '../core/store.js';
-import { speak, stopSpeaking, support, wait } from '../core/audio.js';
-import { align, normalize } from '../analyzers/speaking.js';
-import { transcriptDiff } from '../tasks/common.js';
+import { repeat } from '../tasks/speaking.js';
 import { isoDate, todayIso } from '../core/planner.js';
 import { BANK } from '../../content/index.js';
 
@@ -51,14 +50,14 @@ function showHome(outlet) {
       <header class="page-head">
         <p class="eyebrow">Daily practice</p>
         <h1>Listening Drill</h1>
-        <p class="muted">Hear a sentence once, then type back everything you remember. Raising the speed over time trains the same skill the Listening and Listen and Repeat sections need: catching words the first time.</p>
+        <p class="muted">Same as Listen and Repeat — hear a sentence once, then repeat it out loud — but with far more sentences and a speed you control. Raise it over time to train catching words the first time.</p>
       </header>
 
       <div class="card">
         <h2>Playback speed</h2>
         <label class="field"><span>Speed: <output class="js-speed-out">${st.speed.toFixed(2)}x</output></span>
           <input type="range" class="js-speed" min="0.7" max="1.4" step="0.05" value="${st.speed}"></label>
-        <p class="small muted">Start near 1x. Once you're recalling most words correctly, nudge it up 0.05 at a time.</p>
+        <p class="small muted">Start near 1x. Once you're repeating most sentences accurately, nudge it up 0.05 at a time.</p>
       </div>
 
       <div class="card">
@@ -101,83 +100,41 @@ function showHome(outlet) {
   speedInput.addEventListener('change', () => setDrillSpeed(Number(speedInput.value)));
 }
 
-function buildQueue(sceneId) {
+function buildItem(sceneId) {
   if (sceneId) {
     const sc = SCENES.find((s) => s.id === sceneId);
     if (!sc) return null;
-    return { title: `${sc.icon || ''} ${sc.scene}`.trim(), items: POOL.filter((p) => p.sceneId === sceneId) };
+    return { ...sc, ids: sc.sentences.map((_, i) => `${sc.id}-${i}`) };
   }
   const lastUsed = drillState().lastUsed;
-  const items = [...POOL].sort((a, b) => (lastUsed[a.id] || 0) - (lastUsed[b.id] || 0)).slice(0, MIX_SIZE);
-  return { title: 'Mixed drill', items };
+  const chosen = [...POOL].sort((a, b) => (lastUsed[a.id] || 0) - (lastUsed[b.id] || 0)).slice(0, MIX_SIZE);
+  return {
+    scene: 'Mixed drill',
+    icon: '🎧',
+    intro: 'A mix of sentences from every section, starting with the ones you have practiced least recently.',
+    sentences: chosen.map((c) => c.text),
+    ids: chosen.map((c) => c.id),
+  };
 }
 
 function showSession(outlet, sceneId) {
-  const queue = buildQueue(sceneId);
-  if (!queue) return showHome(outlet);
-  const { title, items } = queue;
+  const item = buildItem(sceneId);
+  if (!item) return showHome(outlet);
   const speed = drillState().speed;
-  let i = 0;
-  const session = { correct: 0, total: 0 };
 
-  function renderListening() {
-    const it = items[i];
-    mount(outlet, html`
-      <section class="page narrow drill-session">
-        <div class="row between small muted"><span>${title}</span><span>${i + 1} / ${items.length}</span></div>
-        <div class="card drill-card">
-          <p class="small muted">Listen, then type back everything you remember.</p>
-          <button type="button" class="btn btn-primary js-play">▶ Play sentence</button>
-          <form class="js-recall-form" autocomplete="off">
-            <label class="field"><span>What did you hear?</span>
-              <input type="text" class="js-recall" autocomplete="off" spellcheck="false"></label>
-            <button class="btn btn-ghost" type="submit">Check</button>
-          </form>
-        </div>
-      </section>`);
-    const playBtn = $('.js-play', outlet);
-    const input = $('.js-recall', outlet);
-    async function play() {
-      playBtn.disabled = true;
-      if (support.tts) { try { await speak(it.text, { rate: speed }); } catch { /* ignore */ } }
-      else { input.placeholder = it.text; await wait(Math.max(1200, it.text.split(' ').length * 450)); input.placeholder = ''; }
-      playBtn.disabled = false;
-    }
-    playBtn.addEventListener('click', play);
-    play();
-    input.focus();
-    $('.js-recall-form', outlet).addEventListener('submit', (e) => { e.preventDefault(); grade(input.value); });
-  }
-
-  function grade(said) {
-    const it = items[i];
-    const target = normalize(it.text);
-    const ops = align(target, normalize(said));
-    const correct = ops.filter((o) => o.op === 'ok').length;
-    const total = target.length;
-    session.correct += correct;
-    session.total += total;
+  function finish(response) {
+    const result = repeat.assess(item, response);
+    let correct = 0, total = 0;
+    result.items.forEach((r) => {
+      correct += r.ops.filter((o) => o.op === 'ok').length;
+      total += r.ops.filter((o) => o.op !== 'ins').length;
+    });
     drillAddResult(todayIso(), { correct, total });
-    drillTouch([it.id]);
-
-    mount(outlet, html`
-      <section class="page narrow drill-session">
-        <div class="row between small muted"><span>${title}</span><span>${i + 1} / ${items.length}</span></div>
-        <div class="card drill-card">
-          <div class="row gap-s center-y"><strong>${correct}/${total} words</strong></div>
-          ${transcriptDiff(ops)}
-          <p class="legend small"><span class="d-del">missed</span> <span class="d-sub">changed</span> <span class="d-ins">extra</span></p>
-          <button class="btn btn-primary js-next" type="button">${i + 1 < items.length ? 'Next sentence' : 'See results'}</button>
-        </div>
-      </section>`);
-    $('.js-next', outlet).addEventListener('click', () => { i++; if (i < items.length) renderListening(); else renderEnd(); });
-  }
-
-  function renderEnd() {
+    drillTouch(item.ids);
     mount(outlet, html`
       <section class="page narrow">
         <header class="page-head"><p class="eyebrow">Listening Drill</p><h1>Session done</h1></header>
-        <p>${session.correct}/${session.total} words recalled this round (${pct(session.correct, session.total)}%).</p>
+        <p>Average score: <strong>${result.overall}</strong> / 5 · <strong>${correct}/${total}</strong> words recalled (${pct(correct, total)}%) across ${item.sentences.length} sentence${item.sentences.length === 1 ? '' : 's'}.</p>
         <div class="row gap-s wrap">
           <a class="btn btn-primary" href="#/drill?${sceneId ? `scene=${sceneId}` : 'mode=mix'}">Practice again</a>
           <a class="btn btn-ghost" href="#/drill">Back to Listening Drill</a>
@@ -185,6 +142,6 @@ function showSession(outlet, sceneId) {
       </section>`);
   }
 
-  renderListening();
-  return () => stopSpeaking();
+  const controller = repeat.render(outlet, item, { mode: 'practice', rate: speed, onDone: finish });
+  return () => controller?.destroy?.();
 }
