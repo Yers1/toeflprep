@@ -266,6 +266,12 @@ input[type="range"] { accent-color: var(--accent); width: 100%; }
 .flashcard.is-flipped .fc-word-s { font-size: 1.3rem; }
 .fc-example { max-width: 46ch; }
 .fc-ru { margin-top: -.4rem; }
+.fc-sent { font: 600 1.25rem/1.45 var(--font); color: var(--ink); margin: 0; max-width: 46ch; }
+.fc-answer { width: 100%; max-width: 560px; }
+.fc-you.ok { color: var(--good); font-weight: 600; }
+.add-card .row > input { flex: 1 1 12rem; }
+.fixes li { margin-bottom: .9rem; }
+.lesson section[id] { scroll-margin-top: 1rem; }
 .grade-row { justify-content: center; }
 .grade-row .btn { flex-direction: column; gap: .15rem; padding: .6rem 1rem; }
 .btn-icon { padding: .5rem .7rem; font-size: 1.05rem; line-height: 1; }

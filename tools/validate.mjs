@@ -34,7 +34,8 @@ for (const task of Object.keys(TASKS)) {
     vocabIds.add(c.id);
     check(deckIds.has(c.deck), `vocab ${c.id}: unknown deck "${c.deck}"`);
     check(c.word && c.pos && c.def && c.ex && c.ru, `vocab ${c.id}: missing field`);
-    check(c.ex.toLowerCase().includes(c.word.toLowerCase()), `vocab ${c.id}: example does not contain the word`);
+    if (DECKS.find((d) => d.id === c.deck)?.mode === 'fix') check(c.word !== c.def, `vocab ${c.id}: answer equals the prompt`);
+    else check(c.ex.toLowerCase().includes(c.word.toLowerCase()), `vocab ${c.id}: example does not contain the word`);
   }
 }
 

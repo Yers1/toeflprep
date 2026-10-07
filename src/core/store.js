@@ -19,7 +19,7 @@ const DEFAULT_SETTINGS = {
 };
 
 function blank() {
-  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {}, drill: { speed: 1, lastUsed: {}, log: {} } };
+  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {}, custom: [], drill: { speed: 1, lastUsed: {}, log: {} } };
 }
 
 let cache = null;
@@ -172,6 +172,7 @@ export function importData(text) {
   }
   if (!d.plan && parsed.plan) d.plan = parsed.plan;
   if (parsed.cards) for (const [id, st] of Object.entries(parsed.cards)) if (!d.cards[id]) d.cards[id] = st;
+  if (Array.isArray(parsed.custom)) { const ids = new Set(d.custom.map((c) => c.id)); d.custom.push(...parsed.custom.filter((c) => c?.id && !ids.has(c.id))); }
   if (parsed.drill?.log) for (const [day, st] of Object.entries(parsed.drill.log)) if (!d.drill.log[day]) d.drill.log[day] = st;
   persist();
   return incoming.length;
@@ -206,6 +207,16 @@ export function gradeCard(id, grade) {
   d.cards[id] = { box, due: Date.now() + BOX_DAYS[box] * 86_400_000 };
   persist();
   return d.cards[id];
+}
+
+// Cards the learner adds (words from the books). Same shape as content/vocab.js.
+export function customCards() {
+  return load().custom;
+}
+
+export function addCustomCard({ word, ru, ex }) {
+  load().custom.push({ id: `mine-${uid()}`, deck: 'mine', word, pos: 'my word', def: '', ex, ru });
+  persist();
 }
 
 // ---- listening drill --------------------------------------------------
