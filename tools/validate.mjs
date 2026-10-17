@@ -8,6 +8,7 @@ import { TASKS } from '../src/tasks/index.js';
 import { makeCTest } from '../src/tasks/reading.js';
 import { isCorrect } from '../src/tasks/writing.js';
 import { moduleBlocks, productiveBlocks } from '../src/core/testmodel.js';
+import { runCalibration } from './calibration.mjs';
 
 let checks = 0;
 const check = (cond, msg) => { checks++; assert.ok(cond, msg); };
@@ -113,4 +114,8 @@ for (const t of TESTS) {
   sp.forEach((b) => validateItem(b.task, b.item));
 }
 
+// ---- scoring calibration --------------------------------------------------
+const cal = runCalibration(check);
+
 console.log(`OK — ${checks} checks passed across ${Object.keys(TASKS).length} task types and ${TESTS.length} mock tests.`);
+console.log(`Calibration: interview weak ${cal.weak} / model ${cal.strong}; discussion learner ${cal.learner} / model ${cal.model}.`);

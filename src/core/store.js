@@ -13,6 +13,7 @@ const DEFAULT_SETTINGS = {
   voiceA: '',             // preferred TTS voices (names); empty = auto
   voiceB: '',
   rate: 0.95,
+  naturalVoice: true,     // play pre-recorded neural voice clips when available
   theme: 'system',        // system | light | dark
   targetBand: 5,
   testDate: '',

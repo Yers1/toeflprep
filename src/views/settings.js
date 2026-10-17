@@ -47,8 +47,9 @@ export default async function settingsView(outlet) {
 
       <form class="card js-voice-form">
         <h2>Audio</h2>
-        ${!support.tts ? html`<p class="notice">This browser has no speech synthesis. Listening prompts will be shown as text.</p>` : html`
-          ${!hasNaturalVoice(voices) ? html`<p class="notice">${isEdge
+        <label class="check"><input type="checkbox" name="naturalVoice" ${st.naturalVoice !== false ? 'checked' : ''}> Use recorded natural voices (recommended). Every Listening and Speaking prompt in the app has a neural-voice recording; the browser voices below are only a fallback.</label>
+        ${!support.tts ? html`<p class="notice">This browser has no speech synthesis. Recorded prompts still play; anything without a recording is shown as text.</p>` : html`
+          ${st.naturalVoice === false && !hasNaturalVoice(voices) ? html`<p class="notice">${isEdge
             ? 'Every voice here sounds robotic (Windows’ default desktop voices). Windows Settings → Time & Language → Speech → Manage voices lets you add an "Online (Natural)" voice for free — then reload this page.'
             : 'Every voice here sounds robotic — this browser only exposes Windows’ default desktop voices. Microsoft Edge (free, usually already installed) exposes natural neural voices with no signup: open this app in Edge and check Settings again.'}</p>` : ''}
           <div class="form-grid">
@@ -109,15 +110,18 @@ export default async function settingsView(outlet) {
 
   const vForm = $('.js-voice-form', outlet);
   vForm.addEventListener('input', (e) => { if (e.target.name === 'rate') $('.js-rate-out', outlet).textContent = e.target.value; });
+  const saveVoice = () => {
+    const f = new FormData(vForm);
+    updateSettings({ naturalVoice: f.get('naturalVoice') === 'on', voiceA: f.get('voiceA') || '', voiceB: f.get('voiceB') || '', rate: Number(f.get('rate')) || 0.95 });
+  };
+  vForm.addEventListener('change', (e) => { if (e.target.name === 'naturalVoice') saveVoice(); });
   vForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    const f = new FormData(vForm);
-    updateSettings({ voiceA: f.get('voiceA') || '', voiceB: f.get('voiceB') || '', rate: Number(f.get('rate')) || 0.95 });
+    saveVoice();
     toast('Saved');
   });
   $('.js-voice-test', outlet)?.addEventListener('click', async () => {
-    const f = new FormData(vForm);
-    updateSettings({ voiceA: f.get('voiceA') || '', voiceB: f.get('voiceB') || '', rate: Number(f.get('rate')) || 0.95 });
+    saveVoice();
     await speak('Welcome to the listening section. You will hear a conversation between a student and a librarian.', { role: 'A' });
     await speak('Excuse me, could you tell me where the reserve books are kept?', { role: 'B' });
   });

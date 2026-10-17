@@ -2,3 +2,4 @@
 __pycache__/
 Thumbs.db
 .vercel
+tools/tts-jobs.json

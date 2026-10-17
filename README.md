@@ -16,7 +16,11 @@ See [`docs/RESEARCH.md`](docs/RESEARCH.md) for the format/scoring research and
   - Reading: Complete the Words, Read in Daily Life, Read an Academic Passage
   - Listening: Listen and Choose a Response, Conversation, Announcement, Academic Talk
   - Writing: Build a Sentence, Write an Email, Academic Discussion
-  - Speaking: Listen and Repeat, Take an Interview
+  - Speaking: Listen and Repeat (20 campus scenes, 140 sentences), Take an Interview (22 sets, 88 questions)
+- **Natural recorded voices** — every Listening and Speaking prompt plays a pre-recorded neural
+  voice (Kokoro, Apache-2.0) from `audio/`, so the app no longer depends on robotic browser
+  voices. Anything without a recording falls back to browser speech; Settings can turn the
+  recordings off.
 - **Writing & Speaking scored against the official ETS rubrics** — every response is broken
   down by criterion (elaboration, conventions, fluency, intelligibility, etc.), with an offline
   estimate always available and an optional AI rater for full feedback, corrections and a
@@ -55,6 +59,41 @@ npm test
 Checks every practice set and both mock tests for structural correctness (question counts,
 answer indices, script/voice consistency, Build-a-Sentence self-consistency, etc.) before
 deploy.
+
+It also runs a scoring calibration (`tools/calibration.mjs`): real learner responses must not be
+over-scored, model answers must not be under-scored, and every grammar rule must fire on its
+error and stay quiet on the correct form.
+
+## Regenerate the recorded voices
+
+After adding or editing any spoken text in `content/`:
+
+```bash
+pip install kokoro-onnx soundfile   # once; also needs ffmpeg on PATH
+npm run audio
+```
+
+The model files `kokoro-v1.0.onnx` and `voices-v1.0.bin` come from the
+[kokoro-onnx releases](https://github.com/thewh1teagle/kokoro-onnx/releases/tag/model-files-v1.0)
+and are read from `~/tts-models` (or `KOKORO_DIR`). Only missing clips are generated, clips for
+removed text are deleted, and `audio/manifest.json` is rewritten.
+
+## How the offline estimate scores
+
+The local estimate is deliberately conservative, because it cannot hear pronunciation or fully
+parse grammar:
+
+- The overall level is at most one level above the weakest criterion, and ties round down.
+- Language and accuracy top out at 4 offline; a 5 needs the AI rater (or a teacher).
+- `src/analyzers/grammar.js` flags frequent learner errors: articles, prepositions, verb patterns,
+  agreement, fragments, comma splices and calques.
+- Discussion: the position must come first, the example must be specific, and “I would add…”
+  must not just repeat a classmate.
+- Interview: an answer, a reason and a specific example are needed for 4+; pace under 100 wpm or
+  two or more long pauses pull fluency down; recognizer confidence can lower intelligibility but
+  never confirm a 5.
+- Listen and Repeat: a missing content word is level 3, as in the ETS descriptor; level 4 allows
+  only one or two small changes.
 
 ## Optional AI feedback
 
