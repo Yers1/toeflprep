@@ -134,9 +134,10 @@ export function scoreRepeat(targetText, saidText) {
 }
 
 // Window for each Listen and Repeat response: 8–12 s depending on length.
-export function repeatWindow(sentence) {
+// `max` lets overload practice (Hard Repeat) give longer sentences more time.
+export function repeatWindow(sentence, max = 12) {
   const n = tokenize(sentence).length;
-  return Math.min(12, Math.max(8, Math.round(5 + n * 0.45)));
+  return Math.min(max, Math.max(8, Math.round(5 + n * 0.45)));
 }
 
 const clamp = (x, lo = 0, hi = 5) => Math.max(lo, Math.min(hi, x));

@@ -106,7 +106,7 @@ export const repeat = {
       if (ctl.signal.aborted) return;
       if (i >= item.sentences.length) return finish();
       const sentence = item.sentences[i];
-      const secs = repeatWindow(sentence);
+      const secs = repeatWindow(sentence, item.maxWindow);
       progress.textContent = `Sentence ${i + 1} of ${item.sentences.length}`;
       mount(stage, html`
         <div class="stage-card">

@@ -4,6 +4,7 @@
 
 import { BANK, TESTS } from '../content/index.js';
 import { VOCAB } from '../content/vocab.js';
+import { HARD } from '../content/bank/hard_repeat.js';
 import { clipKey } from '../src/core/audio.js';
 
 const jobs = new Map();
@@ -25,6 +26,7 @@ function walk(o) {
 }
 
 walk(BANK);
+walk(HARD);
 walk(TESTS);
 VOCAB.forEach((c) => add('A', c.word));
 // Settings → Audio → Play sample

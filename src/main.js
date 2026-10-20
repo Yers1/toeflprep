@@ -12,6 +12,7 @@ const routes = [
   { path: /^\/flashcards\/?$/, view: () => import('./views/flashcards.js'), nav: 'flashcards', title: 'Flashcards' },
   { path: /^\/lesson\/?$/, view: () => import('./views/lesson.js'), nav: 'lesson', title: 'Writing lesson' },
   { path: /^\/drill\/?$/, view: () => import('./views/drill.js'), nav: 'drill', title: 'Listening Drill' },
+  { path: /^\/hard\/?$/, view: () => import('./views/hard.js'), nav: 'hard', title: 'Hard Repeat' },
   { path: /^\/test\/([\w-]+)\/?$/, view: () => import('./views/test-runner.js'), nav: 'tests', title: 'Test', keys: ['id'], focus: true },
   { path: /^\/report\/([\w-]+)\/?$/, view: () => import('./views/report.js'), nav: 'tests', title: 'Score report', keys: ['id'] },
   { path: /^\/criteria\/?$/, view: () => import('./views/criteria.js'), nav: 'criteria', title: 'Scoring criteria' },
