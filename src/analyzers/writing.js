@@ -3,6 +3,8 @@
 // and maps it onto the rubric criteria. Grammar accuracy is only partly
 // observable here, so the local estimate never awards more than 4 on accuracy.
 
+import { grammarIssues } from './grammar.js';
+
 const STOP = new Set('a an the and or but if of to in on at for from by with about as is are was were be been being am do does did have has had i you he she it we they me him her us them my your his its our their this that these those there here what which who whom whose when where why how not no so very can could would should will shall may might must just also than then too into out up down over under again more most some any all each other such own same only both few many much s t don doesn didn isn aren wasn weren won wouldn couldn shouldn im ive id ill youre theyre thats its'.split(' '));
 
 const SUBORDINATORS = /\b(because|although|though|even though|while|whereas|since|unless|if|when|whenever|which|who|whom|whose|so that|in order to|as long as|as soon as|once|until|rather than|instead of|despite|not only)\b/gi;
@@ -84,6 +86,7 @@ function mechanics(text) {
   if (t.trim() && !/[.!?]["’”)]?\s*$/.test(t.trim().split('\n').filter((l) => l.trim()).slice(-1)[0] || '') && !/^(best|regards|sincerely|thanks|thank you|cheers|yours)/i.test(t.trim().split('\n').slice(-2)[0] || '')) {
     add('punctuation', t.trim().slice(-20), 'End your last sentence with punctuation.');
   }
+  issues.push(...grammarIssues(t));
   return issues;
 }
 
@@ -130,13 +133,26 @@ function languageScore(s) {
   v += s.sentenceSd >= 5 ? 1 : s.sentenceSd >= 3 ? 0.5 : 0;
   if (s.avgSentence < 8) v -= 0.5;
   if (s.overused.length >= 2) v -= 0.5;
-  return clamp(r1(v));
+  // Variety is measurable offline; precision and idiom are not, so 5 needs a rater.
+  return clamp(r1(v), 0, 4);
 }
 
 function accuracyScore(s) {
-  const per100 = s.words ? (s.issues.length / s.words) * 100 : 0;
-  const v = 4 - per100 * 0.8;
+  // Per 100 words, but never over fewer than 100, so a short text is not
+  // driven to 0 by two or three slips (length caps already handle short texts).
+  const per100 = s.words ? (s.issues.length / Math.max(s.words, 100)) * 100 : 0;
+  const v = 4 - per100 * 0.7;
   return clamp(r1(v), 0, 4);
+}
+
+// Holistic level: the rubric describes a typical response at each level, so
+// one weak criterion holds the overall down (at most one level above the
+// weakest criterion), and a tie between two levels goes to the lower one.
+export function holistic(criteria) {
+  const vals = Object.values(criteria).filter((v) => v != null);
+  if (!vals.length) return 0;
+  const x = Math.min(mean(vals), Math.min(...vals) + 1);
+  return clamp(Math.ceil(x - 0.5));
 }
 
 function capByLength(score, wordsN, caps) {
@@ -170,6 +186,7 @@ export function scoreEmail(item, text) {
   let elaboration = (covered / goalsN) * 5;
   if (s.words < 60) elaboration -= 1.5;
   else if (s.words < 90) elaboration -= 0.5;
+  else if (s.words < 110) elaboration = Math.min(elaboration, 4);
   elaboration = clamp(r1(elaboration));
 
   let conventions = 1;
@@ -186,7 +203,7 @@ export function scoreEmail(item, text) {
     conventions,
     accuracy: accuracyScore(s),
   };
-  let overall = mean(Object.values(criteria));
+  let overall = holistic(criteria);
   if (covered < goalsN) overall = Math.min(overall, covered === 0 ? 2 : 3);
   overall = capByLength(overall, s.words, [[1, 0], [30, 1], [60, 2], [85, 3]]);
   if (s.copyRatio > 0.5) overall = Math.min(overall, 1);
@@ -204,35 +221,51 @@ export function scoreEmail(item, text) {
   if (s.words < 90) notes.push({ criterion: 'elaboration', tone: 'fix', text: `Only ${s.words} words — add one concrete detail to each point (aim for 120–180).` });
   addLanguageNotes(notes, s);
 
-  return { overall: clamp(Math.round(overall)), criteria, stats: s, coverage, notes, method: 'local' };
+  return { overall: clamp(Math.floor(overall)), criteria, stats: s, coverage, notes, method: 'local' };
 }
 
 export function scoreDiscussion(item, text) {
-  const promptText = [item.professor?.text, ...(item.students || []).map((x) => x.text)].join(' ');
+  const profText = typeof item.professor === 'string' ? item.professor : item.professor?.text || '';
+  const promptText = [profText, ...(item.students || []).map((x) => x.text)].join(' ');
   const s = analyzeText(text, promptText);
   const names = (item.students || []).map((x) => x.name.toLowerCase());
   const lower = String(text).toLowerCase();
   const engages = names.some((n) => lower.includes(n)) || /\b(classmate|as .* (said|mentioned|pointed out)|i (agree|disagree) with)\b/i.test(text);
-  const topicOverlap = new Set(contentWords(text).map(stem).filter((w) => new Set(contentWords(item.professor?.text || '').map(stem)).has(w))).size;
+  const topicOverlap = new Set(contentWords(text).map(stem).filter((w) => new Set(contentWords(profText).map(stem)).has(w))).size;
+
+  const firstSentence = sentences(text)[0] || '';
+  STANCE.lastIndex = 0;
+  const stanceFirst = STANCE.test(firstSentence);
+  STANCE.lastIndex = 0;
+  const namesClassmate = names.some((n) => lower.includes(n));
+
+  const exampleSpecific = specificExample(text);
+  const addRepeats = repeatsClassmate(text, item.students || []);
 
   let relevance = 1;
-  if (s.stance) relevance += 1;
-  if (s.examples) relevance += 1;
+  if (s.stance) relevance += stanceFirst ? 1 : 0.5;
+  if (s.examples) relevance += exampleSpecific ? 1 : 0.5;
   if (s.reasons) relevance += 0.5;
-  if (engages) relevance += 0.5;
+  if (engages) relevance += namesClassmate ? 0.5 : 0.25;
   if (s.words >= 100) relevance += 1; else if (s.words >= 80) relevance += 0.5;
   if (topicOverlap < 2) relevance -= 1.5;
+  if (addRepeats) relevance -= 0.5;
+  if (!s.examples) relevance = Math.min(relevance, 3.5);
+  else if (!exampleSpecific) relevance = Math.min(relevance, 4);
   relevance = clamp(r1(relevance));
 
   const criteria = { relevance, language: languageScore(s), accuracy: accuracyScore(s) };
-  let overall = mean(Object.values(criteria));
+  let overall = holistic(criteria);
   overall = capByLength(overall, s.words, [[1, 0], [40, 1], [70, 2], [90, 3]]);
   if (s.copyRatio > 0.5) overall = Math.min(overall, 1);
 
   const notes = [];
+  if (s.stance && !stanceFirst) notes.push({ criterion: 'relevance', tone: 'fix', text: 'Your position appears late. Answer the professor’s question in the first sentence instead of opening with background (“Nowadays…”).' });
   notes.push(s.stance
     ? { criterion: 'relevance', tone: 'good', text: 'Your position is stated explicitly.' }
     : { criterion: 'relevance', tone: 'fix', text: 'State your position in the first sentence (“I believe… because…”).' });
+  if (addRepeats) notes.push({ criterion: 'relevance', tone: 'fix', text: 'After “I would add”, the sentence mostly repeats what your classmate already said. Add a reason or angle they did not mention.' });
+  if (s.examples && !exampleSpecific) notes.push({ criterion: 'relevance', tone: 'fix', text: 'Your example is general. Make it specific: a place, a person or a real event, what happened, and why it proves your point.' });
   notes.push(s.examples
     ? { criterion: 'relevance', tone: 'good', text: 'You support the point with an example.' }
     : { criterion: 'relevance', tone: 'fix', text: 'Add one concrete example or scenario, then explain how it proves your point.' });
@@ -241,7 +274,35 @@ export function scoreDiscussion(item, text) {
   if (s.words < 100) notes.push({ criterion: 'relevance', tone: 'fix', text: `${s.words} words — aim for 110–150 to show full elaboration.` });
   addLanguageNotes(notes, s);
 
-  return { overall: clamp(Math.round(overall)), criteria, stats: s, engages, notes, method: 'local' };
+  return { overall: clamp(Math.floor(overall)), criteria, stats: s, engages, notes, method: 'local' };
+}
+
+// An example counts as specific when it names something real: a number, a
+// proper noun, a past event or a person the writer knows.
+function specificExample(text) {
+  const marker = new RegExp(EXAMPLE.source, 'i');
+  return sentences(text).some((sent) => {
+    const m = sent.match(marker);
+    if (!m) return false;
+    const rest = sent.slice(m.index + m[0].length);
+    return /\d/.test(rest) || /\s[A-Z][a-z]+/.test(rest.replace(/\sI\b/g, '')) || /\b\w+ed\b/.test(rest)
+      || /\b(my|our) (friend|brother|sister|cousin|roommate|classmate|teacher|school|city|town|university|country|family)\b/i.test(rest)
+      || /\blast (year|semester|summer|month|week)\b/i.test(rest);
+  });
+}
+
+// "I would add that…" followed by the classmate's own idea is not a contribution.
+function repeatsClassmate(text, students) {
+  const m = String(text).match(/\bI(?: would|'d|’d) (?:also )?add (?:that )?([^.!?]+)/i);
+  if (!m) return false;
+  const added = new Set(contentWords(m[1]).map(stem));
+  if (added.size < 4) return false;
+  return students.some((st) => {
+    const theirs = new Set(contentWords(st.text).map(stem));
+    let hit = 0;
+    added.forEach((w) => { if (theirs.has(w)) hit++; });
+    return hit / added.size >= 0.35;
+  });
 }
 
 function addLanguageNotes(notes, s) {

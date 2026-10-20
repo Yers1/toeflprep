@@ -5,6 +5,19 @@ import { RUBRICS } from '../data/rubrics.js';
 
 const MAX_RESPONSE_CHARS = 6000;
 
+// Task-specific anchors that keep the AI rater as strict as the ETS descriptors.
+const SCORING_RULES = {
+  writing_email: `- Every required point must be addressed; one missing point caps the score at 3, two at 2.
+- The purpose of the email must be clear in the first lines. A level 5 needs consistently appropriate tone for the recipient.`,
+  writing_discussion: `- The position must answer the professor's question directly. Opening with background ("Nowadays…") and stating the view late weakens relevance.
+- A level 4 or 5 needs a specific example (a place, a person or a real event) that is explained, not a generic statement.
+- Paraphrasing what a classmate already said is not a contribution. "I would add that…" must add a new reason or angle.
+- Below about 100 words, the response is rarely above 3.`,
+  speaking_interview: `- A level 4 or 5 needs a direct answer, a reason and a specific example. Without an example, development is at most 3.5.
+- Fluency: below 100 words per minute, or two or more pauses of 1.2 s or longer, keeps fluency at 3 or below. A 5 needs about 115–175 words per minute and at most one long pause.
+- Reusing the question's words instead of answering lowers development.`,
+};
+
 function rubricText(task) {
   const r = RUBRICS[task];
   const levels = [5, 4, 3, 2, 1, 0].map((n) => {
@@ -47,7 +60,11 @@ export function buildPrompt({ task, item, response, metrics }) {
   const system = `You are a calibrated TOEFL iBT rater trained on the ETS scoring guides for the January 2026 test.
 Score strictly against the rubric below. Anchor your judgment on the level descriptions, not on effort or length alone.
 Most intermediate learners score 3; award 5 only when every descriptor of level 5 is met.
-${isSpeaking ? 'You receive an automatic transcript, not audio. Recognition errors can appear as odd words: do not penalize a word that is obviously misrecognized. Judge fluency from the measured timing data. Judge intelligibility cautiously from the recognizer confidence and transcript coherence, and say that it is an estimate.' : ''}
+Hard rules:
+- The overall score is at most one level above the weakest criterion. When torn between two levels, choose the lower one.
+- Count every grammar, article, preposition and word-choice error. Calques from another language ("increased twice", "spend accurately", "invest into") are word-choice errors, not style.
+${SCORING_RULES[task] || ''}
+${isSpeaking ? 'You receive an automatic transcript, not audio. Recognition errors can appear as odd words: do not penalize a word that is obviously misrecognized. Judge fluency from the measured timing data. Judge intelligibility cautiously from the recognizer confidence and transcript coherence, never above 4 from a transcript alone, and say that it is an estimate.' : ''}
 Write feedback for the learner in clear, simple English. Be specific: quote their words.
 Reply with one JSON object only, no markdown.`;
 

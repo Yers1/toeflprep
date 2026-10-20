@@ -70,7 +70,50 @@ export async function pickVoices() {
   return { A, B };
 }
 
+// ------------------------------------------------- Recorded voices ------
+// Natural neural-voice clips generated offline (tools/gen-audio.py, Kokoro)
+// and served from /audio. Keyed by voice role + text, so any text in the
+// content bank plays a recording and anything else falls back to browser TTS.
+
+export function clipKey(role, text) {
+  const s = `${role}|${String(text).replace(/\s+/g, ' ').trim()}`;
+  let h = 0x811c9dc5;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 0x01000193); }
+  return (h >>> 0).toString(16).padStart(8, '0');
+}
+
+let clipSet = null;
+function clips() {
+  clipSet = clipSet || fetch('audio/manifest.json')
+    .then((r) => (r.ok ? r.json() : { clips: [] }))
+    .then((j) => new Set(j.clips || []))
+    .catch(() => new Set());
+  return clipSet;
+}
+
+let currentClip = null;
+
+async function playClip(text, role, rate, signal) {
+  if (!hasWindow || typeof Audio === 'undefined' || settings().naturalVoice === false) return false;
+  const set = await clips();
+  // Same text in the other voice is still better than a robotic fallback.
+  const key = [clipKey(role, text), clipKey(role === 'A' ? 'B' : 'A', text)].find((k) => set.has(k));
+  if (!key || signal?.aborted) return !!key;
+  return new Promise((resolve) => {
+    const a = new Audio(`audio/${key}.mp3`);
+    a.preservesPitch = true;
+    a.playbackRate = rate;
+    currentClip = a;
+    const done = (ok) => { if (currentClip === a) currentClip = null; resolve(ok); };
+    a.onended = () => done(true);
+    a.onerror = () => done(false);
+    signal?.addEventListener('abort', () => { a.pause(); done(true); }, { once: true });
+    a.play().catch(() => done(false));
+  });
+}
+
 export function stopSpeaking() {
+  if (currentClip) { currentClip.pause(); currentClip = null; }
   if (support.tts) speechSynthesis.cancel();
 }
 
@@ -96,9 +139,10 @@ function speakOne(text, voice, rate) {
 
 // role: 'A' (usually female) or 'B' (usually male)
 export async function speak(text, { role = 'A', rate, signal } = {}) {
+  const r = rate || settings().rate || 0.95;
+  if (await playClip(text, role, r, signal)) return;
   if (!support.tts) throw new Error('Text-to-speech is not available in this browser.');
   const voices = await pickVoices();
-  const r = rate || settings().rate || 0.95;
   speechSynthesis.cancel();
   for (const part of splitForTts(text)) {
     if (signal?.aborted) return;

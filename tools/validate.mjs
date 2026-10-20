@@ -8,6 +8,9 @@ import { TASKS } from '../src/tasks/index.js';
 import { makeCTest } from '../src/tasks/reading.js';
 import { isCorrect } from '../src/tasks/writing.js';
 import { moduleBlocks, productiveBlocks } from '../src/core/testmodel.js';
+import { runCalibration } from './calibration.mjs';
+import { HARD } from '../content/bank/hard_repeat.js';
+import { words } from '../src/analyzers/writing.js';
 
 let checks = 0;
 const check = (cond, msg) => { checks++; assert.ok(cond, msg); };
@@ -114,4 +117,20 @@ for (const t of TESTS) {
   sp.forEach((b) => validateItem(b.task, b.item));
 }
 
+// ---- Hard Repeat: every sentence must beat the longest real 7th sentence ----
+{
+  const longest7 = Math.max(...BANK.speaking_repeat.map((s) => words(s.sentences.at(-1)).length));
+  const ids = new Set();
+  for (const s of HARD) {
+    check(s.id && !ids.has(s.id), `hard: duplicate or missing id (${s.id})`);
+    ids.add(s.id);
+    check(s.sentences?.length === 7 && s.scene && s.intro, `${s.id}: needs scene, intro and 7 sentences`);
+    s.sentences.forEach((t) => check(words(t).length > longest7, `${s.id}: "${t.slice(0, 40)}…" is not longer than the longest real sentence (${longest7} words)`));
+  }
+}
+
+// ---- scoring calibration --------------------------------------------------
+const cal = runCalibration(check);
+
 console.log(`OK — ${checks} checks passed across ${Object.keys(TASKS).length} task types and ${TESTS.length} mock tests.`);
+console.log(`Calibration: interview weak ${cal.weak} / model ${cal.strong}; discussion learner ${cal.learner} / model ${cal.model}.`);
