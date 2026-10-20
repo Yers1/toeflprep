@@ -55,7 +55,12 @@ def main(jobs_path, shard="0/1"):
                 if done % 25 == 0 or done == len(todo):
                     print(f"  {done}/{len(todo)}", flush=True)
 
-    if i != 0:
+    # --no-prune: a partial job list (e.g. only Speaking) must not delete other clips.
+    if i != 0 or "--no-prune" in sys.argv:
+        clips = sorted(f.stem for f in OUT.glob("*.mp3") if not f.stem.endswith(".part"))
+        if i == 0:
+            (OUT / "manifest.json").write_text(json.dumps({"voices": VOICES, "clips": clips}), encoding="utf-8")
+            print(f"manifest: {len(clips)} clips")
         return
     keys = {j["key"] for j in jobs}
     for f in OUT.glob("*.mp3"):
@@ -67,6 +72,6 @@ def main(jobs_path, shard="0/1"):
 
 
 if __name__ == "__main__":
-    args = [a for a in sys.argv[1:] if not a.startswith("--shard=")]
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
     shard = next((a.split("=", 1)[1] for a in sys.argv[1:] if a.startswith("--shard=")), "0/1")
     main(args[0] if args else str(ROOT / "tools" / "tts-jobs.json"), shard)

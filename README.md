@@ -16,7 +16,7 @@ See [`docs/RESEARCH.md`](docs/RESEARCH.md) for the format/scoring research and
   - Reading: Complete the Words, Read in Daily Life, Read an Academic Passage
   - Listening: Listen and Choose a Response, Conversation, Announcement, Academic Talk
   - Writing: Build a Sentence, Write an Email, Academic Discussion
-  - Speaking: Listen and Repeat (20 campus scenes, 140 sentences), Take an Interview (22 sets, 88 questions)
+  - Speaking: Listen and Repeat (28 campus scenes, 196 sentences), Take an Interview (22 sets, 88 questions)
 - **Natural recorded voices** — every Listening and Speaking prompt plays a pre-recorded neural
   voice (Kokoro, Apache-2.0) from `audio/`, so the app no longer depends on robotic browser
   voices. Anything without a recording falls back to browser speech; Settings can turn the
