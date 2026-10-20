@@ -1,7 +1,7 @@
 // Spaced-repetition flashcards (Leitner system) for TOEFL vocabulary.
 
 import { html, mount, $, $$, shuffle } from '../core/ui.js';
-import { cardState, gradeCard } from '../core/store.js';
+import { cardState, gradeCard, customCards, addCustomCard } from '../core/store.js';
 import { speak, support } from '../core/audio.js';
 import { VOCAB, DECKS } from '../../content/vocab.js';
 
@@ -10,8 +10,12 @@ const SESSION_MAX = 20;
 const BOX_LABELS = ['<1 day', '1 day', '3 days', '1 week', '16 days', '5 weeks'];
 
 function poolFor(deckId) {
-  return deckId && deckId !== 'all' ? VOCAB.filter((c) => c.deck === deckId) : VOCAB;
+  const all = [...VOCAB, ...customCards()];
+  return deckId && deckId !== 'all' ? all.filter((c) => c.deck === deckId) : all;
 }
+
+const modeOf = (card) => DECKS.find((d) => d.id === card.deck)?.mode || '';
+const norm = (s) => s.toLowerCase().replace(/[^a-z0-9']+/g, ' ').trim();
 
 function split(deckId) {
   const now = Date.now();
@@ -63,7 +67,24 @@ function showDecks(outlet) {
           </a>`;
         })}
       </div>
+      <form class="section-block add-card">
+        <h2>Add a word from the books</h2>
+        <p class="muted small">It goes into “My words”: you will see the meaning and have to produce the English.</p>
+        <div class="row gap-s wrap">
+          <input name="word" required placeholder="English word or phrase" aria-label="English word or phrase">
+          <input name="ru" required placeholder="Meaning (RU)" aria-label="Meaning">
+          <input name="ex" placeholder="Example sentence (optional)" aria-label="Example sentence">
+          <button class="btn btn-primary">Add</button>
+        </div>
+      </form>
     </section>`);
+  $('.add-card', outlet).addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = new FormData(e.currentTarget);
+    addCustomCard({ word: f.get('word').trim(), ru: f.get('ru').trim(), ex: f.get('ex').trim() });
+    showDecks(outlet);
+    $('.add-card input', outlet).focus();
+  });
 }
 
 function showSession(outlet, deckId) {
@@ -86,10 +107,12 @@ function showSession(outlet, deckId) {
 
   let i = 0;
   let flipped = false;
+  let typed = '';
   const stats = { reviewed: 0, promoted: 0 };
 
   function flip() {
     if (!queue[i]) return;
+    if (!flipped) typed = $('.fc-answer', outlet)?.value.trim() ?? typed;
     flipped = !flipped;
     render();
   }
@@ -103,6 +126,7 @@ function showSession(outlet, deckId) {
     stats.reviewed++;
     i++;
     flipped = false;
+    typed = '';
     render();
   }
 
@@ -121,14 +145,37 @@ function showSession(outlet, deckId) {
   function render() {
     if (i >= queue.length) return renderEnd();
     const card = queue[i];
+    const mode = modeOf(card);
+    const answer = mode === 'fix' ? card.def : card.word;
+    const ok = typed && norm(typed) === norm(answer);
+    const speakBtn = support.tts ? html`<button type="button" class="btn btn-ghost btn-icon js-speak" aria-label="Play pronunciation">🔊</button>` : '';
+    const you = typed ? html`<p class="fc-you small ${ok ? 'ok' : 'muted'}">${ok ? '✓ ' : 'You: '}${typed}</p>` : '';
     mount(outlet, html`
       <section class="page narrow flash-session">
         <div class="row between small muted"><span>${title}</span><span>${i + 1} / ${queue.length}</span></div>
         <div class="flashcard ${flipped ? 'is-flipped' : ''}" role="button" tabindex="0" aria-label="${flipped ? 'Card back' : 'Card front, tap to flip'}">
-          ${!flipped ? html`
+          ${mode && !flipped ? html`
+            <p class="fc-pos small muted">${card.pos}</p>
+            <p class="fc-sent">${mode === 'fix' ? card.word : card.ru}</p>
+            ${mode === 'produce' && card.def ? html`<p class="muted">${card.def}</p>` : ''}
+            <p class="small muted">${mode === 'fix' ? 'Type the correct sentence below, then press Enter' : 'Type it in English below, then press Enter'}</p>
+          ` : mode === 'fix' ? html`
+            <p class="fc-pos small muted">${card.pos}</p>
+            ${you}
+            <p class="fc-sent">${card.def}</p>
+            ${speakBtn}
+            <p class="fc-example">${card.ex}</p>
+            <p class="fc-ru muted small">${card.ru}</p>
+          ` : mode === 'produce' ? html`
+            ${you}
+            <p class="fc-word fc-word-s">${card.word}</p>
+            ${speakBtn}
+            ${card.ex ? html`<p class="fc-example muted">${card.ex}</p>` : ''}
+            <p class="fc-ru muted small">${card.ru}</p>
+          ` : !flipped ? html`
             <p class="fc-pos small muted">${card.pos}</p>
             <p class="fc-word">${card.word}</p>
-            ${support.tts ? html`<button type="button" class="btn btn-ghost btn-icon js-speak" aria-label="Play pronunciation">🔊</button>` : ''}
+            ${speakBtn}
             <p class="small muted">Tap the card, or press space, to flip</p>
           ` : html`
             <p class="fc-word fc-word-s">${card.word}</p>
@@ -138,6 +185,7 @@ function showSession(outlet, deckId) {
             <p class="fc-ru muted small" hidden>${card.ru}</p>
           `}
         </div>
+        ${mode && !flipped ? html`<textarea class="fc-answer" rows="2" aria-label="Your answer" placeholder="Your answer…">${typed}</textarea>` : ''}
         ${flipped ? html`
           <div class="row gap-s wrap grade-row">
             <button type="button" class="btn btn-ghost js-grade" data-grade="again">Again <span class="small muted">${BOX_LABELS[0]}</span></button>
@@ -148,7 +196,10 @@ function showSession(outlet, deckId) {
       </section>`);
 
     $('.flashcard', outlet).addEventListener('click', (e) => { if (!e.target.closest('button')) flip(); });
-    $('.js-speak', outlet)?.addEventListener('click', (e) => { e.stopPropagation(); speak(card.word).catch(() => {}); });
+    $('.js-speak', outlet)?.addEventListener('click', (e) => { e.stopPropagation(); speak(answer).catch(() => {}); });
+    const box = $('.fc-answer', outlet);
+    box?.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); flip(); } });
+    box?.focus();
     $('.js-translate', outlet)?.addEventListener('click', (e) => { e.stopPropagation(); $('.fc-ru', outlet).hidden = false; e.currentTarget.remove(); });
     $$('.js-grade', outlet).forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); grade(b.dataset.grade); }));
   }

@@ -1,5 +1,5 @@
 import { html, mount, fmtDateTime } from '../core/ui.js';
-import { attempts, plan as getPlan, settings, cards as cardStates } from '../core/store.js';
+import { attempts, plan as getPlan, settings, cards as cardStates, customCards } from '../core/store.js';
 import { fmtBand, CEFR, roundHalf, attemptBand } from '../core/scoring.js';
 import { itemDone, planItemHref, todayIso, daysBetween } from '../core/planner.js';
 import { SECTIONS, TASKS } from '../tasks/index.js';
@@ -14,7 +14,7 @@ function flashcardsDue() {
   const states = cardStates();
   const now = Date.now();
   let due = 0, started = false;
-  for (const c of VOCAB) {
+  for (const c of [...VOCAB, ...customCards()]) {
     const st = states[c.id];
     if (st) { started = true; if (st.due <= now) due++; }
   }
