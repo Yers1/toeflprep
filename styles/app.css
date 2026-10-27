@@ -673,3 +673,23 @@ details.card[open] > summary { margin-bottom: 1rem; }
   .task-head-tools select { max-width: 100%; }
   .timer-pill { min-width: 60px; }
 }
+
+/* ---- course ---- */
+.course-cta { margin-top: 1rem; }
+.lesson-list { padding-left: 1.4rem; display: grid; gap: .35rem; }
+.lesson-list li { display: flex; justify-content: space-between; align-items: center; gap: .75rem; }
+.word-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: .75rem; margin-bottom: 1rem; }
+.word-card p { margin: 0 0 .4rem; }
+.word-use { color: var(--muted); border-left: 3px solid var(--accent-soft); padding-left: .6rem; }
+.word-card mark, .word-use mark { background: var(--accent-soft); color: var(--ink); border-radius: 4px; padding: 0 .15em; }
+.ex-card .ex-q { font-size: 1.1rem; line-height: 1.9; }
+.ex-q input.ex-gap { display: inline-block; font: inherit; width: 9ch; min-height: 0; margin: 0 .3rem; padding: .1rem .4rem; border: 0; border-radius: 4px 4px 0 0; border-bottom: 2px solid var(--accent); background: var(--accent-soft); color: var(--ink); text-align: center; }
+.ex-fix { width: 100%; font: inherit; font-size: 1.05rem; }
+.ex-choices { display: grid; gap: .5rem; margin-bottom: .75rem; }
+.ex-choice { font: inherit; text-align: left; padding: .65rem .85rem; border-radius: 10px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); cursor: pointer; }
+.ex-choice:hover:not(:disabled) { border-color: var(--accent); }
+.ex-choice.is-right { border-color: var(--good); background: var(--good-soft); }
+.ex-choice.is-wrong { border-color: var(--low); background: var(--low-soft); }
+.ex-verdict { font-weight: 650; margin: .75rem 0 .25rem; }
+.ex-verdict.ok { color: var(--good); }
+.ex-verdict.bad { color: var(--low); }

@@ -3,6 +3,8 @@
 // 12 TOEFL task families (academic reading/listening plus campus-life and
 // connector vocabulary useful for Writing and Speaking).
 
+import { COURSE } from './course/index.js';
+
 // mode: '' = word -> meaning; 'produce' = Russian -> type the English;
 // 'fix' = type the corrected sentence (word = wrong, def = right, ex/ru = rule).
 export const DECKS = [
@@ -19,6 +21,16 @@ export const DECKS = [
   { id: 'campus-life', name: 'Campus life', blurb: 'Everyday words from Read in Daily Life and campus Conversation listening tasks.' },
   { id: 'linking', name: 'Linking words', blurb: 'Connectors that make Writing and Speaking responses read as one coherent argument.' },
 ];
+
+// One deck per course module: see the Russian and the example with a gap,
+// type the English; the back shows it inside a level-5 answer.
+const COURSE_MODULES = COURSE.filter((m) => m.lessons.some((l) => l.words?.length));
+DECKS.push(...COURSE_MODULES.map((m) => ({ id: `course-${m.id}`, name: `Course: ${m.title}`, blurb: `Words and phrases from the "${m.title}" lessons, with examples of them in use.`, mode: 'produce' })));
+
+function gapOut(text, word) {
+  const i = text.toLowerCase().indexOf(word.toLowerCase());
+  return i < 0 ? text : `${text.slice(0, i)}_____${text.slice(i + word.length)}`;
+}
 
 function slug(word) {
   return word.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -373,4 +385,8 @@ export const VOCAB = [
   ...societyHistory,
   ...campusLife,
   ...linking,
+  ...COURSE_MODULES.flatMap((m) => m.lessons.flatMap((l) => (l.words || []).map(([word, ru, ex, use]) => ({
+    id: `course-${m.id}-${slug(word)}`, deck: `course-${m.id}`, word, pos: l.title, ru, ex: use,
+    def: gapOut(ex, word),
+  })))),
 ];

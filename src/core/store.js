@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS = {
 };
 
 function blank() {
-  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {}, custom: [], drill: { speed: 1, lastUsed: {}, log: {} } };
+  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {}, custom: [], drill: { speed: 1, lastUsed: {}, log: {} }, course: { lessons: {}, wrong: {} } };
 }
 
 let cache = null;
@@ -250,4 +250,37 @@ export function drillAddResult(dateIso, { correct, total }) {
   d.drill.log[dateIso] = day;
   persist();
   return day;
+}
+
+// ---- course -------------------------------------------------------------
+// lessons: lessonId -> { best, done, at }. wrong: exerciseId -> { streak, day }:
+// an exercise leaves the review queue after correct answers on 2 different days.
+
+export function courseState() {
+  return load().course;
+}
+
+export function courseSaveLesson(id, best, passMark) {
+  const c = load().course;
+  const prev = c.lessons[id];
+  const top = Math.max(best, prev?.best ?? 0);
+  c.lessons[id] = { best: top, done: top >= passMark, at: Date.now() };
+  persist();
+}
+
+export function courseMark(exId, ok, day) {
+  const w = load().course.wrong;
+  const cur = w[exId];
+  if (!ok) w[exId] = { streak: 0, day };
+  else if (cur && cur.day !== day) {
+    if (cur.streak + 1 >= 2) delete w[exId];
+    else w[exId] = { streak: cur.streak + 1, day };
+  } else return;
+  persist();
+}
+
+// The learner's own rewrite was right but worded differently from the key.
+export function courseUnmark(exId) {
+  delete load().course.wrong[exId];
+  persist();
 }

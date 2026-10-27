@@ -10,6 +10,7 @@ import { isCorrect } from '../src/tasks/writing.js';
 import { moduleBlocks, productiveBlocks } from '../src/core/testmodel.js';
 import { runCalibration } from './calibration.mjs';
 import { HARD } from '../content/bank/hard_repeat.js';
+import { COURSE } from '../content/course/index.js';
 import { words, analyzeText, scoreEmail, scoreDiscussion } from '../src/analyzers/writing.js';
 
 let checks = 0;
@@ -143,6 +144,36 @@ const slips = (t) => analyzeText(t).issues.map((i) => i.type);
 check(slips('I can come at 3 p.m. on Friday. Kind regards,\nAli').length === 0, 'a.m./p.m. and "Kind regards," must not flag');
 check(slips('I came late.the bus broke down. then i walked').includes('spacing'), 'missing space must flag');
 check(slips('I came late. then I walked.').includes('capital'), 'lowercase sentence start must flag');
+
+// ---- writing course -------------------------------------------------------
+{
+  const lessonIds = new Set();
+  const words = new Set();
+  for (const m of COURSE) {
+    check(m.id && m.title, `course module missing id/title`);
+    for (const l of m.lessons) {
+      check(l.id && !lessonIds.has(l.id) && !l.id.startsWith('exam-') && l.id !== 'review', `course: bad or duplicate lesson id (${l.id})`);
+      lessonIds.add(l.id);
+      check(l.title && l.exercises?.length >= 12, `${l.id}: needs a title and at least 12 exercises`);
+      (l.words || []).forEach(([w, ru, ex, use]) => {
+        check(w && ru && ex && use, `${l.id}: word "${w}" missing a field`);
+        check(!words.has(w.toLowerCase()), `${l.id}: word "${w}" already used in the course`);
+        words.add(w.toLowerCase());
+        [ex, use].forEach((t) => check(t.toLowerCase().includes(w.toLowerCase()), `${l.id}: example "${t}" does not contain "${w}"`));
+      });
+      l.exercises.forEach((ex, i) => {
+        const at = `${l.id}[${i}]`;
+        check(ex.why, `${at}: missing why`);
+        if (m.id === 'diagnostic') check(COURSE.some((x) => x.id === ex.tag), `${at}: diagnostic tag "${ex.tag}" is not a module`);
+        if (ex.type === 'gap') check(ex.q.split('___').length === 2 && ex.a?.length, `${at}: gap needs exactly one ___ and answers`);
+        else if (ex.type === 'fix') check(ex.a?.length && ex.a.every((a) => a.trim() !== ex.q.trim()), `${at}: fix needs answers that differ from the prompt`);
+        else if (ex.type === 'choice') check(ex.choices?.length === 4 && new Set(ex.choices).size === 4 && Number.isInteger(ex.answer) && ex.answer >= 0 && ex.answer < 4, `${at}: choice needs 4 distinct options and an answer index`);
+        else if (ex.type === 'order') check(ex.tiles?.length >= 3 && isCorrect(ex, ex.tiles.map((_, k) => k)), `${at}: order does not self-validate`);
+        else check(false, `${at}: unknown type ${ex.type}`);
+      });
+    }
+  }
+}
 
 // ---- scoring calibration --------------------------------------------------
 const cal = runCalibration(check);

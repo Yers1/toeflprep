@@ -1,11 +1,12 @@
 import { html, mount, fmtDateTime } from '../core/ui.js';
-import { attempts, plan as getPlan, settings, cards as cardStates, customCards } from '../core/store.js';
+import { attempts, plan as getPlan, settings, cards as cardStates, customCards, courseState } from '../core/store.js';
 import { fmtBand, CEFR, roundHalf, attemptBand } from '../core/scoring.js';
 import { itemDone, planItemHref, todayIso, daysBetween } from '../core/planner.js';
 import { SECTIONS, TASKS } from '../tasks/index.js';
 import { RUBRICS } from '../data/rubrics.js';
 import { TESTS } from '../../content/index.js';
 import { VOCAB } from '../../content/vocab.js';
+import { LESSONS } from '../../content/course/index.js';
 import { estimateSections } from './estimates.js';
 
 const SECS = ['reading', 'listening', 'writing', 'speaking'];
@@ -26,6 +27,11 @@ function flashcardsNotice() {
   if (fc.due > 0) return html`<a class="notice good" href="#/flashcards">📇 ${fc.due} flashcard${fc.due === 1 ? '' : 's'} due today — review now</a>`;
   if (!fc.started) return html`<a class="notice" href="#/flashcards">Start learning TOEFL vocabulary with flashcards</a>`;
   return '';
+}
+
+function courseNotice() {
+  const next = LESSONS.find((l) => !courseState().lessons[l.id]?.done);
+  return next ? html`<a class="notice good" href="#/course/${next.id}">📘 Writing course: ${next.title}</a>` : '';
 }
 
 function criteriaInsights() {
@@ -115,6 +121,7 @@ export default function home(outlet) {
         </div>
       </header>
 
+      ${courseNotice()}
       ${flashcardsNotice()}
 
       <div class="section-cards">
