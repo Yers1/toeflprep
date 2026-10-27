@@ -10,7 +10,7 @@ import { isCorrect } from '../src/tasks/writing.js';
 import { moduleBlocks, productiveBlocks } from '../src/core/testmodel.js';
 import { runCalibration } from './calibration.mjs';
 import { HARD } from '../content/bank/hard_repeat.js';
-import { words } from '../src/analyzers/writing.js';
+import { words, analyzeText, scoreEmail, scoreDiscussion } from '../src/analyzers/writing.js';
 
 let checks = 0;
 const check = (cond, msg) => { checks++; assert.ok(cond, msg); };
@@ -128,6 +128,21 @@ for (const t of TESTS) {
     s.sentences.forEach((t) => check(words(t).length > longest7, `${s.id}: "${t.slice(0, 40)}…" is not longer than the longest real sentence (${longest7} words)`));
   }
 }
+
+// ---- mechanics: model answers are clean, real slips still flag -------------
+for (const task of ['writing_email', 'writing_discussion']) {
+  for (const item of BANK[task] || []) {
+    if (!item.model?.text) continue;
+    const issues = analyzeText(item.model.text).issues;
+    check(issues.length === 0, `${item.id}: model answer flagged: ${issues.map((i) => `${i.type} "${i.sample}"`).join('; ')}`);
+    const score = (task === 'writing_email' ? scoreEmail : scoreDiscussion)(item, item.model.text);
+    check(score.overall >= 4, `${item.id}: model answer scores only ${score.overall}`);
+  }
+}
+const slips = (t) => analyzeText(t).issues.map((i) => i.type);
+check(slips('I can come at 3 p.m. on Friday. Kind regards,\nAli').length === 0, 'a.m./p.m. and "Kind regards," must not flag');
+check(slips('I came late.the bus broke down. then i walked').includes('spacing'), 'missing space must flag');
+check(slips('I came late. then I walked.').includes('capital'), 'lowercase sentence start must flag');
 
 // ---- scoring calibration --------------------------------------------------
 const cal = runCalibration(check);

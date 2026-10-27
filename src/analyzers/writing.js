@@ -19,10 +19,14 @@ export function words(text) {
   return (String(text).toLowerCase().match(/[a-z0-9’']+/g) || []).map((w) => w.replace(/[’']/g, ''));
 }
 
+// Dots inside "a.m.", "p.m.", "e.g.", "U.S." are not sentence ends or missing spaces.
+const ABBR = /\b([a-z])\.(?=[a-z]\.)/gi;
+
 export function sentences(text) {
   return String(text)
     .replace(/\n+/g, ' ')
-    .split(/(?<=[.!?])\s+(?=[A-Za-z"“(])/)
+    .replace(ABBR, '$1')
+    .split(/(?<=[.!?])\s+(?=[A-Z"“(])|(?<=[.!?])(?<!\b(?:am|pm|eg|ie|etc)\.)\s+(?=[a-z])/)
     .map((s) => s.trim())
     .filter((s) => /[a-z]/i.test(s));
 }
@@ -78,12 +82,15 @@ function mechanics(text) {
   for (const m of t.matchAll(/(^|[\s(])i(?=[\s,.;:!?'’]|$)/g)) add('capital', 'i', 'Capitalize the pronoun “I”.');
   for (const s of sentences(t)) if (/^[a-z]/.test(s)) add('capital', s.slice(0, 30), 'Start each sentence with a capital letter.');
   for (const m of t.matchAll(/\b(\w+)\s+\1\b/gi)) if (!/^(that|had|very)$/i.test(m[1])) add('repeat', m[0], 'Repeated word.');
-  for (const m of t.matchAll(/[,.;:!?](?=[A-Za-z])/g)) add('spacing', t.slice(Math.max(0, m.index - 8), m.index + 8), 'Add a space after punctuation.');
+  const plain = t.replace(ABBR, '$1');
+  for (const m of plain.matchAll(/[,.;:!?](?=[A-Za-z])/g)) add('spacing', plain.slice(Math.max(0, m.index - 8), m.index + 8), 'Add a space after punctuation.');
   for (const m of t.matchAll(/\b(alot|dont|cant|wont|doesnt|didnt|isnt|im|ive|thats|could of|would of|should of|irregardless|everyday life is|more better|most easiest)\b/gi)) {
     add('spelling', m[0], `Check “${m[0]}”.`);
   }
   for (const s of sentences(t)) if (words(s).length > 45) add('length', s.slice(0, 40) + '…', 'Very long sentence: split it to keep control.');
-  if (t.trim() && !/[.!?]["’”)]?\s*$/.test(t.trim().split('\n').filter((l) => l.trim()).slice(-1)[0] || '') && !/^(best|regards|sincerely|thanks|thank you|cheers|yours)/i.test(t.trim().split('\n').slice(-2)[0] || '')) {
+  // A signature line ("Talia", "Ben Carter") needs no final punctuation.
+  const last = (t.trim().split('\n').filter((l) => l.trim()).slice(-1)[0] || '').trim();
+  if (last && !/[.!?]["’”)]?$/.test(last) && !/^([A-Z][\w’'-]*\s?){1,3}$/.test(last)) {
     add('punctuation', t.trim().slice(-20), 'End your last sentence with punctuation.');
   }
   issues.push(...grammarIssues(t));
@@ -180,7 +187,7 @@ export function scoreEmail(item, text) {
   const goalsN = coverage.length || 3;
   const firstLine = String(text).trim().split('\n')[0] || '';
   const greeting = /^(dear|hi|hello|good (morning|afternoon|evening)|to whom)/i.test(firstLine.trim());
-  const closing = /(best regards|kind regards|warm regards|regards|sincerely|best wishes|best,|thank you|thanks|cheers|all the best|yours|take care|see you)/i.test(String(text).trim().split('\n').slice(-4).join(' '));
+  const closing = /(best regards|kind regards|warm regards|regards|sincerely|best wishes|best,|thank you|thanks|cheers|all the best|yours|take care|see you|hugs|love,|with gratitude)/i.test(String(text).trim().split('\n').slice(-4).join(' '));
   const formal = item.register !== 'informal';
 
   let elaboration = (covered / goalsN) * 5;

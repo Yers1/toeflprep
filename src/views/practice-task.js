@@ -68,6 +68,13 @@ export default function practiceTask(outlet, { task }, query) {
   const feedback = $('.task-feedback', outlet);
   const seed = uid();
   const engine = meta.engine;
+  // Reading and Listening practice has no official per-set limit, so show time spent.
+  const started = Date.now();
+  let clockHandle = null;
+  const spent = () => {
+    const s = Math.floor((Date.now() - started) / 1000);
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+  };
 
   function nextSetLink() {
     const idx = sets.findIndex((s) => s.id === item.id);
@@ -83,6 +90,9 @@ export default function practiceTask(outlet, { task }, query) {
   function finishObjective(response) {
     const g = engine.grade(item, response);
     controller?.destroy?.();
+    const timed = clockHandle != null;
+    clearInterval(clockHandle);
+    $('.js-clock', outlet)?.remove();
     addAttempt({
       kind: 'task', task, section: meta.section, setId: item.id, title: setTitle(task, item),
       score: { correct: g.correct, total: g.total }, detail: { response },
@@ -92,6 +102,7 @@ export default function practiceTask(outlet, { task }, query) {
       <div class="result-banner ${g.correct / g.total >= 0.8 ? 'good' : g.correct / g.total >= 0.55 ? 'mid' : 'low'}">
         <strong>${g.correct} / ${g.total} correct</strong>
         <span>${Math.round((g.correct / g.total) * 100)}%</span>
+        ${timed ? html`<span>Time ${spent()} · ${Math.round((Date.now() - started) / 1000 / g.total)} s per question</span>` : ''}
       </div>
       ${engine.review(item, response, g)}`);
     mount(feedback, nextSetLink());
@@ -186,9 +197,11 @@ export default function practiceTask(outlet, { task }, query) {
   if (meta.kind === 'objective' && task !== 'writing_sentence') {
     mount(actions, html`<div class="row end"><button class="btn btn-primary js-check" type="button">Check answers</button></div>`);
     $('.js-check', actions).addEventListener('click', () => finishObjective(controller.collect()));
+    $('.page-task', outlet).insertAdjacentHTML('beforeend', '<span class="timer-pill practice-clock js-clock" role="timer" aria-label="Time spent">0:00</span>');
+    clockHandle = setInterval(() => { const el = $('.js-clock', outlet); if (el) el.textContent = spent(); }, 1000);
   }
 
-  return () => controller?.destroy?.();
+  return () => { clearInterval(clockHandle); controller?.destroy?.(); };
 }
 
 function slim(result) {

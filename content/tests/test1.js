@@ -280,7 +280,7 @@ export default {
   // ------------------------------------------------------------ WRITING --
   writing: [
     { task: 'writing_sentence', item: { id: 'pt1-w-bas', items: [
-      bas('Rosa', 'Did you manage to finish the reading?', 'Ken', 'Almost. I', ['only', 'have', 'the last', 'chapter', 'left'], 'to read.', 'had', '“Have + noun + left” means something remains.', [['have', 'only', 'the last', 'chapter', 'left']]),
+      bas('Rosa', 'Did you manage to finish the reading?', 'Ken', 'Almost. I', ['only', 'have', 'the last', 'chapter', 'left'], 'to read.', 'having', '“Have + noun + left” means something remains.', [['have', 'only', 'the last', 'chapter', 'left']]),
       bas('Rosa', 'Why are you taking the bus today?', 'Ken', 'My bike', ['is', 'being', 'repaired', 'at the shop', 'near'], 'the station.', 'repairing', 'Present continuous passive: is being + past participle.'),
       bas('Rosa', 'What did the advisor recommend?', 'Ken', 'She', ['suggested', 'that', 'I', 'take', 'a statistics course'], 'next term.', 'taking', 'After “suggest that”, use the base verb (subjunctive).'),
       bas('Rosa', 'Have you seen the new art exhibit?', 'Ken', 'Not yet, but', ['I’ve', 'heard', 'it’s', 'worth', 'visiting'], '.', 'visit', '“Worth + -ing”.'),

@@ -281,7 +281,7 @@ export default {
   // ------------------------------------------------------------ WRITING --
   writing: [
     { task: 'writing_sentence', item: { id: 'pt2-w-bas', items: [
-      bas('Nina', 'Did you get the job at the museum?', 'Paul', 'I don’t know yet. They', ['said', 'they', 'would', 'call me', 'by'], 'Friday.', 'will', 'Reported speech: will → would.'),
+      bas('Nina', 'Did you get the job at the museum?', 'Paul', 'I don’t know yet. They', ['said', 'they', 'would', 'call me', 'by'], 'Friday.', 'calls', 'Reported speech usually backshifts will → would.'),
       bas('Nina', 'Why is the road closed?', 'Paul', 'A new bridge', ['is', 'being', 'built', 'over', 'the river'], '.', 'building', 'Present continuous passive.'),
       bas('Nina', 'What should I bring to the picnic?', 'Paul', '', ['It', 'would be', 'great', 'if', 'you'], 'could bring some fruit.', 'will', 'Polite suggestion: It would be great if you could…'),
       bas('Nina', 'How did you learn to speak Spanish so well?', 'Paul', 'I', ['lived', 'with', 'a family', 'in Mexico', 'for'], 'a whole year.', 'since', '“For” + a period of time.', [['lived', 'in Mexico', 'with', 'a family', 'for']]),
