@@ -675,6 +675,19 @@ details.card[open] > summary { margin-bottom: 1rem; }
 }
 
 /* ---- course ---- */
+.card.theory { padding: 0; }
+.theory-item { padding: 1.1rem clamp(16px, 2.4vw, 24px); line-height: 1.65; }
+.theory-item + .theory-item { border-top: 1px solid var(--line); }
+.theory-item h3 { margin: 0 0 .45rem; font-size: 1.02rem; color: var(--ink); }
+.theory-item p { margin: 0 0 .5rem; max-width: 72ch; }
+.theory-item p:last-child { margin-bottom: 0; }
+.theory em { color: var(--ink); }
+.theory ol, .theory ul { margin: .3rem 0 .5rem; padding-left: 1.3rem; display: grid; gap: .35rem; max-width: 72ch; }
+.theory ul.theory-lines { list-style: none; padding-left: 0; }
+.theory-lines li { padding: .35rem .7rem; background: var(--surface-2); border-radius: 8px; }
+.theory-model { margin-top: .7rem; padding: .9rem 1rem; background: var(--surface-2); border-left: 3px solid var(--accent); border-radius: 10px; max-width: 72ch; }
+.theory-model strong { display: block; margin-top: .7rem; font-size: .72rem; letter-spacing: .05em; text-transform: uppercase; color: var(--accent); }
+.theory-model strong:first-child { margin-top: 0; }
 .course-cta { margin-top: 1rem; }
 .lesson-list { padding-left: 1.4rem; display: grid; gap: .35rem; }
 .lesson-list li { display: flex; justify-content: space-between; align-items: center; gap: .75rem; }

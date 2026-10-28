@@ -119,7 +119,7 @@ function showLesson(outlet, lesson) {
         ${lesson.why ? html`<p class="lead">${lesson.why}</p>` : ''}
       </header>
       ${lesson.theory?.length ? html`<section class="section-block"><h2>Правило</h2>
-        <div class="card prose">${lesson.theory.map((p) => html`<p>${raw(p)}</p>`)}</div></section>` : ''}
+        <div class="card theory">${lesson.theory.map(theoryBlock)}</div></section>` : ''}
       ${lesson.examples?.length ? html`<section class="section-block"><h2>Ошибка → как правильно</h2>
         <ul class="fixes">${lesson.examples.map(([bad, good, why]) => html`<li><del>${bad}</del><br><ins>${good}</ins>${why ? html`<br><span class="small muted">${why}</span>` : ''}</li>`)}</ul></section>` : ''}
       ${lesson.words?.length ? html`<section class="section-block"><h2>Слова урока</h2>
@@ -184,6 +184,29 @@ function showRun(outlet, { title, list, module, saveAs }) {
         <a class="btn ${module ? 'btn-ghost' : 'btn-primary'}" href="#/course">Курс</a>
       </div>`);
   });
+}
+
+// Theory strings are plain HTML; give the long ones structure: a leading bold title
+// becomes a heading, <br> lines and inline (1) (2) … become lists, and a model text
+// after <br><br> gets its own block.
+function theoryBlock(p) {
+  const m = p.match(/^<strong>([^<]*[.:])<\/strong>\s*/);
+  const [body, model] = (m ? p.slice(m[0].length) : p).split('<br><br>');
+  let main;
+  if (body.includes('<br>')) {
+    const lines = body.split('<br>').filter((x) => x.trim());
+    const intro = /:\s*$/.test(lines[0]) ? lines.shift() : '';
+    main = html`${intro ? html`<p>${raw(intro)}</p>` : ''}<ul class="theory-lines">${lines.map((x) => html`<li>${raw(x)}</li>`)}</ul>`;
+  } else if (!model && body.includes('(1)')) {
+    const [intro, ...items] = body.split(/\s*\(\d\)\s*/);
+    let tail = '';
+    const cut = items.at(-1).indexOf('. ');
+    if (cut > 0) { tail = items.at(-1).slice(cut + 2); items[items.length - 1] = items.at(-1).slice(0, cut + 1); }
+    main = html`${intro ? html`<p>${raw(intro)}</p>` : ''}<ol>${items.map((x) => html`<li>${raw(x.replace(/;\s*$/, ''))}</li>`)}</ol>${tail ? html`<p>${raw(tail)}</p>` : ''}`;
+  } else if (m?.[1].endsWith(':') && body.includes('; ')) {
+    main = html`<ul>${body.split(/;\s+/).map((x) => html`<li>${raw(x)}</li>`)}</ul>`;
+  } else main = html`<p>${raw(body)}</p>`;
+  return html`<div class="theory-item">${m ? html`<h3>${m[1].replace(/[.:]$/, '')}</h3>` : ''}${main}${model ? html`<div class="theory-model">${raw(model)}</div>` : ''}</div>`;
 }
 
 function banner(results) {
