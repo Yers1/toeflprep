@@ -143,7 +143,13 @@ function finishLesson(outlet, lesson, results) {
   const diag = lesson.module === 'diagnostic';
   courseSaveLesson(lesson.id, score, diag ? 0 : PASS);
   const i = LESSONS.findIndex((l) => l.id === lesson.id);
-  const next = LESSONS[i + 1];
+  let next = LESSONS[i + 1];
+  if (diag) {
+    // Point the diagnostic's "Next" at the weakest module, not the next one in order.
+    const rate = (tag) => { const r = results.filter((x) => x.tag === tag); return r.filter((x) => x.ok).length / r.length; };
+    const weakest = [...new Set(results.map((r) => r.tag))].filter(moduleOf).sort((a, b) => rate(a) - rate(b))[0];
+    if (weakest) next = moduleOf(weakest).lessons[0];
+  }
   const box = $('.js-run', outlet);
   mount(box, html`
     ${banner(results)}
