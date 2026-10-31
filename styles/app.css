@@ -727,3 +727,7 @@ details.card[open] > summary { margin-bottom: 1rem; }
 .off-key summary { cursor: pointer; color: var(--accent); font-weight: 600; }
 .off-key textarea { margin: .6rem 0; width: 100%; }
 .off-mod .js-res:not(:empty) { margin-top: 1rem; }
+.off-pred { border-color: var(--accent); }
+.off-pred .eyebrow { margin: 0 0 .2rem; }
+.off-pred-num { margin: 0 0 .4rem; font-size: 2.2rem; font-weight: 700; color: var(--ink); line-height: 1.1; }
+.off-pred-num span { font-size: 1rem; font-weight: 500; color: var(--muted); }

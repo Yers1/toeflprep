@@ -5,6 +5,7 @@ import { html, mount, $, $$, on, pct, toast } from '../core/ui.js';
 import { Countdown, timerPill } from '../core/timer.js';
 import { officialState, officialSave } from '../core/store.js';
 import { OFFICIAL_TESTS, OFFICIAL_MODULES } from '../data/official.js';
+import { objectiveSectionBand, fmtBand, CEFR } from '../core/scoring.js';
 
 // Reading ≈ 30 min for both modules (ETS 2026 spec); Build a Sentence 5:50.
 // Listening has no clock here: the audio sets the pace.
@@ -42,14 +43,23 @@ function result(mod, saved = {}) {
   return { key, marks, ok: marks.filter(Boolean).length, n: key.length };
 }
 
+// Section totals; the band is predicted only once every module of the section is checked.
+// Paper tests have no routing, so the full 1–6 scale applies (same model as our mock tests).
+function sectionScore(saved, sec) {
+  const mods = OFFICIAL_MODULES.filter((m) => m.section === sec);
+  const rs = mods.map((m) => result(m, saved[m.id])).filter(Boolean);
+  if (!rs.length) return null;
+  const ok = rs.reduce((a, r) => a + r.ok, 0);
+  const n = rs.reduce((a, r) => a + r.n, 0);
+  const complete = rs.length === mods.length && sec !== 'Writing';
+  return { ok, n, band: complete ? objectiveSectionBand(sec.toLowerCase(), ok, n) : null };
+}
+
 function summary(testId) {
   const saved = officialState()[testId] || {};
   const parts = SECTIONS.map((sec) => {
-    const rs = OFFICIAL_MODULES.filter((m) => m.section === sec).map((m) => result(m, saved[m.id])).filter(Boolean);
-    if (!rs.length) return '';
-    const ok = rs.reduce((a, r) => a + r.ok, 0);
-    const n = rs.reduce((a, r) => a + r.n, 0);
-    return `${sec} ${ok}/${n}`;
+    const s = sectionScore(saved, sec);
+    return s ? `${sec} ${s.ok}/${s.n}${s.band ? ` ≈ ${fmtBand(s.band)}` : ''}` : '';
   }).filter(Boolean);
   return parts.length ? parts.join(' · ') : 'Не начат';
 }
@@ -118,6 +128,7 @@ function sheet(outlet, test) {
               </details>
               <div class="js-res"></div>
             </div>`)}
+          ${sec !== 'Writing' ? html`<div class="js-pred" data-sec="${sec}"></div>` : ''}
         </section>`)}
     </section>`);
 
@@ -140,7 +151,18 @@ function sheet(outlet, test) {
       <p class="small muted">Ключ распознан: ${r.n} ответов. Если число не совпадает с вопросами модуля, проверь, что вставил таблицу целиком.</p>` : '');
   }
 
+  function predict(sec) {
+    const box = $(`.js-pred[data-sec="${sec}"]`, outlet);
+    if (!box) return;
+    const s = sectionScore(saved(), sec);
+    mount(box, s?.band
+      ? html`<div class="card off-pred"><p class="eyebrow">Прогноз ${sec}</p><p class="off-pred-num">${fmtBand(s.band)} <span>/ 6 · ${CEFR[s.band]}</span></p>
+          <p class="small muted">${s.ok} из ${s.n} верно. Это оценка по шкале соответствия ETS (0–30 → 1–6), а не официальный балл: в бумажной версии нет адаптивного второго модуля.</p></div>`
+      : html`<p class="small muted">Прогноз балла ${sec} появится, когда проверишь оба модуля.</p>`);
+  }
+
   OFFICIAL_MODULES.forEach(paint);
+  ['Reading', 'Listening'].forEach(predict);
 
   on(root, 'input', '.js-ans', (e) => {
     const mod = modOf(e.target);
@@ -153,6 +175,7 @@ function sheet(outlet, test) {
     if (!parseKey(key, mod.sentences).length) { toast('Ключ не распознан: вставь таблицу Answer Key из PDF.', 'error'); return; }
     officialSave(test.id, mod.id, { key });
     paint(mod);
+    predict(mod.section);
   });
   on(root, 'click', '.js-timer', (e) => {
     const sec = e.target.dataset.sec;
