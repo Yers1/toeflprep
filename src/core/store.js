@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS = {
   voiceB: '',
   rate: 0.95,
   naturalVoice: true,     // play pre-recorded neural voice clips when available
-  theme: 'system',        // system | light | dark
+  theme: 'light',         // system | light | dark (ETS Classic is a light design)
   targetBand: 5,
   testDate: '',
 };
@@ -44,6 +44,11 @@ export function load() {
       const parsed = JSON.parse(rawValue);
       data = { ...blank(), ...parsed, settings: { ...DEFAULT_SETTINGS, ...(parsed.settings || {}) } };
     } catch { /* corrupted: start fresh */ }
+  }
+  // One-time switch to the light ETS Classic look for everyone still on the old 'system' default.
+  if (!data.settings.etsLight) {
+    if (data.settings.theme === 'system') data.settings.theme = 'light';
+    data.settings.etsLight = true;
   }
   cache = data;
   return cache;

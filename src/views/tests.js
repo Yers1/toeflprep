@@ -22,7 +22,7 @@ export default function tests(outlet) {
           <div class="section-title"><h2>Practice by section</h2><span class="muted small">One section on the exam clock, with its own band estimate</span></div>
           <div class="sec-grid">
             ${SECS.map((s) => html`
-              <article class="sec-card">
+              <article class="sp-card">
                 <h3><span class="sec-dot sec-${s}"></span>${SECTIONS[s].name}</h3>
                 <p class="muted small">${SECTIONS[s].minutes} min · ${SECTIONS[s].blurb}</p>
                 <ul class="sec-tests">${TESTS.map((t, k) => {

@@ -1,12 +1,13 @@
 import { html, mount, fmtDateTime } from '../core/ui.js';
-import { attempts, plan as getPlan, settings, cards as cardStates, customCards, courseState } from '../core/store.js';
+import { attempts, plan as getPlan, settings, cards as cardStates, customCards, courseState, officialState } from '../core/store.js';
 import { fmtBand, CEFR, roundHalf, attemptBand } from '../core/scoring.js';
 import { itemDone, planItemHref, todayIso, daysBetween } from '../core/planner.js';
 import { SECTIONS, TASKS } from '../tasks/index.js';
 import { RUBRICS } from '../data/rubrics.js';
 import { TESTS } from '../../content/index.js';
 import { VOCAB } from '../../content/vocab.js';
-import { LESSONS } from '../../content/course/index.js';
+import { LESSONS, lessonById, exercises, COURSE } from '../../content/course/index.js';
+import { OFFICIAL_TESTS } from '../data/official.js';
 import { estimateSections } from './estimates.js';
 
 const SECS = ['reading', 'listening', 'writing', 'speaking'];
@@ -22,16 +23,43 @@ function flashcardsDue() {
   return { due, started };
 }
 
-function flashcardsNotice() {
+// Without a study plan, Today falls back to the next useful steps.
+function nextSteps(weak) {
+  const out = [];
+  const open = (l) => !courseState().lessons[l.id]?.done;
+  // Start with the weakest diagnostic module, not simply the next lesson in order.
+  const lesson = (weak || []).map((w) => LESSONS.find((l) => l.module === w.tag && open(l))).find(Boolean) || LESSONS.find(open);
+  if (lesson) out.push({ label: `Course: ${lesson.title}`, meta: 'Writing course · about 25 min', href: `#/course/${lesson.id}` });
   const fc = flashcardsDue();
-  if (fc.due > 0) return html`<a class="notice good" href="#/flashcards">📇 ${fc.due} flashcard${fc.due === 1 ? '' : 's'} due today — review now</a>`;
-  if (!fc.started) return html`<a class="notice" href="#/flashcards">Start learning TOEFL vocabulary with flashcards</a>`;
-  return '';
+  out.push(fc.due > 0
+    ? { label: `${fc.due} flashcard${fc.due === 1 ? '' : 's'} due`, meta: 'Flashcards · 10 min', href: '#/flashcards' }
+    : { label: fc.started ? 'Review flashcards' : 'Start TOEFL vocabulary flashcards', meta: 'Flashcards · 10 min', href: '#/flashcards' });
+  const ets = OFFICIAL_TESTS.find((t) => !officialState()[t.id]?.r1?.key) || OFFICIAL_TESTS[0];
+  out.push({ label: `${ets.name} · Reading`, meta: 'Official ETS test · 30 min', href: `#/official/${ets.id}` });
+  return out;
 }
 
-function courseNotice() {
-  const next = LESSONS.find((l) => !courseState().lessons[l.id]?.done);
-  return next ? html`<a class="notice good" href="#/course/${next.id}">📘 Writing course: ${next.title}</a>` : '';
+// Weakest course modules from the writing diagnostic: a diagnostic item still in
+// the review queue counts as missed.
+function weakSpots() {
+  const diag = lessonById('diag');
+  const cs = courseState();
+  if (!diag || !cs.lessons.diag) return null;
+  const by = {};
+  exercises(diag).forEach((ex) => {
+    const r = (by[ex.tag] ||= { ok: 0, n: 0 });
+    r.n++;
+    if (!cs.wrong[ex.id]) r.ok++;
+  });
+  return Object.entries(by)
+    .map(([tag, r]) => ({ tag, name: COURSE.find((m) => m.id === tag)?.title || tag, ...r }))
+    .sort((a, b) => a.ok / a.n - b.ok / b.n)
+    .slice(0, 3);
+}
+
+function greeting() {
+  const h = new Date().getHours();
+  return h < 5 ? 'Good night' : h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
 }
 
 function criteriaInsights() {
@@ -106,51 +134,66 @@ export default function home(outlet) {
   const insights = criteriaInsights();
   const recent = all.slice(0, 6);
 
+  const fmtDay = (iso) => new Date(`${iso}T12:00:00`).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+  const weak = weakSpots();
+  const lessonsDone = LESSONS.filter((l) => courseState().lessons[l.id]?.done).length;
+  const steps = today && !today.rest
+    ? today.items.map((it, i) => ({ label: it.label, meta: it.minutes ? `${it.minutes} min` : '', href: planItemHref(it), done: itemDone(p, today, i) }))
+    : nextSteps(weak);
+
   mount(outlet, html`
     <section class="page dash">
-      <header class="dash-head">
-        <div class="dash-overall">
-          <p class="eyebrow">Estimated overall</p>
-          <p class="big-band">${fmtBand(overall)}</p>
-          <p class="muted small">${overall ? `CEFR ${CEFR[overall]} · target ${Number(target).toFixed(1)}` : 'Practice all four sections or take a test to see an overall estimate.'}</p>
+      <header class="dash-top">
+        <div>
+          <p class="eyebrow eyebrow-accent">TOEFL iBT · 2026 format</p>
+          <h1>${greeting()}</h1>
+          <p class="muted small">${overall ? `Estimated overall ${fmtBand(overall)} · CEFR ${CEFR[overall]} · target ${Number(target).toFixed(1)}` : 'Your overall estimate appears once all four sections have a score.'}</p>
         </div>
-        <div class="dash-meta">
-          ${left != null ? html`<div><strong>${Math.max(0, left)}</strong><span>days to test</span></div>` : html`<div><a href="#/plan">Set test date</a></div>`}
-          <div><strong>${all.filter((a) => a.kind === 'task').length}</strong><span>practice sets</span></div>
-          <div><strong>${all.filter((a) => a.kind === 'test').length}</strong><span>tests</span></div>
-        </div>
+        <a class="countdown" href="#/plan">
+          ${left != null ? html`<strong>${Math.max(0, left)}</strong><span>day${left === 1 ? '' : 's'} to your test<br><em>${fmtDay(testDate)}</em></span>`
+            : html`<strong>?</strong><span>Set your test date<br><em>to start the countdown</em></span>`}
+        </a>
       </header>
 
-      ${courseNotice()}
-      ${flashcardsNotice()}
-
-      <div class="section-cards">
+      <div class="score-cards">
         ${SECS.map((s) => {
           const b = est[s].band;
-          const pctToTarget = b ? Math.min(100, ((b - 1) / Math.max(0.5, target - 1)) * 100) : 0;
           return html`
-            <a class="sec-card" href="#/practice">
-              <div class="row between"><span><span class="sec-dot sec-${s}"></span>${SECTIONS[s].name}</span><strong>${fmtBand(b)}</strong></div>
-              <div class="meter"><span style="width:${pctToTarget}%"></span><i style="left:${((target - 1) / 5) * 100}%" title="Target"></i></div>
+            <a class="score-card" href="#/practice">
+              <p class="muted small"><span class="sec-dot sec-${s}"></span>${SECTIONS[s].name}</p>
+              <p class="score-num">${fmtBand(b)}<span> / 6</span></p>
+              <div class="score-bar"><span class="${b != null && b < 3 ? 'low' : ''}" style="width:${b ? (b / 6) * 100 : 0}%"></span></div>
               <p class="small muted">${b == null ? 'No data yet' : b >= target ? 'At or above target' : `${(target - b).toFixed(1)} below target`}</p>
             </a>`;
         })}
       </div>
 
-      <div class="dash-grid">
+      <div class="dash-pair">
         <section class="card">
-          <div class="row between"><h2>Today</h2><a class="small" href="#/plan">Full plan</a></div>
-          ${today ? (today.rest ? html`<p>Rest day. A short Listen and Repeat set keeps your ear warm if you want it.</p>` : html`
-            <ul class="today-list">${today.items.map((it, i) => {
-              const done = itemDone(p, today, i);
-              const href = planItemHref(it);
-              return html`<li class="${done ? 'done' : ''}"><span class="tick-static">${done ? '✓' : ''}</span>
-                ${href ? html`<a href="${href}">${it.label}</a>` : html`<span>${it.label}</span>`}<span class="muted small">${it.minutes ? `${it.minutes} min` : ''}</span></li>`;
-            })}</ul>`) : html`
-            <p class="muted">No plan for today.</p>
-            <a class="btn btn-primary" href="#/plan">${p ? 'Rebuild plan' : 'Create a study plan'}</a>`}
+          <div class="row between"><h2>${today && !today.rest ? 'Today’s plan' : 'Next steps'}</h2><a class="small" href="#/plan">${p ? 'Full plan' : 'Create a study plan'}</a></div>
+          ${today?.rest ? html`<p>Rest day. A short Listen and Repeat set keeps your ear warm if you want it.</p>` : html`
+            <ol class="steps">${steps.map((it, i) => html`
+              <li class="${it.done ? 'done' : ''}">
+                <span class="step-n">${it.done ? '✓' : i + 1}</span>
+                <span class="step-text"><strong>${it.label}</strong><span class="muted small">${it.meta}</span></span>
+                ${it.href ? html`<a class="btn btn-primary btn-sm" href="${it.href}">${it.done ? 'Again' : 'Start'}</a>` : ''}
+              </li>`)}</ol>`}
         </section>
+        <section class="card">
+          <h2>Weak spots</h2>
+          ${weak ? html`
+            <p class="muted small">From your writing diagnostic</p>
+            <ul class="weak-list">${weak.map((w) => html`<li><a href="#/course">${w.name}</a><b>${w.ok} / ${w.n}</b></li>`)}</ul>`
+            : html`<p class="muted small">Take the 40-question writing diagnostic to see which grammar topics cost you points.</p>
+              <a class="btn btn-ghost" href="#/course/diag">Start the diagnostic</a>`}
+          <div class="course-progress">
+            <p class="small muted">Writing course · ${lessonsDone} of ${LESSONS.length} lessons</p>
+            <div class="score-bar"><span style="width:${(lessonsDone / LESSONS.length) * 100}%"></span></div>
+          </div>
+        </section>
+      </div>
 
+      <div class="dash-grid one">
         <section class="card">
           <h2>Writing & Speaking focus</h2>
           ${insights.length ? html`<ul class="insights">${insights.map((x) => html`

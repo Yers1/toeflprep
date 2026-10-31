@@ -770,8 +770,45 @@ details.card[open] > summary { margin-bottom: 1rem; }
 
 /* ---- practice by section ---- */
 .sec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
-.sec-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
-.sec-card h3 { margin: 0 0 .3rem; display: flex; align-items: center; gap: .5rem; }
+.sp-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+.sp-card h3 { margin: 0 0 .3rem; display: flex; align-items: center; gap: .5rem; }
 .sec-tests { list-style: none; padding: 0; margin: .8rem 0; display: grid; gap: .35rem; }
 .sec-tests li { display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .45rem .6rem; border-radius: 8px; background: var(--surface-2); }
 .sec-tests a { font-weight: 600; text-decoration: none; }
+
+/* ---- dashboard (ETS Classic) ---- */
+.dash-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 1.5rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.dash-top h1 { margin: 0 0 .3rem; }
+.dash-top p { margin: 0; }
+.eyebrow-accent { color: var(--accent); }
+.countdown { display: flex; align-items: center; gap: 1.1rem; background: #031f42; color: #fff; border-radius: var(--radius); padding: .9rem 1.4rem; text-decoration: none; }
+.countdown strong { font-size: 2.4rem; line-height: 1; font-weight: 800; color: var(--cta); }
+.countdown span { font-size: .85rem; line-height: 1.4; }
+.countdown em { font-style: normal; opacity: .75; }
+.score-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+.score-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.2rem; text-decoration: none; color: var(--text); box-shadow: var(--shadow); }
+.score-card:hover { border-color: var(--accent); }
+.score-card p { margin: 0; }
+.score-num { font-size: 2rem; font-weight: 800; color: var(--ink); margin: .35rem 0 .6rem !important; letter-spacing: -0.02em; }
+.score-num span { font-size: .9rem; font-weight: 500; color: var(--muted); }
+.score-bar { height: 6px; background: var(--surface-2); border-radius: 999px; margin-bottom: .5rem; }
+.score-bar span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+.score-bar span.low { background: var(--low); }
+.dash-pair { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 1.25rem; margin-bottom: 1.25rem; }
+.dash-pair .card { margin: 0; }
+.steps { list-style: none; padding: 0; margin: .4rem 0 0; }
+.steps li { display: flex; align-items: center; gap: .9rem; padding: .8rem 0; border-top: 1px solid var(--line); }
+.step-n { flex: none; width: 2.4rem; height: 2.4rem; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; }
+.step-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.step-text strong { color: var(--ink); font-weight: 600; }
+.steps li.done strong { text-decoration: line-through; color: var(--muted); }
+.weak-list { list-style: none; padding: 0; margin: .4rem 0 1rem; display: grid; gap: .5rem; }
+.weak-list li { display: flex; justify-content: space-between; align-items: center; background: var(--low-soft); border-radius: 10px; padding: .65rem .85rem; }
+.weak-list a { color: var(--ink); font-weight: 600; text-decoration: none; }
+.weak-list b { color: var(--low); }
+.course-progress { margin-top: auto; padding-top: .5rem; }
+.dash-grid.one { grid-template-columns: 1fr; }
+@media (max-width: 900px) {
+  .score-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .dash-pair { grid-template-columns: 1fr; }
+}
