@@ -41,23 +41,29 @@ export default function testRunner(outlet, { id }, query) {
   mount(outlet, html`
     <section class="exam">
       <header class="exam-bar">
-        <div class="exam-title"><strong>${test.title}</strong><span class="js-where muted"></span></div>
+        <button class="ets-btn js-exit" type="button">Exit</button>
+        <div class="exam-where">
+          <strong class="js-where">${test.title}</strong><span class="js-count"></span>
+          <span class="js-hint"></span>
+        </div>
         <div class="exam-tools">
-          <span class="js-count muted small"></span>
           <span class="timer-pill js-timer" hidden></span>
-          <button class="btn btn-ghost btn-sm js-exit" type="button">Exit</button>
+          <button class="ets-btn js-hide" type="button" hidden>Hide Time</button>
+          <button class="ets-btn js-review" type="button" hidden>Review</button>
+          <button class="ets-btn js-back" type="button" hidden>Back</button>
+          <button class="ets-btn ets-next js-next" type="button" hidden>Next</button>
         </div>
       </header>
       <div class="exam-stage"></div>
-      <footer class="exam-foot" hidden>
-        <span class="muted small js-hint"></span>
-        <button class="btn btn-primary js-next" type="button">Next</button>
-      </footer>
     </section>`);
 
   const stage = $('.exam-stage', outlet);
-  const foot = $('.exam-foot', outlet);
   const nextBtn = $('.js-next', outlet);
+  const backBtn = $('.js-back', outlet);
+  const reviewBtn = $('.js-review', outlet);
+  const hideBtn = $('.js-hide', outlet);
+  // Next lives in the top bar like on the real test; foot.hidden toggles it.
+  const foot = { set hidden(v) { nextBtn.hidden = v; } };
   const timerEl = $('.js-timer', outlet);
   const where = $('.js-where', outlet);
   const countEl = $('.js-count', outlet);
@@ -70,6 +76,11 @@ export default function testRunner(outlet, { id }, query) {
     }
   });
 
+  hideBtn.addEventListener('click', () => {
+    const off = timerEl.classList.toggle('is-hidden');
+    hideBtn.textContent = off ? 'Show Time' : 'Hide Time';
+  });
+
   function teardown() {
     aborted = true;
     controller?.destroy?.();
@@ -79,7 +90,9 @@ export default function testRunner(outlet, { id }, query) {
 
   function screen(template, { button = 'Continue', hideTimer = true } = {}) {
     return new Promise((resolve) => {
-      if (hideTimer) timerEl.hidden = true;
+      if (hideTimer) { timerEl.hidden = true; hideBtn.hidden = true; }
+      backBtn.hidden = true;
+      reviewBtn.hidden = true;
       countEl.textContent = '';
       foot.hidden = true;
       mount(stage, html`<div class="exam-card">${template}<div class="row end"><button class="btn btn-primary js-go" type="button">${button}</button></div></div>`);
@@ -118,28 +131,37 @@ export default function testRunner(outlet, { id }, query) {
   }
 
   // ---------------------------------------------------------- modules ---
+  // Every block of the module stays mounted (hidden when not current), so Reading
+  // can go Back and jump from Review like the real test. Listening only moves on.
   function runModule(section, key, moduleNo) {
     return new Promise((resolve) => {
       const blocks = moduleBlocks(test, section, key);
-      const totalQ = blocks.reduce((s, b) => s + questionCount(b.task, b.item), 0);
-      let i = 0;
-      let qStart = 0;
+      const counts = blocks.map((b) => questionCount(b.task, b.item));
+      const starts = counts.map((_, k) => counts.slice(0, k).reduce((a, n) => a + n, 0));
+      const totalQ = counts.reduce((a, n) => a + n, 0);
+      const free = section === 'reading';
+      const ctls = [];
+      const seen = [];
+      let i = -1;
       let ended = false;
-      where.textContent = ` · ${SECTIONS[section].name} · Module ${moduleNo}`;
+      let reviewClose = null;
+      where.textContent = `${SECTIONS[section].name} · Module ${moduleNo}`;
       foot.hidden = false;
       timerEl.hidden = false;
+      hideBtn.hidden = false;
+      backBtn.hidden = !free;
+      reviewBtn.hidden = !free;
       hint.textContent = section === 'listening' ? 'The clock pauses while audio plays.' : '';
+      mount(stage, html`${blocks.map((b, k) => html`<div class="exam-block" data-blk="${k}" hidden><p class="eyebrow">${TASKS[b.task].name}</p><div class="js-block"></div></div>`)}`);
 
+      const collect = (k) => ctls[k]?.collect?.() ?? null;
       const end = () => {
         if (ended) return;
         ended = true;
         moduleTimer.stop();
-        if (i < blocks.length) {
-          detail.responses[blocks[i].ref] = controller?.collect?.() ?? null;
-          for (let k = i + 1; k < blocks.length; k++) detail.responses[blocks[k].ref] = null;
-        }
-        controller?.destroy?.();
+        blocks.forEach((b, k) => { detail.responses[b.ref] = seen[k] ? collect(k) : null; ctls[k]?.destroy?.(); });
         controller = null;
+        reviewClose?.();
         resolve(blocks.map((b) => b.ref));
       };
 
@@ -148,36 +170,72 @@ export default function testRunner(outlet, { id }, query) {
         onEnd: end,
       }).start();
 
-      const show = () => {
-        if (aborted) return;
-        const b = blocks[i];
-        const n = questionCount(b.task, b.item);
-        countEl.textContent = `Questions ${qStart + 1}${n > 1 ? `–${qStart + n}` : ''} of ${totalQ}`;
+      const show = (k) => {
+        if (aborted || ended) return;
+        if (i >= 0) $(`[data-blk="${i}"]`, stage).hidden = true;
+        i = k;
+        const box = $(`[data-blk="${k}"]`, stage);
+        box.hidden = false;
+        const b = blocks[k];
+        const n = counts[k];
+        countEl.textContent = `Question${n > 1 ? 's' : ''} ${starts[k] + 1}${n > 1 ? `–${starts[k] + n}` : ''} of ${totalQ}`;
         nextBtn.disabled = false;
-        nextBtn.textContent = i + 1 < blocks.length ? 'Next' : 'Finish module';
-        mount(stage, html`<div class="exam-block"><p class="eyebrow">${TASKS[b.task].name}</p><div class="js-block"></div></div>`);
-        controller = TASKS[b.task].engine.render($('.js-block', stage), b.item, {
-          mode: 'test',
-          seed: `${detail.startedAt}:${b.ref}`,
-          startIndex: qStart,
-          setCanAdvance: (ok) => {
-            nextBtn.disabled = !ok;
-            if (section === 'listening') { if (ok) moduleTimer.start(); else moduleTimer.pause(); }
-          },
-        });
+        nextBtn.textContent = k + 1 < blocks.length ? 'Next' : 'Finish module';
+        backBtn.disabled = k === 0;
+        if (!seen[k]) {
+          seen[k] = true;
+          ctls[k] = TASKS[b.task].engine.render($('.js-block', box), b.item, {
+            mode: 'test',
+            seed: `${detail.startedAt}:${b.ref}`,
+            startIndex: starts[k],
+            setCanAdvance: (ok) => {
+              if (i !== k) return;
+              nextBtn.disabled = !ok;
+              if (section === 'listening') { if (ok) moduleTimer.start(); else moduleTimer.pause(); }
+            },
+          });
+        }
+        controller = ctls[k];
+        window.scrollTo(0, 0);
       };
 
-      nextBtn.onclick = () => {
-        if (ended) return;
-        const b = blocks[i];
-        detail.responses[b.ref] = controller?.collect?.() ?? null;
-        controller?.destroy?.();
-        qStart += questionCount(b.task, b.item);
-        i++;
-        if (i >= blocks.length) end();
-        else show();
+      // Per-question state for the Review grid.
+      const states = () => blocks.flatMap((b, k) => {
+        if (!seen[k]) return Array(counts[k]).fill('unseen');
+        const r = collect(k) || [];
+        return Array.from({ length: counts[k] }, (_, q) => (r[q] != null && r[q] !== '' ? 'answered' : 'unanswered'));
+      });
+
+      reviewBtn.onclick = () => {
+        const st = states();
+        const modal = document.createElement('div');
+        modal.className = 'ets-modal';
+        mount(modal, html`<div class="ets-dialog" role="dialog" aria-modal="true" aria-label="Review questions">
+          <h2>Review Questions</h2>
+          <p class="muted small">${SECTIONS[section].name} · Module ${moduleNo} · ${st.filter((x) => x === 'answered').length} of ${totalQ} answered</p>
+          <p class="ets-legend"><span class="answered">Answered</span><span class="unanswered">Unanswered</span><span class="unseen">Not seen</span></p>
+          <div class="ets-grid">${st.map((x, q) => html`<button type="button" class="${x}${q >= starts[i] && q < starts[i] + counts[i] ? ' current' : ''}" data-q="${q}">${q + 1}</button>`)}</div>
+          <div class="row end"><button class="btn btn-primary js-close" type="button">Close</button></div>
+        </div>`);
+        document.body.appendChild(modal);
+        reviewClose = () => { modal.remove(); reviewClose = null; };
+        modal.addEventListener('click', (e) => {
+          const q = e.target.closest('[data-q]');
+          if (q) { show(starts.findLastIndex((s0) => s0 <= Number(q.dataset.q))); reviewClose(); }
+          else if (e.target === modal || e.target.closest('.js-close')) reviewClose();
+        });
+        $('.js-close', modal).focus();
       };
-      show();
+
+      backBtn.onclick = () => { if (i > 0) show(i - 1); };
+      nextBtn.onclick = async () => {
+        if (ended) return;
+        if (i + 1 < blocks.length) { show(i + 1); return; }
+        const open = free ? states().filter((x) => x !== 'answered').length : 0;
+        if (open && !(await confirmDialog(`${open} question${open > 1 ? 's are' : ' is'} not answered. Finish the module anyway? You cannot return to it.`, { okLabel: 'Finish module' }))) return;
+        end();
+      };
+      show(0);
     });
   }
 
@@ -196,7 +254,7 @@ export default function testRunner(outlet, { id }, query) {
   function runProductive(block) {
     return new Promise((resolve) => {
       const task = TASKS[block.task];
-      where.textContent = ` · ${SECTIONS[task.section].name} · ${task.name}`;
+      where.textContent = `${SECTIONS[task.section].name} · ${task.name}`;
       countEl.textContent = '';
       timerEl.hidden = true;
       const speaking = task.section === 'speaking';
@@ -265,7 +323,7 @@ export default function testRunner(outlet, { id }, query) {
     if (aborted) return;
     timerEl.hidden = true;
     foot.hidden = true;
-    where.textContent = '';
+    where.textContent = test.title;
     mount(stage, html`<div class="exam-card"><h2>Scoring your test…</h2></div>`);
     assessAll();
     detail.finishedAt = Date.now();
