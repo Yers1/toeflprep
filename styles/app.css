@@ -706,3 +706,24 @@ details.card[open] > summary { margin-bottom: 1rem; }
 .ex-verdict { font-weight: 650; margin: .75rem 0 .25rem; }
 .ex-verdict.ok { color: var(--good); }
 .ex-verdict.bad { color: var(--low); }
+
+/* ---- official ETS answer sheets ---- */
+.off-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem; }
+.off-card { display: block; color: inherit; text-decoration: none; margin: 0; transition: border-color .15s; }
+.off-card:hover { border-color: var(--accent); }
+.off-card h3 { margin: 0 0 .3rem; }
+.off-howto { margin: .6rem 0 0; padding-left: 1.2rem; display: grid; gap: .35rem; line-height: 1.55; }
+.off-mod h3 { margin: 0 0 .8rem; }
+.off-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: .45rem .7rem; }
+.off-grid.wide { grid-template-columns: 1fr; }
+.off-row { display: grid; grid-template-columns: 1.7rem 1fr; align-items: center; gap: .35rem; }
+.off-row > span { color: var(--muted); font-size: .8rem; text-align: right; }
+.off-row input { min-width: 0; padding: .4rem .55rem; }
+.off-row.ok input { border-color: var(--good); background: var(--good-soft); }
+.off-row.bad input { border-color: var(--low); background: var(--low-soft); }
+.off-row.extra { opacity: .45; }
+.off-fix { grid-column: 2; color: var(--good); font-weight: 600; font-size: .8rem; }
+.off-key { margin-top: 1rem; }
+.off-key summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+.off-key textarea { margin: .6rem 0; width: 100%; }
+.off-mod .js-res:not(:empty) { margin-top: 1rem; }

@@ -20,7 +20,7 @@ const DEFAULT_SETTINGS = {
 };
 
 function blank() {
-  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {}, custom: [], drill: { speed: 1, lastUsed: {}, log: {} }, course: { lessons: {}, wrong: {} } };
+  return { version: 3, attempts: [], external: [], plan: null, settings: { ...DEFAULT_SETTINGS }, seen: {}, cards: {}, custom: [], drill: { speed: 1, lastUsed: {}, log: {} }, course: { lessons: {}, wrong: {} }, official: {} };
 }
 
 let cache = null;
@@ -282,5 +282,17 @@ export function courseMark(exId, ok, day) {
 // The learner's own rewrite was right but worded differently from the key.
 export function courseUnmark(exId) {
   delete load().course.wrong[exId];
+  persist();
+}
+
+// Answer sheets for the official ETS paper tests: { [testId]: { [moduleId]: { answers, key, at } } }.
+export function officialState() {
+  return load().official;
+}
+
+export function officialSave(testId, moduleId, patch) {
+  const o = load().official;
+  o[testId] ||= {};
+  o[testId][moduleId] = { ...(o[testId][moduleId] || {}), ...patch, at: Date.now() };
   persist();
 }

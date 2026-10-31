@@ -1,8 +1,17 @@
 // Directory of practice tests and materials for the January 2026 format.
-// Links checked September 2026. Content from these sites is not copied into
+// Links checked September 2026 (official ETS PDF tests added 31 Oct 2026). Content from these sites is not copied into
 // this app; they are listed so learners can use them alongside it.
 
 export const RESOURCE_GROUPS = [
+  {
+    id: 'official-pdf',
+    title: 'Official ETS practice tests — PDF + audio, free',
+    note: 'Seven complete tests in the 2026 format with answer keys. Take them with the answer sheet on the ETS tests page.',
+    items: [
+      { name: 'Practice Test 1 and 2 (student versions)', url: 'https://www.ets.org/content/dam/ets-org/pdfs/toefl/toefl-ibt-full-length-practice-test-1.pdf', what: 'Full tests aligned with the January 2026 format, adapted for paper. Answer keys for Reading, Listening and Build a Sentence inside.', format2026: true, full: true, free: true },
+      { name: 'Teacher Resources Practice Tests 1–5', url: 'https://www.ets.org/toefl/teachers-advisors-agents/ibt/teaching/preparing-students.html', what: 'Five more full tests with audio and keys, plus lesson plans for every section and sample Speaking responses.', format2026: true, full: true, free: true },
+    ],
+  },
   {
     id: 'official-free',
     title: 'Official ETS — free',
@@ -23,7 +32,8 @@ export const RESOURCE_GROUPS = [
     items: [
       { name: 'TestReady Mock Tests, Section Tests and Focused Practice', url: 'https://www.ets.org/toefl/test-takers/ibt/prepare/toefl-testready.html', what: 'Scored full tests and section tests with Speaking and Writing feedback; practice by question type.', format2026: true, full: true },
       { name: 'Official TOEFL iBT Prep Course (Standard / PLUS)', url: 'https://www.ets.org/toefl/test-takers/ibt/prepare/toefl-testready.html', what: 'Self-paced course with a 6-month subscription.', format2026: true },
-      { name: 'The Official Guide to the TOEFL iBT Test, 8th edition', url: 'https://www.mheducation.com/highered/mhp/product/official-guide-toefl-ibt-test-eighth-edition.html', what: 'Book (McGraw Hill, 2026): 2 full practice tests in the new format, practice sets for each section, answer keys.', format2026: true, full: true },
+      { name: 'The Official Guide to the TOEFL iBT Test, 8th edition', url: 'https://www.mheducation.com/highered/mhp/product/official-guide-toefl-ibt-test-eighth-edition.html', what: 'Book (McGraw Hill, autumn 2026): 2 full practice tests in the new format (reviewers say test 1 repeats the earlier Pocket Edition), practice sets for each section, audio by access code.', format2026: true, full: true },
+      { name: 'Kaplan TOEFL iBT Premium Plus 2026', url: 'https://www.simonandschuster.com/books/TOEFL-iBT-Premium-Plus-2026/Kaplan-Test-Prep/Kaplan-Test-Prep/9798349700125', what: 'Commercial book with 4 online full-length tests; Kaplan says the online part was updated for the 2026 format.', format2026: true, full: true },
       { name: 'Official TOEFL iBT Tests, Volumes 1–2', url: 'https://www.mheducation.com/highered/mhp/product/official-guide-toefl-ibt-test-eighth-edition.html', what: 'Five past tests per volume — older format. Useful only for extra academic reading and listening practice.', format2026: false, full: true },
       { name: 'ETS course on edX: The Insider’s Guide', url: 'https://www.edx.org/learn/test-prep/educational-testing-service-toefl-r-test-preparation-the-insiders-guide', what: 'Free to audit. Built for the previous format; general strategies still apply.', format2026: false, free: true },
     ],
