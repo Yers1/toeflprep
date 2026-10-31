@@ -1,19 +1,19 @@
-/* TOEFL Prep 2026 — design system
-   Calm academic instrument: quiet surfaces, one teal accent, section hues
+/* TOEFL Prep 2026 — design system (ETS Classic)
+   Calm academic instrument: white surfaces, navy ink, ETS blue accent, mint call to action, section hues
    used only as small markers. */
 
 :root {
-  --bg: #f6f7f5;
+  --bg: #f4f7fc;
   --surface: #ffffff;
-  --surface-2: #f0f2ef;
-  --ink: #15201c;
-  --text: #33413c;
-  --muted: #6a7873;
-  --line: #dde3df;
-  --line-strong: #c7d0cb;
-  --accent: #0f766e;
+  --surface-2: #eef3fa;
+  --ink: #031f42;
+  --text: #2b3d57;
+  --muted: #5b6b82;
+  --line: #e2e8f2;
+  --line-strong: #cbd5e3;
+  --accent: #1f5fb0;
   --accent-ink: #ffffff;
-  --accent-soft: #dff2ee;
+  --accent-soft: #eaf1fb;
   --good: #15803d;
   --good-soft: #e3f4e8;
   --mid: #b45309;
@@ -24,27 +24,31 @@
   --listening: #7c3aed;
   --writing: #d97706;
   --speaking: #db2777;
-  --shadow: 0 1px 2px rgba(20, 32, 28, .06), 0 4px 14px rgba(20, 32, 28, .05);
+  --shadow: 0 1px 2px rgba(3, 31, 66, .05), 0 6px 18px rgba(3, 31, 66, .06);
+  --cta: #00e2c5;
+  --cta-hover: #00c9af;
+  --cta-ink: #031f42;
+  --brand: #031f42;
   --radius: 14px;
   --radius-lg: 20px;
-  --font: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font: 'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --mono: 'Geist Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg: #0f1413;
-    --surface: #161d1b;
-    --surface-2: #1c2522;
-    --ink: #eef3f1;
-    --text: #cdd7d3;
-    --muted: #8d9a95;
-    --line: #26312e;
-    --line-strong: #34423e;
-    --accent: #2dd4bf;
-    --accent-ink: #062622;
-    --accent-soft: #123a35;
+    --bg: #07121f;
+    --surface: #0e1b2c;
+    --surface-2: #14243a;
+    --ink: #eef4fc;
+    --text: #c3cfdf;
+    --muted: #8696ad;
+    --line: #1e2e45;
+    --line-strong: #2a3d58;
+    --accent: #6ea8f5;
+    --accent-ink: #031f42;
+    --accent-soft: #12294a;
     --good: #4ade80;
     --good-soft: #14301f;
     --mid: #fbbf24;
@@ -56,21 +60,22 @@
     --writing: #fbbf24;
     --speaking: #f472b6;
     --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+    --brand: #1f5fb0;
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --bg: #0f1413;
-  --surface: #161d1b;
-  --surface-2: #1c2522;
-  --ink: #eef3f1;
-  --text: #cdd7d3;
-  --muted: #8d9a95;
-  --line: #26312e;
-  --line-strong: #34423e;
-  --accent: #2dd4bf;
-  --accent-ink: #062622;
-  --accent-soft: #123a35;
+  --bg: #07121f;
+  --surface: #0e1b2c;
+  --surface-2: #14243a;
+  --ink: #eef4fc;
+  --text: #c3cfdf;
+  --muted: #8696ad;
+  --line: #1e2e45;
+  --line-strong: #2a3d58;
+  --accent: #6ea8f5;
+  --accent-ink: #031f42;
+  --accent-soft: #12294a;
   --good: #4ade80;
   --good-soft: #14301f;
   --mid: #fbbf24;
@@ -82,6 +87,7 @@
   --writing: #fbbf24;
   --speaking: #f472b6;
   --shadow: 0 1px 2px rgba(0, 0, 0, .4);
+  --brand: #1f5fb0;
   color-scheme: dark;
 }
 
@@ -193,8 +199,8 @@ a.notice { display: block; text-decoration: none; font-weight: 550; }
 .btn:hover { background: var(--surface-2); }
 .btn:active { transform: translateY(1px); }
 .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
-.btn-primary:hover { background: color-mix(in srgb, var(--accent) 88%, black); }
+.btn-primary { background: var(--cta); border-color: var(--cta); color: var(--cta-ink); font-weight: 600; }
+.btn-primary:hover { background: var(--cta-hover); border-color: var(--cta-hover); }
 .btn-ghost { background: transparent; }
 .btn-danger { background: var(--low); border-color: var(--low); color: #fff; }
 .btn-lg { padding: .9rem 1.3rem; font-size: 1rem; }
