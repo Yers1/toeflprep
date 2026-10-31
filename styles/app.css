@@ -761,3 +761,11 @@ details.card[open] > summary { margin-bottom: 1rem; }
 .off-pred .eyebrow { margin: 0 0 .2rem; }
 .off-pred-num { margin: 0 0 .4rem; font-size: 2.2rem; font-weight: 700; color: var(--ink); line-height: 1.1; }
 .off-pred-num span { font-size: 1rem; font-weight: 500; color: var(--muted); }
+
+/* ---- practice by section ---- */
+.sec-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
+.sec-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 1.1rem 1.2rem; box-shadow: var(--shadow); }
+.sec-card h3 { margin: 0 0 .3rem; display: flex; align-items: center; gap: .5rem; }
+.sec-tests { list-style: none; padding: 0; margin: .8rem 0; display: grid; gap: .35rem; }
+.sec-tests li { display: flex; justify-content: space-between; align-items: center; gap: .5rem; padding: .45rem .6rem; border-radius: 8px; background: var(--surface-2); }
+.sec-tests a { font-weight: 600; text-decoration: none; }

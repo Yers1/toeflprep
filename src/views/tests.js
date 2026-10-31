@@ -18,6 +18,23 @@ export default function tests(outlet) {
           <p class="lead">Full tests follow the January 2026 format: Reading and Listening in two adaptive modules, timed Writing and Speaking, and a report on the 1–6 scale. All questions are original.</p>
         </header>
 
+        <section class="section-block">
+          <div class="section-title"><h2>Practice by section</h2><span class="muted small">One section on the exam clock, with its own band estimate</span></div>
+          <div class="sec-grid">
+            ${SECS.map((s) => html`
+              <article class="sec-card">
+                <h3><span class="sec-dot sec-${s}"></span>${SECTIONS[s].name}</h3>
+                <p class="muted small">${SECTIONS[s].minutes} min · ${SECTIONS[s].blurb}</p>
+                <ul class="sec-tests">${TESTS.map((t, k) => {
+                  const best = done.filter((a) => a.setId === t.id && a.section === s).map((a) => a.score?.band).filter((b) => b != null);
+                  return html`<li><a href="#/test/${t.id}?section=${s}">${SECTIONS[s].name} Test ${k + 1}</a>${best.length ? html`<span class="chip chip-good">${fmtBand(Math.max(...best))}</span>` : html`<span class="muted small">new</span>`}</li>`;
+                })}</ul>
+                ${s === 'reading' || s === 'listening' ? html`<a class="small" href="#/official">+ 7 official ETS tests →</a>` : ''}
+              </article>`)}
+          </div>
+        </section>
+
+        <h2>Full tests</h2>
         <div class="test-grid">
           ${TESTS.map((t) => {
             const mine = done.filter((a) => a.setId === t.id);
@@ -29,8 +46,7 @@ export default function tests(outlet) {
                   ${best.length ? html`<span class="chip chip-good">Best ${fmtBand(Math.max(...best))}</span>` : html`<span class="chip">New</span>`}
                 </div>
                 <p class="muted">${t.description}</p>
-                <ul class="test-sections">${SECS.map((s) => html`<li><span class="sec-dot sec-${s}"></span>${SECTIONS[s].name} <span class="muted small">${SECTIONS[s].minutes} min</span>
-                  <a class="small" href="#/test/${t.id}?section=${s}">section only</a></li>`)}</ul>
+                <ul class="test-sections">${SECS.map((s) => html`<li><span class="sec-dot sec-${s}"></span>${SECTIONS[s].name} <span class="muted small">${SECTIONS[s].minutes} min</span></li>`)}</ul>
                 <div class="row gap-s wrap">
                   <a class="btn btn-primary" href="#/test/${t.id}">Start full test (~90 min)</a>
                   ${mine[0] ? html`<a class="btn btn-ghost" href="#/report/${mine[0].id}">Last report</a>` : ''}
