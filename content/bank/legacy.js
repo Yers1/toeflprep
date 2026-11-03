@@ -344,205 +344,271 @@ export default {
   "reading_academic": [
     {
       "id": "lg-acad-the-ecology-of-biological-soil-crusts",
-      "title": "The ecology of biological soil crusts",
-      "text": "In many dry environments, the apparently bare ground between plants is covered by a thin living community known as biological soil crust. These crusts contain organisms such as cyanobacteria, lichens, and mosses. Although they may be only a few millimeters thick, they influence the entire ecosystem. Filaments produced by cyanobacteria bind loose soil particles together, reducing erosion caused by wind and water. Some crust organisms also convert atmospheric nitrogen into forms that plants can use. Biological soil crusts recover slowly after disturbance. A single vehicle track can remain visible for decades because growth is limited by scarce moisture. Recovery time also depends on the organisms present: mobile cyanobacteria may recolonize before more complex lichens. Land managers therefore face a difficult balance. Restricting travel protects crusts, but some desert areas must remain accessible for research, recreation, or local livelihoods. Recent management plans often concentrate traffic on established routes rather than attempting to prevent all human activity.",
+      "title": "The Ecology of Biological Soil Crusts",
+      "text": "In many arid and semiarid regions, the seemingly bare ground between shrubs is in fact covered by a living layer known as a biological soil crust. These crusts are communities of cyanobacteria, lichens, mosses, and fungi that inhabit the uppermost few millimeters of soil. Despite their modest size, they play a pivotal role in desert ecosystems. Cyanobacteria secrete sticky sheaths that bind loose particles together, which helps the surface resist erosion by wind and water. Many crust organisms also fix atmospheric nitrogen, converting it into compounds that plants can absorb in otherwise nutrient-poor soils. However, crusts are extremely fragile when dry. A single footstep or tire can crush them. The damage may persist for decades because the organisms grow only during brief periods when moisture is available. Recovery also proceeds in stages: mobile cyanobacteria usually recolonize disturbed soil first, while slower-growing lichens and mosses may take far longer to return. Land managers therefore face a difficult balance. Prohibiting all access would protect the crusts, but many deserts must remain open for research, recreation, and grazing. Consequently, many management plans now confine traffic to established trails and roads, so that damage is concentrated in a small area rather than spread across the entire landscape.",
       "questions": [
         {
           "q": "What is the passage mainly about?",
           "choices": [
-            "Why desert plants require constant rain",
-            "How soil crusts function and why they need protection",
-            "Why lichens grow faster than cyanobacteria",
-            "How vehicle tracks help desert research"
-          ],
-          "answer": 1,
-          "explanation": "The passage explains ecosystem functions, vulnerability, and management."
-        },
-        {
-          "q": "How do cyanobacterial filaments affect soil?",
-          "choices": [
-            "They increase moisture loss",
-            "They make nitrogen unavailable",
-            "They hold particles together",
-            "They replace desert plants"
+            "Why desert shrubs depend on frequent rainfall to survive and grow",
+            "How cyanobacteria gradually develop into lichens and mosses over time",
+            "The ecological role of soil crusts and the difficulty of protecting them",
+            "Why recreation and grazing should be banned in all desert regions"
           ],
           "answer": 2,
-          "explanation": "The filaments bind loose soil and reduce erosion."
+          "explanation": "The passage first describes what crusts do (\"play a pivotal role,\" bind soil, fix nitrogen) and then why they are fragile and how managers protect them. It never says access should be banned: \"many deserts must remain open.\"",
+          "type": "main"
         },
         {
-          "q": "Why can vehicle tracks remain visible for decades?",
+          "q": "The word \"pivotal\" in the passage is closest in meaning to",
           "choices": [
-            "Crust growth is slow in dry conditions",
-            "Vehicles remove all nitrogen from soil",
-            "Managers refuse to repair the routes",
-            "Lichens grow only under vehicles"
-          ],
-          "answer": 0,
-          "explanation": "Scarce moisture makes recovery slow."
-        },
-        {
-          "q": "The word \"concentrate\" in the final sentence is closest in meaning to",
-          "choices": [
-            "study",
-            "direct",
-            "increase",
-            "hide"
+            "rotating",
+            "central",
+            "temporary",
+            "visible"
           ],
           "answer": 1,
-          "explanation": "Plans direct traffic onto established routes."
+          "explanation": "\"Despite their modest size, they play a pivotal role\" means a central, very important role. \"Rotating\" is the literal sense of a pivot and does not fit the context.",
+          "type": "vocab"
+        },
+        {
+          "q": "According to the passage, all of the following are true about biological soil crusts EXCEPT:",
+          "choices": [
+            "They help the soil surface resist erosion.",
+            "Some of their organisms make nitrogen available to plants.",
+            "Their organisms grow only when moisture is available.",
+            "They recover quickly once a disturbance has ended."
+          ],
+          "answer": 3,
+          "explanation": "The passage says damage \"may persist for decades\" and lichens and mosses \"may take far longer to return,\" so recovery is slow. The other three are stated: \"resist erosion,\" \"fix atmospheric nitrogen ... plants can absorb,\" \"grow only during brief periods when moisture is available.\"",
+          "type": "except"
+        },
+        {
+          "q": "What can be inferred about lichens and mosses in soil crusts?",
+          "choices": [
+            "They are often missing from soil that was recently disturbed.",
+            "They are more resistant to trampling than cyanobacteria.",
+            "They are the first organisms to return after a disturbance.",
+            "They are responsible for most of the erosion in deserts."
+          ],
+          "answer": 0,
+          "explanation": "Cyanobacteria \"usually recolonize disturbed soil first,\" while \"slower-growing lichens and mosses may take far longer to return,\" so lichens and mosses are likely absent from recently disturbed soil.",
+          "type": "inference"
+        },
+        {
+          "q": "Why does the author mention \"research, recreation, and grazing\"?",
+          "choices": [
+            "To list the main causes of nitrogen loss in desert soils",
+            "To explain why closing deserts to all human activity is not practical",
+            "To show that crusts recover faster in areas that people use",
+            "To identify the activities that cause the least damage to crusts"
+          ],
+          "answer": 1,
+          "explanation": "The author says prohibiting all access would protect crusts, \"but many deserts must remain open for research, recreation, and grazing.\" These uses explain why a total ban is not realistic.",
+          "type": "purpose"
         }
       ]
     },
     {
       "id": "lg-acad-why-some-materials-remember-their-shape",
-      "title": "Why some materials remember their shape",
-      "text": "Shape-memory alloys can return to a previously defined form after being bent. Their behavior results from a reversible change in crystal structure. At a lower temperature, the material enters a phase in which its internal structure can be rearranged relatively easily, so the object may be deformed. Heating causes the atoms to shift back into a more rigid arrangement, restoring the original shape. Nickel-titanium is a widely used shape-memory alloy because it combines this effect with resistance to corrosion. Medical devices provide one important application. A compact stent made from the alloy can be inserted into a blood vessel and then expand at body temperature. Engineers must nevertheless control the transformation temperature precisely. If the material changes phase too early, a device may be difficult to position; if it changes too late, it may not function inside the body. The same principle is used in pipe connectors, temperature-sensitive switches, and small robotic mechanisms.",
+      "title": "Why Some Materials Remember Their Shape",
+      "text": "Shape-memory alloys are metals that can be deformed at one temperature and then return to their original form when heated. This ability arises from a reversible change in their crystal structure rather than from any chemical reaction. At lower temperatures, the alloy exists in a phase called martensite, in which layers of atoms can shift relative to one another with relatively little force. [A] When the material is bent in this state, its internal structure rearranges to accommodate the new shape. [B] Once the alloy is heated above a specific transformation temperature, however, it converts to a more rigid phase called austenite. The atoms then return to their original arrangement, restoring the remembered shape. [C] The most widely used example is nickel-titanium, which was developed at a United States naval laboratory in the early 1960s. Its popularity stems from a combination of strength, corrosion resistance, and compatibility with human tissue. [D] Physicians use it in orthodontic wires that apply gentle, steady pressure to teeth and in stents that expand inside narrowed blood vessels. Designing such devices requires meticulous control of the transformation temperature, which depends on the precise ratio of nickel to titanium. If the change occurs too early, a stent may open before it reaches the correct position. If it occurs too late, the device may never expand at all. Beyond medicine, the same principle is applied in pipe couplings, thermostatic valves, and compact actuators.",
       "questions": [
         {
-          "q": "What causes a shape-memory alloy to recover its original form?",
+          "q": "According to the passage, what causes a shape-memory alloy to recover its original form?",
           "choices": [
-            "A chemical coating dissolves",
-            "Its crystal structure changes with temperature",
-            "Corrosion makes the material expand",
-            "Pressure removes nickel from the alloy"
+            "A chemical reaction between nickel and titanium that is triggered by heat",
+            "The removal of nickel from the alloy",
+            "A change in crystal structure above a certain temperature",
+            "Pressure applied by the surrounding tissue"
+          ],
+          "answer": 2,
+          "explanation": "Heating \"above a specific transformation temperature\" converts the alloy to austenite, \"restoring the remembered shape.\" The passage rules out a chemical cause: \"rather than from any chemical reaction.\"",
+          "type": "detail"
+        },
+        {
+          "q": "There are four locations in the passage that indicate where the following sentence could be added. Where would the sentence best fit?",
+          "insert": "This new shape remains stable after the bending force is removed, so the object appears to be permanently deformed.",
+          "choices": [
+            "Location A",
+            "Location B",
+            "Location C",
+            "Location D"
           ],
           "answer": 1,
-          "explanation": "Heating reverses the crystal phase and restores the defined shape."
+          "fixed": true,
+          "explanation": "\"This new shape\" refers back to \"the new shape\" in the sentence just before [B], and \"appears to be permanently deformed\" sets up the contrast with \"however\" in the next sentence, where heating restores the shape. At [A] no new shape has been mentioned yet, and at [C] the shape has already been restored.",
+          "type": "insert"
         },
         {
-          "q": "Why is nickel-titanium useful for medical devices?",
+          "q": "The word \"accommodate\" in the passage is closest in meaning to",
           "choices": [
-            "It is soft at every temperature",
-            "It never changes its internal structure",
-            "It remembers shape and resists corrosion",
-            "It can be positioned without temperature control"
+            "provide housing for",
+            "do a favor for",
+            "push against",
+            "adjust to fit"
           ],
-          "answer": 2,
-          "explanation": "The passage identifies both properties."
+          "answer": 3,
+          "explanation": "When the alloy is bent, \"its internal structure rearranges to accommodate the new shape,\" that is, it adjusts to fit the shape. \"Provide housing for\" and \"do a favor for\" are real meanings of \"accommodate\" that do not fit here, and the structure does not \"push against\" the shape it takes on.",
+          "type": "vocab"
         },
         {
-          "q": "What difficulty must engineers address?",
+          "q": "Why does the author mention \"orthodontic wires\" and \"stents\"?",
           "choices": [
-            "Selecting an exact transformation temperature",
-            "Preventing every type of deformation",
-            "Making the alloy dissolve in blood",
-            "Replacing all rigid materials"
+            "To give examples of medical uses of nickel-titanium",
+            "To show that nickel-titanium is too weak for industrial use",
+            "To explain how the transformation temperature is measured",
+            "To contrast nickel-titanium with other shape-memory alloys"
           ],
           "answer": 0,
-          "explanation": "The transformation must happen neither too early nor too late."
+          "explanation": "Right after naming nickel-titanium and its \"compatibility with human tissue,\" the author says \"Physicians use it in orthodontic wires ... and in stents.\" These are examples of its medical applications.",
+          "type": "purpose"
         },
         {
-          "q": "Which application is mentioned in the passage?",
+          "q": "What can be inferred about the ratio of nickel to titanium in a medical device?",
           "choices": [
-            "Solar panels",
-            "Aircraft fuel",
-            "Robotic mechanisms",
-            "Concrete foundations"
+            "It has no effect on how well the finished alloy resists corrosion.",
+            "It is exactly the same in every device that is made from the alloy.",
+            "It alone determines whether the alloy is safe for use in human tissue.",
+            "A small error in it could make a device change shape at the wrong time."
           ],
-          "answer": 2,
-          "explanation": "Small robotic mechanisms appear in the final sentence."
+          "answer": 3,
+          "explanation": "The transformation temperature \"depends on the precise ratio of nickel to titanium,\" and a change that comes \"too early\" or \"too late\" makes a stent fail. So an imprecise ratio could make a device change shape at the wrong moment.",
+          "type": "inference"
         }
       ]
     },
     {
       "id": "lg-acad-why-rivers-meander",
-      "title": "Why rivers meander",
-      "text": "Most rivers do not flow in straight lines. Even on gentle slopes, a river often develops a series of curves called meanders. The process begins with a small irregularity, such as a fallen tree or a patch of harder rock, that deflects the current toward one bank. Water moving faster on the outside of the curve erodes that bank, while slower water on the inside deposits sediment. Over time the curve grows wider and the river shifts sideways across its floodplain. A meander can eventually become so curved that the river cuts across the narrow neck of land between two bends, abandoning the old loop. The abandoned channel, called an oxbow lake, gradually fills with sediment and vegetation. Meandering therefore does not simply move water; it reshapes the surrounding landscape over decades and centuries.",
+      "title": "Why Rivers Meander",
+      "text": "Few natural rivers flow in straight lines for long. Instead, most develop a series of looping bends called meanders. The term comes from the Maeander, a winding river in western Turkey now known as the Büyük Menderes. A meander typically begins with a minor irregularity, such as a fallen tree or a resistant patch of rock, that deflects the current toward one bank. Since water travels faster along the outside of a bend, it erodes that bank and forms a steep slope known as a cut bank. On the inside of the bend, by contrast, the current slows and deposits sand and gravel, building a gently sloping point bar. Erosion on one side and deposition on the other cause the bend to migrate gradually across the floodplain. Eventually, two neighboring bends may grow so close that the river breaks through the narrow neck of land separating them, often during a flood. The river then follows the shorter path. The abandoned loop becomes a crescent-shaped oxbow lake that slowly fills with sediment and vegetation. Because meanders shift unpredictably, engineers in the twentieth century straightened many rivers to protect farmland and improve navigation. However, straightened channels often carry floodwater downstream more rapidly and destroy wetland habitats. As a result, some projects, such as one on Florida's Kissimmee River, now aim to restore the original curves.",
       "questions": [
         {
-          "q": "What starts the formation of a meander?",
+          "q": "What is the passage mainly about?",
           "choices": [
-            "A change in rainfall",
-            "A small irregularity that deflects the current",
-            "The river reaching the ocean",
-            "A rise in water temperature"
+            "How engineers first learned to control floods on large rivers",
+            "Why rivers in western Turkey are more curved than other rivers",
+            "How meanders form and change, and how people have responded to them",
+            "Why oxbow lakes are important habitats for many kinds of wildlife"
           ],
-          "answer": 1,
-          "explanation": "The passage says a small irregularity deflects the current toward one bank."
+          "answer": 2,
+          "explanation": "The passage explains how meanders begin, migrate, and form oxbow lakes, and then how engineers straightened rivers and are now restoring curves. The other options are either too narrow or not stated.",
+          "type": "main"
         },
         {
-          "q": "What happens on the inside of a curve?",
+          "q": "According to the passage, what happens on the inside of a meander bend?",
           "choices": [
-            "Erosion increases",
-            "Sediment is deposited",
-            "The water speeds up",
-            "The bank collapses"
+            "Fast-moving water erodes the bank and leaves a steep wall known as a cut bank.",
+            "The slower current deposits sediment and forms a point bar.",
+            "The river breaks through a narrow neck of land.",
+            "Floodwater is carried downstream more rapidly."
           ],
           "answer": 1,
-          "explanation": "Slower water on the inside deposits sediment."
+          "explanation": "\"On the inside of the bend, by contrast, the current slows and deposits sand and gravel, building a gently sloping point bar.\" The cut bank forms on the outside.",
+          "type": "detail"
         },
         {
-          "q": "What is an oxbow lake?",
+          "q": "The word \"migrate\" in the passage is closest in meaning to",
           "choices": [
-            "A lake formed by a glacier",
-            "An abandoned river loop that fills with sediment",
-            "A reservoir built for irrigation",
-            "A pond created by beavers"
+            "shift position",
+            "travel seasonally to breed",
+            "settle in another country",
+            "transfer to a new system"
           ],
-          "answer": 1,
-          "explanation": "An oxbow lake is an abandoned channel that gradually fills."
+          "answer": 0,
+          "explanation": "Erosion on one side and deposition on the other make the bend \"migrate gradually across the floodplain,\" that is, shift position. The other options are real meanings of \"migrate\" for animals, people, and data, not for a river bend.",
+          "type": "vocab"
         },
         {
-          "q": "The word \"abandoning\" in the passage is closest in meaning to",
+          "q": "According to the passage, all of the following are true about oxbow lakes EXCEPT:",
           "choices": [
-            "repairing",
-            "leaving",
-            "widening",
-            "measuring"
+            "They are shaped like a crescent.",
+            "They form from a loop that the river has abandoned.",
+            "They slowly fill with sediment and vegetation.",
+            "They are created by engineers to reduce flooding."
           ],
-          "answer": 1,
-          "explanation": "The river leaves the old loop behind."
+          "answer": 3,
+          "explanation": "Oxbow lakes form naturally when the river \"breaks through the narrow neck of land\"; engineers are mentioned only for straightening rivers. The other three come from \"The abandoned loop becomes a crescent-shaped oxbow lake that slowly fills with sediment and vegetation.\"",
+          "type": "except"
+        },
+        {
+          "q": "Why does the author mention Florida's Kissimmee River?",
+          "choices": [
+            "To show that engineers still straighten rivers to improve navigation",
+            "To identify the river that gave meanders their name",
+            "To give an example of an effort to return a river to its curved course",
+            "To illustrate how oxbow lakes form during floods"
+          ],
+          "answer": 2,
+          "explanation": "The river is named as an example of projects that \"now aim to restore the original curves.\" The river that gave meanders their name is the Maeander in Turkey.",
+          "type": "purpose"
         }
       ]
     },
     {
       "id": "lg-acad-how-plants-defend-themselves",
-      "title": "How plants defend themselves",
-      "text": "Plants cannot run away from danger, but they are far from defenseless. Many species produce chemical compounds that make their leaves taste unpleasant or even toxic to herbivores. Some of these defenses are always present, while others are activated only after an attack. When a leaf is damaged, the plant may release volatile chemicals that warn neighboring plants, which then begin producing their own protective compounds. Other plants use physical defenses, such as thorns, tough fibers, or tiny hairs that irritate the mouths of grazing animals. A few species even recruit helpers: certain trees emit signals that attract predatory insects, which feed on the herbivores damaging the tree. These strategies are not mutually exclusive. A single plant may combine chemical, physical, and indirect defenses, adjusting the mix as conditions change.",
+      "title": "How Plants Defend Themselves",
+      "text": "Because plants cannot flee from the animals that eat them, they have evolved an impressive array of defenses. Some protection is physical. Thorns and spines deter large grazers, tiny hairs called trichomes can trap or irritate insects, and many grasses accumulate silica, a hard mineral that wears down the teeth of herbivores. Other defenses are chemical. Compounds such as nicotine and caffeine, which humans value as stimulants, are believed to protect plants by poisoning or repelling insects. Producing these substances, however, consumes energy that could otherwise support growth. For this reason, many plants manufacture certain defenses only after they are attacked, an approach known as induced defense. When caterpillars chew the leaves of a corn plant, for instance, the plant releases airborne chemicals that attract parasitic wasps, which lay their eggs inside the caterpillars. Some neighboring plants appear to detect such signals and strengthen their own defenses before any damage occurs. Perhaps the most striking strategy is a partnership with animals. Certain acacia trees in Central America provide ants with hollow thorns for shelter and with nutritious food. In return, the ants aggressively attack leaf-eating insects and remove competing vines. Taken together, these examples reveal the remarkable variety of solutions that have evolved in organisms that must endure threats rather than escape them.",
       "questions": [
         {
-          "q": "What is the main idea of the passage?",
+          "q": "What is the passage mainly about?",
           "choices": [
-            "Plants compete with each other for light",
-            "Plants use several kinds of defenses against herbivores",
-            "Herbivores have no effect on plant growth",
-            "Chemical defenses are always toxic to humans"
+            "How plants compete with one another for sunlight and water",
+            "The physical, chemical, and cooperative ways plants protect themselves",
+            "Why humans have long valued plant chemicals such as caffeine",
+            "How parasitic wasps lay their eggs and develop inside caterpillars"
           ],
           "answer": 1,
-          "explanation": "The passage surveys chemical, physical, and indirect defenses."
+          "explanation": "The passage moves from physical defenses (\"Some protection is physical\") to chemical ones (\"Other defenses are chemical\") to partnerships with animals. The other options are minor details or not discussed.",
+          "type": "main"
         },
         {
-          "q": "What do volatile chemicals released by a damaged leaf do?",
+          "q": "According to the passage, how does silica protect grasses?",
           "choices": [
-            "They attract herbivores",
-            "They warn neighboring plants",
-            "They harden the soil",
-            "They slow down photosynthesis"
+            "It traps insects on the surface of the leaves.",
+            "It poisons insects that chew the leaves.",
+            "It attracts parasitic wasps that lay their eggs inside feeding caterpillars.",
+            "It wears down the teeth of animals that eat the grass."
           ],
-          "answer": 1,
-          "explanation": "The chemicals warn nearby plants to produce defenses."
+          "answer": 3,
+          "explanation": "Grasses \"accumulate silica, a hard mineral that wears down the teeth of herbivores.\" Trapping insects is done by trichomes, poisoning by compounds such as nicotine.",
+          "type": "detail"
         },
         {
-          "q": "How do some trees recruit helpers?",
+          "q": "Why does the author mention \"nicotine and caffeine\"?",
           "choices": [
-            "By growing taller",
-            "By attracting predatory insects",
-            "By producing sweet fruit",
-            "By dropping their leaves"
-          ],
-          "answer": 1,
-          "explanation": "Signals attract predatory insects that feed on the herbivores."
-        },
-        {
-          "q": "The phrase \"mutually exclusive\" in the passage is closest in meaning to",
-          "choices": [
-            "unable to occur together",
-            "difficult to observe",
-            "equally important",
-            "widely studied"
+            "To give examples of chemical defenses produced by plants",
+            "To explain why humans began to cultivate certain plants",
+            "To show that chemical defenses do not harm insects",
+            "To illustrate how plants send warnings to their neighbors"
           ],
           "answer": 0,
-          "explanation": "The strategies can be combined, so they are not mutually exclusive."
+          "explanation": "Right after \"Other defenses are chemical,\" the author names \"nicotine and caffeine\" as compounds that \"protect plants by poisoning or repelling insects.\" They are examples of chemical defenses.",
+          "type": "purpose"
+        },
+        {
+          "q": "What can be inferred about induced defenses?",
+          "choices": [
+            "They are more effective than thorns and spines against grazers.",
+            "They are found only in corn plants and their close relatives.",
+            "They let plants save energy when no attack is taking place.",
+            "They work only when ants are present to attack herbivores."
+          ],
+          "answer": 2,
+          "explanation": "Defensive substances consume \"energy that could otherwise support growth,\" and \"for this reason\" plants make some defenses \"only after they are attacked.\" So induced defenses save energy when there is no attack. \"Many plants\" use them, not only corn.",
+          "type": "inference"
+        },
+        {
+          "q": "The word \"striking\" in the passage is closest in meaning to",
+          "choices": [
+            "physically attractive",
+            "hitting",
+            "refusing to work",
+            "remarkable"
+          ],
+          "answer": 3,
+          "explanation": "\"Perhaps the most striking strategy is a partnership with animals\" means the most remarkable or noteworthy strategy. The other options are real meanings of \"striking\" that do not fit a strategy.",
+          "type": "vocab"
         }
       ]
     }

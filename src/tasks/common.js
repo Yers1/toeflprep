@@ -38,10 +38,12 @@ const LETTERS = 'ABCD';
 // questions: [{ q, choices, answer, explanation }]
 export function mcqTemplate(questions, name, seed, { startIndex = 0 } = {}) {
   return questions.map((q, qi) => {
-    const order = seededOrder(q.choices.length, `${seed}:${qi}`);
+    // fixed: choices that name places in the text (Location A–D) keep their order.
+    const order = q.fixed ? [...q.choices.keys()] : seededOrder(q.choices.length, `${seed}:${qi}`);
     return html`
       <fieldset class="mcq" data-q="${qi}">
         <legend><span class="qnum">${startIndex + qi + 1}</span>${q.q}</legend>
+        ${q.insert ? html`<blockquote class="insert-sentence">${q.insert}</blockquote>` : ''}
         ${order.map((ci, k) => html`
           <label class="choice">
             <input type="radio" name="${name}-${qi}" value="${ci}">
@@ -81,6 +83,7 @@ export function mcqReview(questions, answers, { startIndex = 0 } = {}) {
       <div class="review-q ${ok ? 'is-ok' : 'is-bad'}">
         <p class="review-q-title"><span class="mark" aria-label="${ok ? 'Correct' : 'Incorrect'}">${ok ? '✓' : '✗'}</span>
           <span class="qnum">${startIndex + i + 1}</span>${q.q}</p>
+        ${q.insert ? html`<blockquote class="insert-sentence">${q.insert}</blockquote>` : ''}
         <ul class="review-choices">
           ${q.choices.map((c, ci) => html`<li class="${ci === q.answer ? 'is-answer' : ''} ${ci === chosen && !ok ? 'is-chosen' : ''}">
             ${c}${ci === q.answer ? raw(' <em>correct answer</em>') : ''}${ci === chosen && !ok ? raw(' <em>your answer</em>') : ''}</li>`)}

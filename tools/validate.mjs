@@ -51,6 +51,7 @@ function validateItem(task, item) {
   } else if (task === 'reading_daily' || task === 'reading_academic') {
     check(item.questions?.length > 0, `${item.id}: no questions`);
     item.questions.forEach((q, i) => validateMcq(item.id, i, q));
+    if (task === 'reading_academic') validateAcademic(item);
   } else if (task === 'listening_response') {
     check(item.items?.length > 0, `${item.id}: no response items`);
     item.items.forEach((p, i) => {
@@ -82,6 +83,34 @@ function validateItem(task, item) {
   } else if (task === 'speaking_interview') {
     check(item.questions?.length === 4, `${item.id}: expected 4 questions, got ${item.questions?.length}`);
   }
+}
+
+// Read an Academic Passage, as in the seven ETS 2026 practice tests: a titled passage
+// of about 200–240 words, five questions, one vocabulary item, mixed question types.
+function validateAcademic(item) {
+  const ACAD_TYPES = ['main', 'detail', 'vocab', 'purpose', 'inference', 'except', 'insert'];
+  const n = item.text.replace(/\[[A-D]\]/g, '').split(/\s+/).filter((w) => /[a-z]/i.test(w)).length;
+  check(item.title && n >= 190 && n <= 250, `${item.id}: academic passage needs a title and 190–250 words (has ${n})`);
+  check(item.questions.length === 5, `${item.id}: academic passage needs 5 questions`);
+  item.questions.forEach((q, i) => check(ACAD_TYPES.includes(q.type), `${item.id} q${i}: type must be one of ${ACAD_TYPES.join('/')}`));
+  const types = item.questions.map((q) => q.type);
+  check(types.filter((t) => t === 'vocab').length === 1, `${item.id}: needs exactly one vocabulary question`);
+  check(new Set(types).size >= 4, `${item.id}: needs at least 4 different question types`);
+  const marks = (item.text.match(/\[[A-D]\]/g) || []).join('');
+  const ins = item.questions.filter((q) => q.type === 'insert');
+  check(ins.length <= 1, `${item.id}: at most one insert-sentence question`);
+  if (ins.length) {
+    const q = ins[0];
+    check(marks === '[A][B][C][D]', `${item.id}: insert question needs [A] [B] [C] [D] once each, in order, in the text`);
+    check(q.fixed === true && q.insert && q.choices.join('|') === 'Location A|Location B|Location C|Location D', `${item.id}: insert question needs fixed: true, an insert sentence and choices Location A–D`);
+  } else check(!marks, `${item.id}: [A]–[D] markers without an insert question`);
+  item.questions.filter((q) => q.type === 'except').forEach((q) => check(/EXCEPT|NOT/.test(q.q), `${item.id}: except question must say EXCEPT or NOT`));
+  item.questions.filter((q) => q.type === 'vocab').forEach((q) => check(/closest in meaning/.test(q.q), `${item.id}: vocabulary question must ask what a word is closest in meaning to`));
+  // The key must not give itself away by being clearly the longest option.
+  item.questions.filter((q) => q.type !== 'insert').forEach((q, i) => {
+    const others = Math.max(...q.choices.filter((_, k) => k !== q.answer).map((c) => c.length));
+    check(q.choices[q.answer].length <= others * 1.12, `${item.id} q${i}: key is clearly the longest option`);
+  });
 }
 
 function validateMcq(id, i, q) {

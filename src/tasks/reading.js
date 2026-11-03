@@ -98,8 +98,11 @@ function docHeader(item) {
   return html`<dl class="doc-meta">${rows.map(([k, v]) => html`<dt>${k}</dt><dd>${v}</dd>`)}</dl>`;
 }
 
+// "[A]"–"[D]" in a passage mark the four places an insert-sentence question offers (ETS 2026 style).
+const withSquares = (line) => line.split(/\[([A-D])\]/).map((part, k) => (k % 2 ? html`<span class="ins-mark" title="Location ${part}">■ ${part}</span>` : part));
+
 function passageBody(item) {
-  return String(item.text).split(/\n{2,}/).map((p) => html`<p>${p.split('\n').map((line, i) => (i ? [html`<br>`, line] : line))}</p>`);
+  return String(item.text).split(/\n{2,}/).map((p) => html`<p>${p.split('\n').map((line, i) => (i ? [html`<br>`, withSquares(line)] : withSquares(line)))}</p>`);
 }
 
 function passageTemplate(item, kind) {
