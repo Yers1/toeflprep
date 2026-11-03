@@ -141,9 +141,7 @@ ul, ol { padding-left: 1.25em; margin: 0 0 .75em; }
   border-right: 1px solid var(--line);
 }
 .brand { display: flex; align-items: center; gap: .55rem; padding: .4rem .5rem 1.2rem; color: var(--ink); text-decoration: none; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
-.brand-word { font-size: 1.08rem; font-weight: 500; color: var(--text); letter-spacing: -0.02em; }
-.brand-word b { font-weight: 800; color: var(--ink); }
-.brand-tag { font-size: .68rem; font-weight: 700; letter-spacing: .04em; color: var(--accent); background: var(--accent-soft); padding: .15rem .4rem; border-radius: 6px; }
+.brand em { font-style: normal; color: var(--accent); }
 .nav { display: flex; flex-direction: column; gap: .15rem; }
 .nav a { color: var(--text); text-decoration: none; padding: .6rem .7rem; border-radius: 10px; font-size: .92rem; font-weight: 500; display: flex; align-items: center; gap: .7rem; min-height: 44px; }
 .nav a svg { flex: none; width: 20px; height: 20px; }
