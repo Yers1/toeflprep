@@ -140,8 +140,8 @@ ul, ol { padding-left: 1.25em; margin: 0 0 .75em; }
   background: var(--surface);
   border-right: 1px solid var(--line);
 }
-.brand { display: flex; align-items: center; gap: .55rem; padding: .4rem .5rem 1.2rem; color: var(--ink); text-decoration: none; font-weight: 700; letter-spacing: -0.01em; white-space: nowrap; }
-.brand em { font-style: normal; color: var(--accent); }
+.brand { display: flex; align-items: center; gap: .55rem; padding: .4rem .5rem 1.2rem; color: var(--ink); text-decoration: none; font-weight: 800; font-size: 1.1rem; letter-spacing: -0.03em; white-space: nowrap; }
+.brand em { font-style: normal; font-weight: 500; color: var(--accent); }
 .nav { display: flex; flex-direction: column; gap: .15rem; }
 .nav a { color: var(--text); text-decoration: none; padding: .6rem .7rem; border-radius: 10px; font-size: .92rem; font-weight: 500; display: flex; align-items: center; gap: .7rem; min-height: 44px; }
 .nav a svg { flex: none; width: 20px; height: 20px; }
