@@ -8,7 +8,7 @@ import { Countdown, timerPill } from '../core/timer.js';
 import { TASKS, SECTIONS } from '../tasks/index.js';
 import { TESTS } from '../../content/index.js';
 import {
-  SECTION_ORDER, MODULE_TIME, ROUTE_THRESHOLD, moduleBlocks, productiveBlocks,
+  SECTION_ORDER, moduleTime, readingBlockTime, ROUTE_THRESHOLD, moduleBlocks, productiveBlocks,
   questionCount, gradeObjective, scoreTest,
 } from '../core/testmodel.js';
 import { sessionAudio } from './session-audio.js';
@@ -165,7 +165,7 @@ export default function testRunner(outlet, { id }, query) {
         resolve(blocks.map((b) => b.ref));
       };
 
-      moduleTimer = new Countdown(MODULE_TIME[section][key], {
+      moduleTimer = new Countdown(moduleTime(test, section, key), {
         onTick: (left, total) => timerPill(timerEl, left, total),
         onEnd: end,
       }).start();
@@ -179,6 +179,10 @@ export default function testRunner(outlet, { id }, query) {
         const b = blocks[k];
         const n = counts[k];
         countEl.textContent = `Question${n > 1 ? 's' : ''} ${starts[k] + 1}${n > 1 ? `–${starts[k] + n}` : ''} of ${totalQ}`;
+        if (section === 'reading') {
+          const s = readingBlockTime(b);
+          hint.textContent = `Pace: about ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')} for this task`;
+        }
         nextBtn.disabled = false;
         nextBtn.textContent = k + 1 < blocks.length ? 'Next' : 'Finish module';
         backBtn.disabled = k === 0;

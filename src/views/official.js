@@ -7,9 +7,10 @@ import { officialState, officialSave } from '../core/store.js';
 import { OFFICIAL_TESTS, OFFICIAL_MODULES } from '../data/official.js';
 import { objectiveSectionBand, fmtBand, CEFR } from '../core/scoring.js';
 
-// Reading ≈ 30 min for both modules (ETS 2026 spec); Build a Sentence 5:50.
+// Reading: each ETS practice module is 10 + 2 + 3 + 5 items, 11:30 at exam
+// pace (see readingBlockTime), so 23 min for both; Build a Sentence 5:50.
 // Listening has no clock here: the audio sets the pace.
-const TIMES = { Reading: 30 * 60, Writing: 350 };
+const TIMES = { Reading: 23 * 60, Writing: 350 };
 const SECTIONS = ['Reading', 'Listening', 'Writing'];
 
 export default function official(outlet, { id }) {

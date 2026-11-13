@@ -9,12 +9,26 @@ import { objectiveSectionBand, writingBand, rubricToBand, overallBand, roundHalf
 export const SECTION_ORDER = ['reading', 'listening', 'writing', 'speaking'];
 export const ROUTE_THRESHOLD = 0.6;
 
-// Seconds per module. Listening time counts answering time only (the clock
-// pauses while audio plays).
+// Seconds per Listening module; counts answering time only (the clock pauses
+// while audio plays).
 export const MODULE_TIME = {
-  reading: { m1: 15 * 60, hard: 15 * 60, easy: 15 * 60 },
   listening: { m1: 6 * 60, hard: 6 * 60, easy: 6 * 60 },
 };
+
+// Reading pace per task. ETS publishes only module totals, so this follows the
+// common 2026 pacing guide: Complete the Words 2:00, a 2-question Daily Life
+// text 1:30, every other set 1:00 per question. An ETS-shaped module
+// (10 + 2 + 3 + 5 items) gets 11:30.
+export function readingBlockTime(block) {
+  if (block.task === 'reading_ctw') return 120;
+  const n = block.item.questions.length;
+  return block.task === 'reading_daily' && n <= 2 ? 90 : n * 60;
+}
+
+export function moduleTime(test, section, key) {
+  if (section !== 'reading') return MODULE_TIME[section][key];
+  return moduleBlocks(test, section, key).reduce((s, b) => s + readingBlockTime(b), 0);
+}
 
 export function moduleBlocks(test, section, key) {
   const blocks = test[section]?.[key] || [];
