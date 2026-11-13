@@ -103,21 +103,28 @@ export default function testRunner(outlet, { id }, query) {
 
   // ------------------------------------------------------------ intro ---
   async function intro() {
-    const minutes = sections.reduce((s, sec) => s + SECTIONS[sec].minutes, 0);
+    const fmt = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+    const r1 = moduleTime(test, 'reading', 'm1');
+    const r2 = ['easy', 'hard'].map((k) => moduleTime(test, 'reading', k)).sort((a, b) => a - b);
+    const secLine = (s) => (s === 'reading'
+      ? `Module 1 ${fmt(r1)} · Module 2 ${fmt(r2[0])}${r2[1] !== r2[0] ? `–${fmt(r2[1])}` : ''} · exam ≈ 30 min`
+      : `${SECTIONS[s].minutes} min · ${SECTIONS[s].blurb}`);
+    const minutes = sections.reduce((s, sec) => s + (sec === 'reading' ? Math.ceil((r1 + r2[1]) / 60) : SECTIONS[sec].minutes), 0);
     const needsMic = sections.includes('speaking');
     await screen(html`
       <p class="eyebrow">${sections.length === 4 ? 'Full practice test' : `${SECTIONS[sections[0]].name} section test`}</p>
       <h1>${test.title}</h1>
       <p class="lead">${test.description || ''}</p>
       <ul class="exam-sections">
-        ${sections.map((s) => html`<li><strong>${SECTIONS[s].name}</strong><span>${SECTIONS[s].minutes} min · ${SECTIONS[s].blurb}</span></li>`)}
+        ${sections.map((s) => html`<li><strong>${SECTIONS[s].name}</strong><span>${secLine(s)}</span></li>`)}
       </ul>
       <div class="checklist">
         <p class="strong">Before you start (about ${minutes} minutes)</p>
         <ul>
           <li>Use headphones and a quiet room.</li>
           ${needsMic ? html`<li>Allow microphone access — Speaking starts automatically after each beep.</li>` : ''}
-          <li>Once you move to the next question you cannot go back, as on the real test.</li>
+          ${sections.includes('reading') ? html`<li>Reading: within a module you can go Back and use Review; once Module 2 starts you cannot return to Module 1.</li>` : ''}
+          ${sections.some((s) => s !== 'reading') ? html`<li>Listening, Writing and Speaking: once you move on you cannot go back, as on the real test.</li>` : ''}
           ${!support.tts ? html`<li class="error">This browser cannot play synthesized audio; Listening will show transcripts instead.</li>` : ''}
           ${needsMic && !support.asr ? html`<li class="warn">Automatic transcription needs Chrome or Edge. You can type what you said on the report page.</li>` : ''}
         </ul>
