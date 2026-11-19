@@ -8,8 +8,16 @@ import { bindInterviewReview } from '../tasks/speaking.js';
 import { BANK } from '../../content/index.js';
 import { RUBRICS } from '../data/rubrics.js';
 
-function pickSet(task, requested) {
-  const sets = BANK[task] || [];
+// Inference drill: the bank's academic passages with only the inference and
+// "why does the author mention" questions (the student's weakest types).
+const FOCUS_TYPES = ['inference', 'purpose'];
+function focusSets() {
+  return BANK.reading_academic
+    .map((s) => ({ ...s, id: `inf-${s.id}`, text: s.text.replace(/\s?\[[A-D]\]/g, ''), questions: s.questions.filter((q) => FOCUS_TYPES.includes(q.type)) }))
+    .filter((s) => s.questions.length);
+}
+
+function pickSet(task, requested, sets) {
   if (requested) {
     const found = sets.find((s) => s.id === requested);
     if (found) return found;
@@ -28,8 +36,10 @@ export default function practiceTask(outlet, { task }, query) {
     mount(outlet, html`<section class="page"><h1>Unknown task</h1><p><a href="#/practice">All tasks</a></p></section>`);
     return;
   }
-  const sets = BANK[task] || [];
-  const item = pickSet(task, query.set);
+  const focus = task === 'reading_academic' && query.focus === 'inference';
+  const sets = focus ? focusSets() : BANK[task] || [];
+  const item = pickSet(task, query.set, sets);
+  const base = `#/practice/${task}?${focus ? 'focus=inference&' : ''}set=`;
   let controller = null;
 
   mount(outlet, html`
@@ -38,7 +48,10 @@ export default function practiceTask(outlet, { task }, query) {
       <header class="task-head">
         <div>
           <p class="eyebrow">${meta.section} · ${meta.spec}</p>
-          <h1>${meta.name}</h1>
+          <h1>${focus ? 'Inference & purpose drill' : meta.name}</h1>
+          ${task === 'reading_academic' ? html`<p class="small">${focus
+            ? html`Only inference and “Why does the author mention…?” questions. <a href="#/practice/reading_academic">All question types</a>`
+            : html`<a href="#/practice/reading_academic?focus=inference">Inference &amp; purpose drill</a> — only the question types you miss most.`}</p>` : ''}
         </div>
         <div class="task-head-tools">
           <label class="select-wrap"><span class="sr-only">Choose a set</span>
@@ -55,7 +68,7 @@ export default function practiceTask(outlet, { task }, query) {
     </section>`);
 
   $('.js-set', outlet).addEventListener('change', (e) => {
-    location.hash = `#/practice/${task}?set=${encodeURIComponent(e.target.value)}`;
+    location.hash = `${base}${encodeURIComponent(e.target.value)}`;
   });
 
   if (!item) {
@@ -80,8 +93,8 @@ export default function practiceTask(outlet, { task }, query) {
     const idx = sets.findIndex((s) => s.id === item.id);
     const next = sets[(idx + 1) % sets.length];
     return html`<div class="row gap-s wrap">
-      <a class="btn btn-primary" href="#/practice/${task}?set=${encodeURIComponent(next.id)}">Next set</a>
-      <a class="btn btn-ghost" href="#/practice/${task}?set=${encodeURIComponent(item.id)}&r=${Date.now()}">Try this set again</a>
+      <a class="btn btn-primary" href="${base}${encodeURIComponent(next.id)}">Next set</a>
+      <a class="btn btn-ghost" href="${base}${encodeURIComponent(item.id)}&r=${Date.now()}">Try this set again</a>
       <a class="btn btn-ghost" href="#/practice">All tasks</a>
     </div>`;
   }

@@ -53,7 +53,7 @@ function sectionScore(saved, sec) {
   const ok = rs.reduce((a, r) => a + r.ok, 0);
   const n = rs.reduce((a, r) => a + r.n, 0);
   const complete = rs.length === mods.length && sec !== 'Writing';
-  return { ok, n, band: complete ? objectiveSectionBand(sec.toLowerCase(), ok, n) : null };
+  return { ok, n, band: complete ? objectiveSectionBand(sec.toLowerCase(), ok, n, undefined, true) : null };
 }
 
 function summary(testId) {

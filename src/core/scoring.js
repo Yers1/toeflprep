@@ -51,19 +51,26 @@ export function bandFromRaw30(section, raw) {
   return r > 30 ? 6 : 1;
 }
 
+// Our own Reading items run easier than ETS: on 14 Nov 2026 a practice score
+// of 79% (estimated 5.0) came out as 4.0 on the real test, while Listening
+// matched. So own Reading is discounted; ETS's official tests are not.
+const OWN_READING_FACTOR = 0.85;
+
 // Reading / Listening: proportion correct across both modules. Test takers
 // routed to the easier second module cannot reach the top of the scale.
-export function objectiveSectionBand(section, correct, total, route) {
+export function objectiveSectionBand(section, correct, total, route, official = false) {
   if (!total) return null;
-  const p = correct / total;
+  const p = (correct / total) * (section === 'reading' && !official ? OWN_READING_FACTOR : 1);
   const ceiling = route === 'easy' ? 21 : 30;
   return bandFromRaw30(section, p * ceiling);
 }
 
-// Average of 0–5 rubric scores → 1–6 band (practice estimate).
+// Average of 0–5 rubric scores → 1–6 band (practice estimate). Calibrated on
+// real results (14 Nov 2026): Writing avg 2.85 → 3.5, Speaking avg 3.18 → 4.0;
+// the old "1 + avg" gave Writing 4.0. A perfect 5 still maps to 6.
 export function rubricToBand(avg) {
   if (avg == null || Number.isNaN(avg)) return null;
-  return clampBand(1 + avg);
+  return clampBand(0.5 + 1.1 * avg);
 }
 
 // Writing: Build a Sentence accuracy + Email + Discussion, each on 0–5.
