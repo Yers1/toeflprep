@@ -18,7 +18,7 @@ export default [
       q('Maya', 'Is the campus gym open during the holidays?', 'Leo', 'Yes, but', ['it', 'closes', 'two hours', 'earlier', 'than usual'], '.', 'early', 'Measure phrase comes before the comparative: two hours earlier.'),
       q('Maya', 'Did the professor say anything about the final exam?', 'Leo', 'She said', ['that', 'it', 'would', 'cover', 'only'], 'the last four chapters.', 'covers', 'Reported speech: will → would; the verb after “would” stays in base form.', [['that', 'it', 'would', 'only', 'cover']]),
       q('Maya', 'How long have you been learning Korean?', 'Leo', 'I', ['have been', 'taking', 'classes', 'since', 'I started'], 'university.', 'for', '“Since” + a starting point; “for” + a length of time.'),
-      q('Maya', 'Could you send me the notes from Monday’s seminar?', 'Leo', 'Of course.', ['I’ll', 'email', 'them', 'to you', 'as soon as'], 'I get home.', 'will', 'Time clauses (as soon as) use the present tense for the future.'),
+      q('Maya', 'Could you send me the notes from Monday’s seminar?', 'Leo', 'Of course.', ['I’ll', 'email', 'them', 'to you', 'as soon as', 'I get'], 'home.', 'I will get', 'After “as soon as” about the future, use the present tense: as soon as I get, not I will get. “I’ll” already contains “will”.'),
     ],
   },
   {
