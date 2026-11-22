@@ -7,18 +7,25 @@ import { mcqTemplate, collectMcq, gradeMcq, mcqReview, lockInputs } from './comm
 // ---------------------------------------------------------- C-test --------
 // Keep the first sentence intact; from the second sentence on, remove the
 // second half of every second word until `n` blanks exist.
+// rule 'ets' matches ETS's practice tests: short words count too (is → i_,
+// and → a_ _), while names inside a sentence and one-letter words are skipped.
 
-export function makeCTest(text, n = 10) {
+export function makeCTest(text, n = 10, rule) {
+  const ets = rule === 'ets';
   const sentenceEnd = text.search(/[.!?]\s/);
   const head = sentenceEnd > 0 ? text.slice(0, sentenceEnd + 2) : '';
   const rest = sentenceEnd > 0 ? text.slice(sentenceEnd + 2) : text;
   const parts = [];
   if (head) parts.push({ t: head });
-  let counter = 0, blanks = 0;
+  let counter = 0, blanks = 0, sentenceStart = true;
   const tokens = rest.split(/(\s+)/);
   for (const tok of tokens) {
     const m = tok.match(/^([("“]*)([A-Za-z]+)([^A-Za-z]*)$/);
-    if (blanks < n && m && m[2].length >= 4 && !/^[A-Z]{2,}$/.test(m[2])) {
+    const atStart = sentenceStart;
+    if (/\S/.test(tok)) sentenceStart = /[.!?]["”)]*$/.test(tok);
+    const blankable = m && !/^[A-Z]{2,}$/.test(m[2])
+      && (ets ? m[2].length >= 2 && (atStart || !/^[A-Z]/.test(m[2])) : m[2].length >= 4);
+    if (blanks < n && blankable) {
       counter++;
       if (counter % 2 === 0) {
         const word = m[2];
@@ -36,7 +43,7 @@ export function makeCTest(text, n = 10) {
 
 export const ctw = {
   render(root, item, ctx) {
-    const ct = makeCTest(item.text, item.blanks || 10);
+    const ct = makeCTest(item.text, item.blanks || 10, item.rule);
     mount(root, html`
       <article class="passage passage-ctw">
         ${item.title ? html`<h3 class="passage-title">${item.title}</h3>` : ''}
@@ -62,7 +69,7 @@ export const ctw = {
     };
   },
   grade(item, response) {
-    const ct = makeCTest(item.text, item.blanks || 10);
+    const ct = makeCTest(item.text, item.blanks || 10, item.rule);
     let correct = 0;
     const details = ct.blanks.map((b, i) => {
       const ok = (response?.[i] || '') === b.missing.toLowerCase();
@@ -72,7 +79,7 @@ export const ctw = {
     return { correct, total: ct.blanks.length, details };
   },
   review(item, response) {
-    const ct = makeCTest(item.text, item.blanks || 10);
+    const ct = makeCTest(item.text, item.blanks || 10, item.rule);
     return html`
       <div class="review-ctw">
         <p class="ctw-text">${ct.parts.map((p) => {
@@ -86,7 +93,7 @@ export const ctw = {
         <p class="muted small">Underlined letters are the answer; struck-through letters are what you typed.</p>
       </div>`;
   },
-  count: (item) => makeCTest(item.text, item.blanks || 10).blanks.length,
+  count: (item) => makeCTest(item.text, item.blanks || 10, item.rule).blanks.length,
 };
 
 // ---------------------------------------------------- Passage + MCQ -------

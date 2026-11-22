@@ -45,9 +45,9 @@ for (const task of Object.keys(TASKS)) {
 
 function validateItem(task, item) {
   if (task === 'reading_ctw') {
-    const ct = makeCTest(item.text, item.blanks || 10);
+    const ct = makeCTest(item.text, item.blanks || 10, item.rule);
     check(ct.blanks.length >= 5, `${item.id}: too few C-test blanks (${ct.blanks.length})`);
-    ct.blanks.forEach((b) => check(/^[a-z]+$/.test(b.missing) && b.missing.length >= 2, `${item.id}: bad blank "${b.missing}"`));
+    ct.blanks.forEach((b) => check(/^[a-z]+$/.test(b.missing) && b.missing.length >= (item.rule === 'ets' ? 1 : 2), `${item.id}: bad blank "${b.missing}"`));
   } else if (task === 'reading_daily' || task === 'reading_academic') {
     check(item.questions?.length > 0, `${item.id}: no questions`);
     item.questions.forEach((q, i) => validateMcq(item.id, i, q));

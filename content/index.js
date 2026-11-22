@@ -7,6 +7,7 @@ import sentences from './bank/writing_sentence.js';
 import { repeat, interview } from './bank/speaking.js';
 import rl from './bank/reading_listening.js';
 import xcd from './bank/extra_ctw_daily.js';
+import xets from './bank/extra_ctw_ets.js';
 import xacad from './bank/extra_academic.js';
 import xwr from './bank/extra_writing.js';
 import pt1 from './tests/test1.js';
@@ -15,7 +16,7 @@ import pt2 from './tests/test2.js';
 const merge = (...lists) => lists.flat().filter(Boolean);
 
 export const BANK = {
-  reading_ctw: merge(rl.reading_ctw, legacy.reading_ctw, xcd.reading_ctw),
+  reading_ctw: merge(xets, rl.reading_ctw, legacy.reading_ctw, xcd.reading_ctw),
   reading_daily: merge(rl.reading_daily, legacy.reading_daily, xcd.reading_daily),
   reading_academic: merge(rl.reading_academic, legacy.reading_academic, xacad),
   listening_response: merge(rl.listening_response, legacy.listening_response),
