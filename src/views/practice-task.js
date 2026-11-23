@@ -22,8 +22,10 @@ function pickSet(task, requested, sets) {
     const found = sets.find((s) => s.id === requested);
     if (found) return found;
   }
-  // Least practiced first, then bank order.
-  return [...sets].sort((a, b) => seenCount(task, a.id) - seenCount(task, b.id))[0];
+  // Least practiced first; random among those, so topics don't come in bank order.
+  const min = Math.min(...sets.map((s) => seenCount(task, s.id)));
+  const pool = sets.filter((s) => seenCount(task, s.id) === min);
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 function setTitle(task, item) {
@@ -90,8 +92,7 @@ export default function practiceTask(outlet, { task }, query) {
   };
 
   function nextSetLink() {
-    const idx = sets.findIndex((s) => s.id === item.id);
-    const next = sets[(idx + 1) % sets.length];
+    const next = sets.length > 1 ? pickSet(task, null, sets.filter((s) => s.id !== item.id)) : item;
     return html`<div class="row gap-s wrap">
       <a class="btn btn-primary" href="${base}${encodeURIComponent(next.id)}">Next set</a>
       <a class="btn btn-ghost" href="${base}${encodeURIComponent(item.id)}&r=${Date.now()}">Try this set again</a>
