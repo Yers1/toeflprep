@@ -47,7 +47,7 @@ function validateItem(task, item) {
   if (task === 'reading_ctw') {
     const ct = makeCTest(item.text, item.blanks || 10, item.rule);
     check(ct.blanks.length >= 5, `${item.id}: too few C-test blanks (${ct.blanks.length})`);
-    ct.blanks.forEach((b) => check(/^[a-z]+$/.test(b.missing) && b.missing.length >= (item.rule === 'ets' ? 1 : 2), `${item.id}: bad blank "${b.missing}"`));
+    ct.blanks.forEach((b) => check(/^[a-z]+$/.test(b.missing) && b.missing.length >= (item.rule === 'legacy' ? 2 : 1), `${item.id}: bad blank "${b.missing}"`));
   } else if (task === 'reading_daily' || task === 'reading_academic') {
     check(item.questions?.length > 0, `${item.id}: no questions`);
     item.questions.forEach((q, i) => validateMcq(item.id, i, q));
@@ -72,6 +72,7 @@ function validateItem(task, item) {
       check(q.context?.text, `${item.id}[${i}]: missing context line`);
       check(q.tiles?.length >= 4, `${item.id}[${i}]: too few tiles`);
       check(isCorrect(q, q.tiles.map((_, k) => k)), `${item.id}[${i}]: correct order does not self-validate`);
+      Object.keys(q.given || {}).forEach((k) => check(Number(k) > 0 && Number(k) < q.tiles.length, `${item.id}[${i}]: given words must sit between two slots`));
     });
   } else if (task === 'writing_email') {
     check(item.scenario && item.to && item.goals?.length === 3, `${item.id}: incomplete email prompt`);

@@ -7,11 +7,11 @@ import { mcqTemplate, collectMcq, gradeMcq, mcqReview, lockInputs } from './comm
 // ---------------------------------------------------------- C-test --------
 // Keep the first sentence intact; from the second sentence on, remove the
 // second half of every second word until `n` blanks exist.
-// rule 'ets' matches ETS's practice tests: short words count too (is → i_,
+// The ETS rule (default; rule 'legacy' = old 4+ letter rule): short words count too (is → i_,
 // and → a_ _), while names inside a sentence and one-letter words are skipped.
 
 export function makeCTest(text, n = 10, rule) {
-  const ets = rule === 'ets';
+  const ets = rule !== 'legacy'; // every paragraph now follows the ETS rule
   const sentenceEnd = text.search(/[.!?]\s/);
   const head = sentenceEnd > 0 ? text.slice(0, sentenceEnd + 2) : '';
   const rest = sentenceEnd > 0 ? text.slice(sentenceEnd + 2) : text;
@@ -46,8 +46,7 @@ export const ctw = {
     const ct = makeCTest(item.text, item.blanks || 10, item.rule);
     mount(root, html`
       <article class="passage passage-ctw">
-        ${item.title ? html`<h3 class="passage-title">${item.title}</h3>` : ''}
-        <p class="instruction">Fill in the missing letters to complete the text.</p>
+        <p class="instruction">Fill in the missing letters in the paragraph.</p>
         <p class="ctw-text">${ct.parts.map((p) => p.blank == null
           ? p.t
           : html`<span class="ctw-word">${p.prefix}<input type="text" class="ctw-input" data-b="${p.blank}" maxlength="${p.missing.length}" size="${p.missing.length}"

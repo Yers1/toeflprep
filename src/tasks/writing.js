@@ -17,6 +17,14 @@ function tileList(q) {
   return [...q.tiles, ...(q.distractor ? [q.distractor] : [])];
 }
 
+// ETS shows every tile in lower case (only "I" and names keep a capital), so the
+// sentence-initial tile must not give itself away.
+const startsSentence = (q) => !q.prefix || /[.?!]$/.test(q.prefix.trim());
+function face(q, t) {
+  const list = tileList(q);
+  return t === 0 && startsSentence(q) && !/^I(\b|['’])/.test(list[0]) ? list[0][0].toLowerCase() + list[0].slice(1) : list[t];
+}
+
 export function isCorrect(q, order) {
   const list = tileList(q);
   const built = (order || []).map((i) => list[i]).join(' ').toLowerCase();
@@ -24,9 +32,12 @@ export function isCorrect(q, order) {
   return answers.includes(built);
 }
 
+// `given` holds ETS-style fixed words inside the sentence: { slotIndex: 'tell me' } is shown before that slot.
 export function sentenceText(q, order) {
   const list = tileList(q);
-  return [q.prefix, ...(order || []).map((i) => list[i]), q.suffix].filter(Boolean).join(' ').replace(/\s+([.?!,])/g, '$1');
+  const mid = (order || []).flatMap((i, k) => [q.given?.[k], list[i]]);
+  const out = [q.prefix, ...mid, q.suffix].filter(Boolean).join(' ').replace(/\s+([.?!,])/g, '$1');
+  return out.charAt(0).toUpperCase() + out.slice(1);
 }
 
 export const sentence = {
@@ -73,18 +84,18 @@ export const sentence = {
               ${q.prefix ? html`<span class="given">${q.prefix}</span>` : ''}
               ${q.tiles.map((_, s) => {
                 const tIdx = order[s];
+                const given = q.given?.[s] ? html`<span class="given">${q.given[s]}</span>` : '';
                 return tIdx == null
-                  ? html`<span class="slot" aria-label="Empty slot ${s + 1}"></span>`
-                  : html`<button type="button" class="slot filled" data-slot="${s}" aria-label="Remove ${list[tIdx]}">${list[tIdx]}</button>`;
+                  ? html`${given}<span class="slot" aria-label="Empty slot ${s + 1}"></span>`
+                  : html`${given}<button type="button" class="slot filled" data-slot="${s}" aria-label="Remove ${face(q, tIdx)}">${face(q, tIdx)}</button>`;
               })}
               ${q.suffix ? html`<span class="given">${q.suffix}</span>` : ''}
             </p>
           </div>
         </div>
         <div class="tile-bank" role="group" aria-label="Word tiles">
-          ${bank.map((t) => html`<button type="button" class="tile" data-tile="${t}" ${order.includes(t) ? 'disabled' : ''}>${list[t]}</button>`)}
-        </div>
-        ${q.distractor ? html`<p class="muted small">One tile is not needed.</p>` : ''}`);
+          ${bank.map((t) => html`<button type="button" class="tile" data-tile="${t}" ${order.includes(t) ? 'disabled' : ''}>${face(q, t)}</button>`)}
+        </div>`);
       $('.bas-count', root).textContent = `${idx + 1} / ${qs.length}`;
       $('.js-prev', root).disabled = idx === 0 || ctx.mode === 'test';
       $('.js-prev', root).hidden = ctx.mode === 'test';

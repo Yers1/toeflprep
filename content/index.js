@@ -12,6 +12,7 @@ import xacad from './bank/extra_academic.js';
 import xwr from './bank/extra_writing.js';
 import xbas from './bank/extra_sentence.js';
 import ets from './bank/ets_writing.js';
+import etsBas from './bank/ets_sentence.js';
 import pt1 from './tests/test1.js';
 import pt2 from './tests/test2.js';
 
@@ -25,7 +26,7 @@ export const BANK = {
   listening_conversation: merge(rl.listening_conversation, legacy.listening_conversation),
   listening_announcement: merge(rl.listening_announcement, legacy.listening_announcement),
   listening_academic: merge(rl.listening_academic, legacy.listening_academic),
-  writing_sentence: merge(sentences, xbas),
+  writing_sentence: merge(etsBas, sentences, xbas),
   writing_email: merge(ets.writing_email, emails, xwr.writing_email),
   writing_discussion: merge(ets.writing_discussion, discussions, legacy.writing_discussion, xwr.writing_discussion),
   speaking_repeat: repeat,
