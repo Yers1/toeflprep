@@ -286,6 +286,8 @@ export class Capture {
     rec.onend = () => {
       // Chrome stops recognition after silence; restart while still recording.
       if (this.active && !this.asrBlocked) {
+        // A session cut by a network hiccup never finalizes its interim words; keep them.
+        if (this.interim) { this.finals.push(this.interim); this.interim = ''; }
         try { rec.start(); } catch { /* already started */ }
       } else if (this.asrEnded) {
         this.asrEnded();
@@ -315,7 +317,7 @@ export class Capture {
       if (!this.rec) return resolve();
       this.asrEnded = resolve;
       try { this.rec.stop(); } catch { resolve(); }
-      setTimeout(resolve, 1800);
+      setTimeout(resolve, 4000); // slow connections deliver the last words late
     });
 
     const [blob] = await Promise.all([recorded, asrDone]);
